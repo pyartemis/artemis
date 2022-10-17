@@ -1,7 +1,6 @@
 from typing import Dict, Callable
 import numpy as np
 import pandas as pd
-from sklearn.inspection import partial_dependence
 
 
 def partial_dependence_value(df: pd.DataFrame, change_dict: Dict, predict_function: Callable) -> float:
