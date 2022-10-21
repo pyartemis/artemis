@@ -52,7 +52,7 @@ def calculate_h_stat_ova(model, X: pd.DataFrame, progress) -> pd.DataFrame:
                                                                         ignore_index=True)
 
 
-def calculate_h_stat_i_versus(model, X: pd.DataFrame, i: str, versus: List[str], progress) -> float:
+def calculate_h_stat_i_versus(model, X: pd.DataFrame, i: str, versus: List[str], progress: int = True) -> float:
     nominator = denominator = 0
 
     if progress:
