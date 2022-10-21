@@ -16,20 +16,24 @@ TODO:
 """
 
 
-def calculate_h_stat(model, X: pd.DataFrame, n: int = None, kind: InteractionCalculationStrategy = ONE_VS_ONE):
+def calculate_h_stat(model,
+                     X: pd.DataFrame,
+                     n: int = None,
+                     kind: InteractionCalculationStrategy = ONE_VS_ONE,
+                     show_progress: bool = False):
     X_sampled = sample_if_not_none(X, n)
 
     if kind == ONE_VS_ONE:
-        return calculate_h_stat_ovo(model, X_sampled)
+        return calculate_h_stat_ovo(model, X_sampled, show_progress)
     elif kind == ONE_VS_ALL:
-        return calculate_h_stat_ova(model, X_sampled)
+        return calculate_h_stat_ova(model, X_sampled, show_progress)
     else:
         raise ValueError(f"Interaction calculation strategy: {kind} unknown.")
 
 
-def calculate_h_stat_ovo(model, X: pd.DataFrame) -> pd.DataFrame:
+def calculate_h_stat_ovo(model, X: pd.DataFrame, progress) -> pd.DataFrame:
     pairs = list(combinations(X.columns, 2))
-    h_stat_pairs = [[c1, c2, calculate_h_stat_i_versus(model, X, c1, [c2])] for c1, c2 in pairs if c1 != c2]
+    h_stat_pairs = [[c1, c2, calculate_h_stat_i_versus(model, X, c1, [c2], progress)] for c1, c2 in pairs if c1 != c2]
 
     return pd.DataFrame(h_stat_pairs,
                         columns=["Feature 1", "Feature 2", "H-statistic"]).sort_values(by="H-statistic",
@@ -37,8 +41,9 @@ def calculate_h_stat_ovo(model, X: pd.DataFrame) -> pd.DataFrame:
                                                                                        ignore_index=True)
 
 
-def calculate_h_stat_ova(model, X: pd.DataFrame) -> pd.DataFrame:
-    h_stat_one_vs_all = [[column, calculate_h_stat_i_versus(model, X, column, remove_element(X.columns, column))] for
+def calculate_h_stat_ova(model, X: pd.DataFrame, progress) -> pd.DataFrame:
+    h_stat_one_vs_all = [[column,
+                          calculate_h_stat_i_versus(model, X, column, remove_element(X.columns, column), progress)] for
                          column in X.columns]
 
     return pd.DataFrame(h_stat_one_vs_all,
@@ -47,9 +52,15 @@ def calculate_h_stat_ova(model, X: pd.DataFrame) -> pd.DataFrame:
                                                                         ignore_index=True)
 
 
-def calculate_h_stat_i_versus(model, X: pd.DataFrame, i: str, versus: List[str]) -> float:
+def calculate_h_stat_i_versus(model, X: pd.DataFrame, i: str, versus: List[str], progress) -> float:
     nominator = denominator = 0
-    for _, row in tqdm(X.iterrows()):
+
+    if progress:
+        iterator = tqdm(X.iterrows())
+    else:
+        iterator = X.iterrows()
+
+    for _, row in iterator:
         change_i = {i: row[i]}
         change_versus = {col: row[col] for col in versus}
         change_i_versus = {**change_i, **change_versus}
