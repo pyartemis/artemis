@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 import pandas as pd
 from pandas import Index
 
@@ -16,3 +17,7 @@ def sample_if_not_none(X: pd.DataFrame, n: int):
         return X
     else:
         return X.sample(n)
+
+
+def center(x: np.array):
+    return x - np.mean(x)

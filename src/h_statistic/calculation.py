@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 from src.domain.domain import ONE_VS_ALL, ONE_VS_ONE, InteractionCalculationStrategy
-from src.util.ops import remove_element, sample_if_not_none
+from src.util.ops import remove_element, sample_if_not_none, center
 from src.util.partial_dependence import partial_dependence_value
 from tqdm import tqdm
 
@@ -60,6 +60,7 @@ def calculate_h_stat_i_versus(model, X: pd.DataFrame, i: str, versus: List[str])
     pd_i_list = np.array([])
     pd_versus_list = np.array([])
     pd_i_versus_list = np.array([])
+
     for _, row in X.iterrows():
         change_i = {i: row[i]}
         change_versus = {col: row[col] for col in versus}
@@ -73,10 +74,6 @@ def calculate_h_stat_i_versus(model, X: pd.DataFrame, i: str, versus: List[str])
         pd_versus_list = np.append(pd_versus_list, pd_versus)
         pd_i_versus_list = np.append(pd_i_versus_list, pd_i_versus)
 
-    nominator = (
-        pd_i_versus_list - np.mean(pd_i_versus_list)
-        - (pd_i_list - np.mean(pd_i_list))
-        - (pd_versus_list - np.mean(pd_versus_list))
-    ) ** 2
-    denominator = (pd_i_versus_list - np.mean(pd_i_versus_list)) ** 2
+    nominator = (center(pd_i_versus_list) - center(pd_i_list) - center(pd_versus_list)) ** 2
+    denominator = center(pd_i_versus_list) ** 2
     return np.sum(nominator) / np.sum(denominator)
