@@ -27,7 +27,7 @@ class Visualisation:
 
     def plot(self, ovo: pd.DataFrame, ova: Optional[pd.DataFrame] = None):
         nrows = 1 if ova is None else 2
-        fig = plt.figure(figsize=(nrows * 9, 12))
+        fig = plt.figure(figsize=(18, nrows*6))
         gs = gridspec.GridSpec(nrows, 4, hspace=0.4, wspace=0.1)
         ax1 = fig.add_subplot(gs[0, :2])
         ax2 = fig.add_subplot(gs[0, 2:])
