@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from src.domain.domain import ONE_VS_ALL, ONE_VS_ONE
-from src.h_statistic.visualisation import HStatisticVisualisation
+from src.domain.domain import ONE_VS_ALL, ONE_VS_ONE, Methods
+from src.visualisation import Visualisation
 from src.util.ops import remove_element, center, sample_if_not_none
 from src.util.partial_dependence import partial_dependence_value
 
@@ -24,7 +24,7 @@ class HStatistic:
     def plot(self):
         assert self.ovo is not None and self.ova is not None, "Before executing plot() method, fit() must be executed!"
 
-        HStatisticVisualisation().plot(self.ova, self.ovo)
+        Visualisation(method=Methods.H_STATISTIC).plot(self.ova, self.ovo)
 
     def _ovo(self, model, X: pd.DataFrame, progress: bool) -> pd.DataFrame:
         pairs = list(combinations(X.columns, 2))
@@ -33,8 +33,8 @@ class HStatistic:
             for c1, c2 in tqdm(pairs, desc=ONE_VS_ONE.value, disable=not progress)
         ]
 
-        return pd.DataFrame(h_stat_pairs, columns=["Feature 1", "Feature 2", "H-statistic"]).sort_values(
-            by="H-statistic", ascending=False, ignore_index=True
+        return pd.DataFrame(h_stat_pairs, columns=["Feature 1", "Feature 2", Methods.H_STATISTIC]).sort_values(
+            by=Methods.H_STATISTIC, ascending=False, ignore_index=True
         )
 
     def _ova(self, model, X: pd.DataFrame, progress) -> pd.DataFrame:
@@ -43,8 +43,8 @@ class HStatistic:
             for column in tqdm(X.columns, desc=ONE_VS_ALL.value, disable=not progress)
         ]
 
-        return pd.DataFrame(h_stat_one_vs_all, columns=["Feature", "H-statistic"]).sort_values(
-            by="H-statistic", ascending=False, ignore_index=True
+        return pd.DataFrame(h_stat_one_vs_all, columns=["Feature", Methods.H_STATISTIC]).sort_values(
+            by=Methods.H_STATISTIC, ascending=False, ignore_index=True
         )
 
     @staticmethod
