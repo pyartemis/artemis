@@ -24,7 +24,7 @@ class HStatistic:
     def plot(self):
         assert self.ovo is not None and self.ova is not None, "Before executing plot() method, fit() must be executed!"
 
-        Visualisation(method=Methods.H_STATISTIC).plot(self.ova, self.ovo)
+        Visualisation(method=Methods.H_STATISTIC).plot(self.ovo, self.ova)
 
     def _ovo(self, model, X: pd.DataFrame, progress: bool) -> pd.DataFrame:
         pairs = list(combinations(X.columns, 2))
