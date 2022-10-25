@@ -1,4 +1,11 @@
+from dataclasses import dataclass
 from enum import Enum
+
+
+@dataclass
+class Methods:
+    H_STATISTIC: str = "H-statistic"
+    VARIABLE_INTERACTION: str = "Variable Interaction"
 
 
 class InteractionCalculationStrategy(Enum):
