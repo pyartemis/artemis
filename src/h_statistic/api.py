@@ -1,5 +1,5 @@
 from itertools import combinations
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from src.domain.domain import ONE_VS_ALL, ONE_VS_ONE, Methods
 from src.visualisation import Visualisation
-from src.util.ops import remove_element, center, sample_if_not_none
+from src.util.ops import remove_element, center, sample_if_not_none, all_if_none
 from src.util.partial_dependence import partial_dependence_value
 
 
@@ -17,17 +17,25 @@ class FriedmanHStatistic:
         self.ovo = None
         self.ova = None
 
-    def fit(self, model, X: pd.DataFrame, n: int = None, show_progress: bool = False):
+    def fit(self,
+            model,
+            X: pd.DataFrame,
+            n: int = None,
+            features: List[str] = None,
+            show_progress: bool = False):
         X_sampled = sample_if_not_none(X, n)
-        self.ovo, self.ova = self._ovo(model, X_sampled, show_progress), self._ova(model, X_sampled, show_progress)
+        features_included = all_if_none(X, features)
+
+        self.ovo = self._ovo(model, X_sampled, show_progress, features_included)
+        self.ova = self._ova(model, X_sampled, show_progress, features_included)
 
     def plot(self):
         assert self.ovo is not None and self.ova is not None, "Before executing plot() method, fit() must be executed!"
 
         Visualisation(method=Methods.H_STATISTIC).plot(self.ovo, self.ova)
 
-    def _ovo(self, model, X: pd.DataFrame, progress: bool) -> pd.DataFrame:
-        pairs = list(combinations(X.columns, 2))
+    def _ovo(self, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
+        pairs = list(combinations(features, 2))
         h_stat_pairs = [
             [c1, c2, self._calculate_h_stat_i_versus(model, X, c1, [c2])]
             for c1, c2 in tqdm(pairs, desc=ONE_VS_ONE.value, disable=not progress)
@@ -37,10 +45,10 @@ class FriedmanHStatistic:
             by=Methods.H_STATISTIC, ascending=False, ignore_index=True
         )
 
-    def _ova(self, model, X: pd.DataFrame, progress) -> pd.DataFrame:
+    def _ova(self, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
         h_stat_one_vs_all = [
             [column, self._calculate_h_stat_i_versus(model, X, column, remove_element(X.columns, column))]
-            for column in tqdm(X.columns, desc=ONE_VS_ALL.value, disable=not progress)
+            for column in tqdm(features, desc=ONE_VS_ALL.value, disable=not progress)
         ]
 
         return pd.DataFrame(h_stat_one_vs_all, columns=["Feature", Methods.H_STATISTIC]).sort_values(

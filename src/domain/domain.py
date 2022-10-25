@@ -4,7 +4,7 @@ from enum import Enum
 
 @dataclass
 class Methods:
-    H_STATISTIC: str = "H-statistic"
+    H_STATISTIC: str = "Friedman H-statistic"
     VARIABLE_INTERACTION: str = "Variable Interaction"
 
 

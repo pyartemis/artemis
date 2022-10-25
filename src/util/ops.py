@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -17,6 +17,13 @@ def sample_if_not_none(X: pd.DataFrame, n: int):
         return X
     else:
         return X.sample(n)
+
+
+def all_if_none(X: pd.DataFrame, columns: List[str]):
+    if columns is None:
+        return X.columns
+    else:
+        return columns
 
 
 def center(x: np.array):
