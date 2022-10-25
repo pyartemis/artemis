@@ -11,7 +11,7 @@ from src.util.ops import remove_element, center, sample_if_not_none
 from src.util.partial_dependence import partial_dependence_value
 
 
-class HStatistic:
+class FriedmanHStatistic:
 
     def __init__(self):
         self.ovo = None
