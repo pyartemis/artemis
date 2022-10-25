@@ -12,6 +12,7 @@ class InteractionGraphConfiguration:
     NODE_COLOR: str = "#DBDFAC"
     NODE_SIZE: int = 1500
     TITLE: str = "Interaction graph"
+    MIN_RELEVANT_INTERACTION: float = 0.05
 
     @staticmethod
     def default():
