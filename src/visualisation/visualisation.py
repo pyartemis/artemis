@@ -5,6 +5,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import gridspec
 from matplotlib import pyplot as plt
+
 from src.visualisation.configuration import (
     InteractionGraphConfiguration,
     InteractionMatrixConfiguration,
@@ -25,36 +26,40 @@ class Visualisation:
         self.graph_config = graph_config
         self.versus_all_config = versus_all_config
 
-    def plot(self, ovo: pd.DataFrame, ova: Optional[pd.DataFrame] = None):
+    def plot_summary(self, ovo: pd.DataFrame, ova: Optional[pd.DataFrame] = None):
         nrows = 1 if ova is None else 2
         fig = plt.figure(figsize=(18, nrows * 6))
         gs = gridspec.GridSpec(nrows, 4, hspace=0.4, wspace=0.1)
         ax1 = fig.add_subplot(gs[0, :2])
         ax2 = fig.add_subplot(gs[0, 2:])
 
-        self.ovo_heatmap(ovo, ax1)
-        self.ovo_interaction_graph(ovo, ax2)
+        self.plot_heatmap(ovo, ax1)
+        self.plot_interaction_graph(ovo, ax2)
 
         if ova is not None:
             ax3 = fig.add_subplot(gs[1, 1:3])
-            self.ova_barchart(ova, ax3)
+            self.plot_barchart(ova, ax3)
 
         fig.suptitle(f"{self.method} summary")
 
-    def ovo_heatmap(self, ovo: pd.DataFrame, ax):
+    def plot_heatmap(self, ovo: pd.DataFrame, ax=None):
         ovo_copy = ovo.copy()
         ovo_copy["Feature 1"], ovo_copy["Feature 2"] = ovo_copy["Feature 2"], ovo_copy["Feature 1"]
         ovo_all_pairs = pd.concat([ovo, ovo_copy])
 
-        ax.set_title(self.matrix_config.TITLE)
+        if ax is not None:
+            ax.set_title(self.matrix_config.TITLE)
+        else:
+            plt.title(self.matrix_config.TITLE)
+
         sns.heatmap(
             ovo_all_pairs.pivot_table(self.method, "Feature 1", "Feature 2"),
             cmap=self.matrix_config.COLOR_MAP,
             annot=True,
-            ax=ax,
+            ax=ax
         )
 
-    def ovo_interaction_graph(self, ovo: pd.DataFrame, ax):
+    def plot_interaction_graph(self, ovo: pd.DataFrame, ax=None):
         config = self.graph_config
         ovo_relevant_interactions = ovo[ovo[self.method] > self.graph_config.MIN_RELEVANT_INTERACTION]
         G = nx.from_pandas_edgelist(ovo_relevant_interactions,
@@ -83,20 +88,22 @@ class Visualisation:
             font_weight=config.FONT_WEIGHT,
         )
 
-        ax.set_title(config.TITLE)
+        if ax is not None:
+            ax.set_title(self.graph_config.TITLE)
+        else:
+            plt.title(self.graph_config.TITLE)
 
-    def ova_barchart(self, ova: pd.DataFrame, ax):
+    def plot_barchart(self, ova: pd.DataFrame, ax=None):
         config = self.versus_all_config
+
         ova.head(config.N_HIGHEST).plot.barh(
             x="Feature",
             y=self.method,
             ylabel=self.method,
             cmap="crest",
-            title=f"Top {config.N_HIGHEST} features with highest {self.method}",
+            title=config.TITLE,
             ax=ax
         )
-
-        ax.set_title(config.TITLE)
 
     def _edge_widths(self, G):
         return [
