@@ -1,11 +1,10 @@
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
 import pandas as pd
-from pandas import Index
 
 
-def remove_element(columns: Index, column) -> List[str]:
+def remove_element(columns: pd.Index, column) -> List[str]:
     columns_copy = columns.tolist().copy()
     columns_copy.remove(column)
 
