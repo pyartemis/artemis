@@ -1,18 +1,21 @@
 from dataclasses import dataclass
-from enum import Enum
 
 
 @dataclass
-class Methods:
-    H_STATISTIC: str = "H-statistic"
-    VARIABLE_INTERACTION: str = "Variable Interaction"
+class Method:
+    H_STATISTIC: str = "Friedman H-statistic"
+    VARIABLE_INTERACTION: str = "Greenwell Variable Interaction"
 
 
-class InteractionCalculationStrategy(Enum):
-    ONE_VS_ONE = 'one vs one'
-    ONE_VS_ALL = 'one vs all'
+@dataclass
+class InteractionCalculationStrategy:
+    ONE_VS_ONE: str = 'one vs one'
+    ONE_VS_ALL: str = 'one vs all'
 
 
-# hack to allow static imports
-ONE_VS_ONE = InteractionCalculationStrategy.ONE_VS_ONE
-ONE_VS_ALL = InteractionCalculationStrategy.ONE_VS_ALL
+@dataclass
+class VisualisationType:
+    SUMMARY: str = "summary"
+    INTERACTION_GRAPH: str = "interaction graph"
+    BAR_CHART: str = "bar chart"
+    HEATMAP: str = "heatmap"
