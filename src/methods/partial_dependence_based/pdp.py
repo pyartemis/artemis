@@ -7,47 +7,26 @@ import pandas as pd
 from numpy import ndarray
 from tqdm import tqdm
 
-from src.domain.domain import VisualisationType, InteractionCalculationStrategy
-from src.util.exceptions import VisualisationNotSupportedException
+from src.domain.domain import InteractionCalculationStrategy
+from src.methods.method import FeatureInteractionMethod
 from src.util.ops import sample_if_not_none, all_if_none
-from src.visualisation.visualisation import Visualisation
 
 
-class PartialDependenceBasedMethod:
+class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
     def __init__(self, method: str, accepted_visualisations: List[str]):
-        self.accepted_visualisations = accepted_visualisations
-        self.ovo = None
-        self.X_sampled = None
-        self.features_included = None
-        self.method = method
+        super().__init__(accepted_visualisations, method)
 
-    def fit_(self,
-             model,
-             X: pd.DataFrame,
-             n: int = None,
-             features: List[str] = None,
-             show_progress: bool = False):
+    def sample_ovo(self,
+                   model,
+                   X: pd.DataFrame,
+                   n: int = None,
+                   features: List[str] = None,
+                   show_progress: bool = False):
         self.X_sampled = sample_if_not_none(X, n)
         self.features_included = all_if_none(X, features)
 
         self.ovo = self._ovo(model, self.X_sampled, show_progress, self.features_included)
-
-    def plot_(self, ova: pd.DataFrame = None, vis_type: VisualisationType = VisualisationType.SUMMARY):
-
-        if vis_type not in self.accepted_visualisations:
-            raise VisualisationNotSupportedException(self.method, vis_type)
-
-        vis = Visualisation(method=self.method)
-
-        if vis_type == VisualisationType.SUMMARY:
-            vis.plot_summary(self.ovo, ova)
-        elif vis_type == VisualisationType.INTERACTION_GRAPH:
-            vis.plot_interaction_graph(self.ovo)
-        elif vis_type == VisualisationType.BAR_CHART:
-            vis.plot_barchart(ova)
-        elif vis_type == VisualisationType.HEATMAP:
-            vis.plot_heatmap(self.ovo)
 
     def _ovo(self, model, X_sampled: pd.DataFrame, show_progress: bool, features: List[str]):
         pairs = list(combinations(features, 2))

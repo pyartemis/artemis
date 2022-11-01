@@ -19,11 +19,7 @@ class GreenwellVariableInteraction(PartialDependenceBasedMethod):
             n: int = None,
             features: List[str] = None,
             show_progress: bool = False):
-        super().fit_(model, X, n, features, show_progress)
-
-    def plot(self, vis_type: VisualisationType = VisualisationType.SUMMARY):
-        assert self.ovo is not None, "Before executing plot() method, fit() must be executed!"
-        super().plot_(vis_type=vis_type)
+        super().sample_ovo(model, X, n, features, show_progress)
 
     def _calculate_i_versus(self, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
         j = versus[0]  # only OvO

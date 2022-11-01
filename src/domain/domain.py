@@ -5,6 +5,7 @@ from dataclasses import dataclass
 class Method:
     H_STATISTIC: str = "Friedman H-statistic"
     VARIABLE_INTERACTION: str = "Greenwell Variable Interaction"
+    PERFORMANCE_BASED: str = "Sejong Oh Performance Based"
 
 
 @dataclass

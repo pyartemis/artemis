@@ -13,6 +13,7 @@ from src.visualisation.configuration import (
 )
 
 
+# TODO: rewrite visualisation configuration
 class Visualisation:
     def __init__(
             self,
@@ -61,7 +62,7 @@ class Visualisation:
 
     def plot_interaction_graph(self, ovo: pd.DataFrame, ax=None):
         config = self.graph_config
-        ovo_relevant_interactions = ovo[ovo[self.method] > self.graph_config.MIN_RELEVANT_INTERACTION]
+        ovo_relevant_interactions = ovo[abs(ovo[self.method]) > self.graph_config.MIN_RELEVANT_INTERACTION]
         G = nx.from_pandas_edgelist(ovo_relevant_interactions,
                                     source="Feature 1", target="Feature 2", edge_attr=self.method)
         pos = nx.spring_layout(G, weight=self.method, iterations=300)
@@ -76,7 +77,7 @@ class Visualisation:
             font_weight=config.FONT_WEIGHT,
             font_color=config.FONT_COLOR,
             node_color=config.NODE_COLOR,
-            edge_color=config.EDGE_COLOR,
+            edge_color=self._edge_colors(G),
         )
 
         nx.draw_networkx_edge_labels(
@@ -107,9 +108,14 @@ class Visualisation:
 
     def _edge_widths(self, G):
         return [
-            elem * self.graph_config.MAX_EDGE_WIDTH
+            abs(elem) * self.graph_config.MAX_EDGE_WIDTH
             for elem in nx.get_edge_attributes(G, self.method).values()
         ]
+
+    def _edge_colors(self, G):
+
+        return [self.graph_config.EDGE_COLOR_POS if elem > 0 else self.graph_config.EDGE_COLOR_NEG for elem in
+                nx.get_edge_attributes(G, self.method).values()]
 
     def _edge_labels(self, ovo):
         return {

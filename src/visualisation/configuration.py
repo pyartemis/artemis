@@ -8,7 +8,8 @@ class InteractionGraphConfiguration:
     FONT_COLOR: str = "#3B1F2B"
     FONT_WEIGHT: str = "bold"
     FONT_SIZE: int = 10
-    EDGE_COLOR: str = "#DB162F"
+    EDGE_COLOR_POS: str = "#24E9D0"
+    EDGE_COLOR_NEG: str = "#DB162F"
     NODE_COLOR: str = "#DBDFAC"
     NODE_SIZE: int = 1500
     TITLE: str = "Interaction graph"

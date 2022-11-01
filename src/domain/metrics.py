@@ -14,7 +14,7 @@ class Metric:
     def calculate(self, y_true: np.array, y_hat: np.array) -> float:
         ...
 
-    def check_if_applicable(self, problem_type: ProblemType):
+    def applicable_to(self, problem_type: str):
         return self.problem_type == problem_type
 
 

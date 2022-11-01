@@ -7,6 +7,7 @@ from tqdm import tqdm
 from src.domain.domain import VisualisationType, Method, InteractionCalculationStrategy
 from src.methods.partial_dependence_based.pdp import PartialDependenceBasedMethod
 from src.util.ops import remove_element, center
+from src.visualisation.visualisation import Visualisation
 
 
 class FriedmanHStatistic(PartialDependenceBasedMethod):
@@ -23,13 +24,13 @@ class FriedmanHStatistic(PartialDependenceBasedMethod):
             n: int = None,
             features: List[str] = None,
             show_progress: bool = False):
-        super().fit_(model, X, n, features, show_progress)
+        super().sample_ovo(model, X, n, features, show_progress)
         self.ova = self._ova(model, self.X_sampled, show_progress, self.features_included)
 
     def plot(self, vis_type: VisualisationType = VisualisationType.SUMMARY):
         assert self.ovo is not None and self.ova is not None, "Before executing plot() method, fit() must be executed!"
 
-        super().plot_(self.ova, vis_type)
+        super().plot_(Visualisation(method=self.method), self.ova, vis_type)
 
     def _ova(self, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
         h_stat_one_vs_all = [
