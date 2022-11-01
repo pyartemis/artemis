@@ -19,3 +19,9 @@ class VisualisationType:
     INTERACTION_GRAPH: str = "interaction graph"
     BAR_CHART: str = "bar chart"
     HEATMAP: str = "heatmap"
+
+
+@dataclass
+class ProblemType:
+    REGRESSION: str = "regression"
+    CLASSIFICATION: str = "classification"
