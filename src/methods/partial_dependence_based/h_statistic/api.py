@@ -12,9 +12,7 @@ from src.util.ops import remove_element, center
 class FriedmanHStatistic(PartialDependenceBasedMethod):
 
     def __init__(self):
-        super().__init__(Method.H_STATISTIC,
-                         [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH, VisualisationType.BAR_CHART,
-                          VisualisationType.HEATMAP])
+        super().__init__(Method.H_STATISTIC)
         self.ova = None
 
     def fit(self,
@@ -23,13 +21,13 @@ class FriedmanHStatistic(PartialDependenceBasedMethod):
             n: int = None,
             features: List[str] = None,
             show_progress: bool = False):
-        super().fit_(model, X, n, features, show_progress)
+        super().sample_ovo(model, X, n, features, show_progress)
         self.ova = self._ova(model, self.X_sampled, show_progress, self.features_included)
 
-    def plot(self, vis_type: VisualisationType = VisualisationType.SUMMARY):
+    def plot(self, vis_type: str = VisualisationType.SUMMARY):
         assert self.ovo is not None and self.ova is not None, "Before executing plot() method, fit() must be executed!"
 
-        super().plot_(self.ova, vis_type)
+        self.visualisation.plot(self.ovo, vis_type, self.ova)
 
     def _ova(self, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
         h_stat_one_vs_all = [

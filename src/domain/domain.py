@@ -5,6 +5,7 @@ from dataclasses import dataclass
 class Method:
     H_STATISTIC: str = "Friedman H-statistic"
     VARIABLE_INTERACTION: str = "Greenwell Variable Interaction"
+    PERFORMANCE_BASED: str = "Sejong Oh Performance Based"
 
 
 @dataclass
@@ -19,3 +20,9 @@ class VisualisationType:
     INTERACTION_GRAPH: str = "interaction graph"
     BAR_CHART: str = "bar chart"
     HEATMAP: str = "heatmap"
+
+
+@dataclass
+class ProblemType:
+    REGRESSION: str = "regression"
+    CLASSIFICATION: str = "classification"

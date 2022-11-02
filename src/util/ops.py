@@ -18,6 +18,14 @@ def sample_if_not_none(X: pd.DataFrame, n: int):
         return X.sample(n)
 
 
+def sample_both_if_not_none(X: pd.DataFrame, y: np.array, n: int):
+    if n is None:
+        return X
+    else:
+        X_sampled = X.sample(n)
+        return X_sampled, y[X_sampled.index]
+
+
 def all_if_none(X: pd.DataFrame, columns: List[str]):
     if columns is None:
         return X.columns
