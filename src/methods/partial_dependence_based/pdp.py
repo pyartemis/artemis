@@ -10,14 +10,12 @@ from tqdm import tqdm
 from src.domain.domain import InteractionCalculationStrategy
 from src.methods.method import FeatureInteractionMethod
 from src.util.ops import sample_if_not_none, all_if_none
-from src.visualisation.configuration import VisualisationConfigurationProvider
-from src.visualisation.visualisation import Visualisation
 
 
 class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
     def __init__(self, method: str):
-        super().__init__(method, Visualisation(method, VisualisationConfigurationProvider.get(method)))
+        super().__init__(method)
 
     def sample_ovo(self,
                    model,

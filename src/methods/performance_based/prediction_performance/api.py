@@ -9,13 +9,12 @@ from src.domain.domain import Method, ProblemType
 from src.domain.metrics import Metric, RMSE
 from src.methods.method import FeatureInteractionMethod
 from src.util.ops import all_if_none, sample_both_if_not_none
-from src.visualisation.configuration import VisualisationConfigurationProvider
 
 
 class SejongOhInteraction(FeatureInteractionMethod):
 
     def __init__(self, metric: Metric = RMSE()):
-        super().__init__(Method.PERFORMANCE_BASED, VisualisationConfigurationProvider.get(Method.PERFORMANCE_BASED))
+        super().__init__(Method.PERFORMANCE_BASED)
         self.metric = metric
         self.y_sampled = None
 
