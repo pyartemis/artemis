@@ -12,6 +12,9 @@ class GreenwellVariableInteractionUnitTest(unittest.TestCase):
     def setUp(self) -> None:
         self.model, self.X, _ = california_housing_random_forest()
 
+    def test_failing(self):
+        self.assertEqual(False, True)
+
     def test_all_features_sampled(self):
         # when
         greenwell_inter = GreenwellVariableInteraction()
