@@ -43,7 +43,7 @@ class SejongOhInteraction(FeatureInteractionMethod):
             interactions.append([f1, f2, sum(inter) / len(inter)])
 
         return pd.DataFrame(interactions, columns=["Feature 1", "Feature 2", self.method]).sort_values(
-            by=self.method, ascending=False, ignore_index=True, key=lambda x: abs(x)
+            by=self.method, ascending=False, ignore_index=True
         )
 
     def _inter(self, model, X: pd.DataFrame, y_true: np.array, f1: str, f2: str, reference_performance: float):
