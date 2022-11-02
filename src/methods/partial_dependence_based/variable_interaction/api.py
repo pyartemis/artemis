@@ -3,15 +3,14 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-from src.domain.domain import VisualisationType, Method
+from src.domain.domain import Method
 from src.methods.partial_dependence_based.pdp import PartialDependenceBasedMethod
 
 
 class GreenwellVariableInteraction(PartialDependenceBasedMethod):
 
     def __init__(self):
-        super().__init__(Method.VARIABLE_INTERACTION,
-                         [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH, VisualisationType.HEATMAP])
+        super().__init__(Method.VARIABLE_INTERACTION)
 
     def fit(self,
             model,

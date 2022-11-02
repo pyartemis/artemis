@@ -5,19 +5,17 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from src.domain.domain import Method, ProblemType, VisualisationType
+from src.domain.domain import Method, ProblemType
 from src.domain.metrics import Metric, RMSE
 from src.methods.method import FeatureInteractionMethod
 from src.util.ops import all_if_none, sample_both_if_not_none
-from src.visualisation.configuration import InteractionGraphConfiguration
-from src.visualisation.visualisation import Visualisation
+from src.visualisation.configuration import VisualisationConfigurationProvider
 
 
 class SejongOhInteraction(FeatureInteractionMethod):
 
     def __init__(self, metric: Metric = RMSE()):
-        super().__init__([VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH, VisualisationType.HEATMAP],
-                         Method.PERFORMANCE_BASED)
+        super().__init__(Method.PERFORMANCE_BASED, VisualisationConfigurationProvider.get(Method.PERFORMANCE_BASED))
         self.metric = metric
         self.y_sampled = None
 
@@ -32,13 +30,6 @@ class SejongOhInteraction(FeatureInteractionMethod):
         self.X_sampled, self.y_sampled = sample_both_if_not_none(X, y_true, n)
         self.features_included = all_if_none(X, features)
         self.ovo = self._perf_based_ovo(model, self.X_sampled, self.y_sampled, n_repeat, show_progress)
-
-    def plot(self, vis_type: VisualisationType = VisualisationType.SUMMARY):
-        assert self.ovo is not None, "Before executing plot() method, fit() must be executed!"
-        graph_config = InteractionGraphConfiguration.default()
-        graph_config.MIN_RELEVANT_INTERACTION = 0.1  # TODO: smarter interaction relevance
-
-        self.plot_(Visualisation(method=self.method, graph_config=graph_config), vis_type=vis_type)
 
     def _perf_based_ovo(self, model, X: pd.DataFrame, y_true: np.array, n_repeat: int, show_progress: bool):
         original_performance = self.metric.calculate(y_true, model.predict(X))
