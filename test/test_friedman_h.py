@@ -1,11 +1,11 @@
 import unittest
-from util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
-from src.domain.domain import Method
-from src.methods.partial_dependence_based.h_statistic.api import FriedmanHStatistic
-from src.visualisation.configuration import VisualisationConfigurationProvider
+from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
+from artemis.utilities.domain import Method
+from artemis.interactions_methods.model_agnostic_methods import FriedmanHStatisticMethod
+from artemis.visualisation.configuration import VisualisationConfigurationProvider
 
 
-class FriedmanHStatisticTestCase(unittest.TestCase):
+class FriedmanHStatisticMethodTestCase(unittest.TestCase):
     SAMPLE_SIZE = 5
 
     def setUp(self) -> None:
@@ -13,7 +13,7 @@ class FriedmanHStatisticTestCase(unittest.TestCase):
 
     def test_all_features_sampled(self):
         # when
-        h_stat = FriedmanHStatistic()
+        h_stat = FriedmanHStatisticMethod()
         h_stat.fit(self.model, self.X, SAMPLE_SIZE)
 
         # then
@@ -30,7 +30,7 @@ class FriedmanHStatisticTestCase(unittest.TestCase):
 
     def test_subset_of_features_sampled(self):
         # when
-        h_stat = FriedmanHStatistic()
+        h_stat = FriedmanHStatisticMethod()
         h_stat.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # then
@@ -45,7 +45,7 @@ class FriedmanHStatisticTestCase(unittest.TestCase):
 
     def test_decreasing_order(self):
         # when
-        h_stat = FriedmanHStatistic()
+        h_stat = FriedmanHStatisticMethod()
         h_stat.fit(self.model, self.X, SAMPLE_SIZE)
 
         # then
@@ -58,7 +58,7 @@ class FriedmanHStatisticTestCase(unittest.TestCase):
 
     def test_plot(self):
         # when
-        h_stat = FriedmanHStatistic()
+        h_stat = FriedmanHStatisticMethod()
         h_stat.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # allowed plots are generated without exception
