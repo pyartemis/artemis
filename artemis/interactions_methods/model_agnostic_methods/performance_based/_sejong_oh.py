@@ -5,13 +5,13 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from src.domain.domain import Method, ProblemType
-from src.domain.metrics import Metric, RMSE
-from src.methods.method import FeatureInteractionMethod
-from src.util.ops import all_if_none, sample_both_if_not_none
+from artemis.utilities.domain import Method, ProblemType
+from artemis.utilities.metrics import Metric, RMSE
+from artemis.interactions_methods._method import FeatureInteractionMethod
+from artemis.utilities.ops import all_if_none, sample_both_if_not_none
 
 
-class SejongOhInteraction(FeatureInteractionMethod):
+class SejongOhMethod(FeatureInteractionMethod):
 
     def __init__(self, metric: Metric = RMSE()):
         super().__init__(Method.PERFORMANCE_BASED)

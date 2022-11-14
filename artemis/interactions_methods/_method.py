@@ -2,9 +2,9 @@ from abc import abstractmethod
 
 import pandas as pd
 
-from src.domain.domain import VisualisationType
-from src.visualisation.configuration import VisualisationConfigurationProvider
-from src.visualisation.visualisation import Visualisation
+from artemis.utilities.domain import VisualisationType
+from artemis.visualisation.configuration import VisualisationConfigurationProvider
+from artemis.visualisation.visualisation import Visualisation
 
 
 class FeatureInteractionMethod:

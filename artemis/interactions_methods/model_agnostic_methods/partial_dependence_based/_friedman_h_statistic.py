@@ -4,12 +4,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from src.domain.domain import VisualisationType, Method, InteractionCalculationStrategy
-from src.methods.partial_dependence_based.pdp import PartialDependenceBasedMethod
-from src.util.ops import remove_element, center
+from artemis.utilities.domain import VisualisationType, Method, InteractionCalculationStrategy
+from ._pdp import PartialDependenceBasedMethod
+from artemis.utilities.ops import remove_element, center
 
 
-class FriedmanHStatistic(PartialDependenceBasedMethod):
+class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
 
     def __init__(self):
         super().__init__(Method.H_STATISTIC)
