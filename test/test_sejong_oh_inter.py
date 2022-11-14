@@ -1,7 +1,7 @@
 import unittest
 
 from artemis.utilities.domain import Method
-from artemis.interactions_methods.model_agnostic_methods import SejongOhMethod
+from artemis.interactions_methods.model_agnostic import SejongOhMethod
 from artemis.visualisation.configuration import VisualisationConfigurationProvider
 from .util import california_housing_random_forest, SAMPLE_SIZE, N_REPEAT, CALIFORNIA_SUBSET, has_decreasing_order
 

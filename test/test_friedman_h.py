@@ -1,7 +1,7 @@
 import unittest
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
 from artemis.utilities.domain import Method
-from artemis.interactions_methods.model_agnostic_methods import FriedmanHStatisticMethod
+from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod
 from artemis.visualisation.configuration import VisualisationConfigurationProvider
 
 

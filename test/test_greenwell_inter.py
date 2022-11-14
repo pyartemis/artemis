@@ -2,7 +2,7 @@ import unittest
 
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
 from artemis.utilities.domain import Method, VisualisationType
-from artemis.interactions_methods.model_agnostic_methods import GreenwellMethod
+from artemis.interactions_methods.model_agnostic import GreenwellMethod
 from artemis.utilities.exceptions import VisualisationNotSupportedException
 from artemis.visualisation.configuration import VisualisationConfigurationProvider
 
