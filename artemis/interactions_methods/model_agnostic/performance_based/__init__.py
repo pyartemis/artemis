@@ -1,0 +1,1 @@
+from ._sejong_oh import SejongOhMethod

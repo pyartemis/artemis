@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 
 import numpy as np
 
-from src.domain.domain import ProblemType
+from .domain import ProblemType
 
 
 class Metric:

@@ -1,20 +1,20 @@
 import unittest
 
-from util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
-from src.domain.domain import Method, VisualisationType
-from src.methods.partial_dependence_based.variable_interaction.api import GreenwellVariableInteraction
-from src.util.exceptions import VisualisationNotSupportedException
-from src.visualisation.configuration import VisualisationConfigurationProvider
+from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
+from artemis.utilities.domain import Method, VisualisationType
+from artemis.interactions_methods.model_agnostic import GreenwellMethod
+from artemis.utilities.exceptions import VisualisationNotSupportedException
+from artemis.visualisation.configuration import VisualisationConfigurationProvider
 
 
-class GreenwellVariableInteractionUnitTest(unittest.TestCase):
+class GreenwellMethodUnitTest(unittest.TestCase):
 
     def setUp(self) -> None:
         self.model, self.X, _ = california_housing_random_forest()
 
     def test_all_features_sampled(self):
         # when
-        greenwell_inter = GreenwellVariableInteraction()
+        greenwell_inter = GreenwellMethod()
         greenwell_inter.fit(self.model, self.X, SAMPLE_SIZE)
 
         # then
@@ -27,7 +27,7 @@ class GreenwellVariableInteractionUnitTest(unittest.TestCase):
 
     def test_subset_of_features_sampled(self):
         # when
-        greenwell_inter = GreenwellVariableInteraction()
+        greenwell_inter = GreenwellMethod()
         greenwell_inter.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # then
@@ -41,7 +41,7 @@ class GreenwellVariableInteractionUnitTest(unittest.TestCase):
 
     def test_decreasing_order(self):
         # when
-        greenwell_inter = GreenwellVariableInteraction()
+        greenwell_inter = GreenwellMethod()
         greenwell_inter.fit(self.model, self.X, SAMPLE_SIZE)
 
         # then
@@ -52,7 +52,7 @@ class GreenwellVariableInteractionUnitTest(unittest.TestCase):
 
     def test_plot(self):
         # when
-        greenwell_inter = GreenwellVariableInteraction()
+        greenwell_inter = GreenwellMethod()
         greenwell_inter.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # allowed plots are generated without exception
@@ -65,7 +65,7 @@ class GreenwellVariableInteractionUnitTest(unittest.TestCase):
 
     def test_should_raise_VisualisationNotSupportedException(self):
         # when
-        greenwell_inter = GreenwellVariableInteraction()
+        greenwell_inter = GreenwellMethod()
         greenwell_inter.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # barchart is not supported for greenwell (no OvA), so this should raise VisualisationNotSupportedException

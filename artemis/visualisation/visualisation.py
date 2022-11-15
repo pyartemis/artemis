@@ -6,9 +6,9 @@ import seaborn as sns
 from matplotlib import gridspec
 from matplotlib import pyplot as plt
 
-from src.domain.domain import VisualisationType
-from src.util.exceptions import VisualisationNotSupportedException
-from src.visualisation.configuration import (
+from artemis.utilities.domain import VisualisationType
+from artemis.utilities.exceptions import VisualisationNotSupportedException
+from artemis.visualisation.configuration import (
     VisualisationConfiguration,
 )
 
