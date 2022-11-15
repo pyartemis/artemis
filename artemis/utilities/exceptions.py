@@ -9,3 +9,9 @@ class MethodNotSupportedException(Exception):
     def __init__(self, method: str):
         self.method = method
         super().__init__(f"Method: {self.method} is not supported")
+
+
+class MethodNotFittedException(Exception):
+    def __init__(self, method: str):
+        self.method = method
+        super().__init__(f"Method: {self.method} is was not fitted. Execute fit() first.")

@@ -1,3 +1,5 @@
+import math
+import random
 from typing import List
 
 import numpy as np
@@ -35,3 +37,9 @@ def all_if_none(X: pd.DataFrame, columns: List[str]):
 
 def center(x: np.array):
     return x - np.mean(x)
+
+
+def point_on_circle(x, y, r):
+    alpha = 2 * math.pi * random.random()
+
+    return r * math.cos(alpha) + x, r * math.sin(alpha) + y
