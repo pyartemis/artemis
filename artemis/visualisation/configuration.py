@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
-from src.domain.domain import Method, VisualisationType
-from src.util.exceptions import MethodNotSupportedException
+from artemis.utilities.domain import Method, VisualisationType
+from artemis.utilities.exceptions import MethodNotSupportedException
 
 
 @dataclass

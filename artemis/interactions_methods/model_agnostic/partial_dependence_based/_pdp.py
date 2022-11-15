@@ -7,9 +7,9 @@ import pandas as pd
 from numpy import ndarray
 from tqdm import tqdm
 
-from src.domain.domain import InteractionCalculationStrategy
-from src.methods.method import FeatureInteractionMethod
-from src.util.ops import sample_if_not_none, all_if_none
+from artemis.utilities.domain import InteractionCalculationStrategy
+from artemis.interactions_methods._method import FeatureInteractionMethod
+from artemis.utilities.ops import sample_if_not_none, all_if_none
 
 
 class PartialDependenceBasedMethod(FeatureInteractionMethod):

@@ -3,11 +3,11 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-from src.domain.domain import Method
-from src.methods.partial_dependence_based.pdp import PartialDependenceBasedMethod
+from artemis.utilities.domain import Method
+from ._pdp import PartialDependenceBasedMethod
 
 
-class GreenwellVariableInteraction(PartialDependenceBasedMethod):
+class GreenwellMethod(PartialDependenceBasedMethod):
 
     def __init__(self):
         super().__init__(Method.VARIABLE_INTERACTION)
