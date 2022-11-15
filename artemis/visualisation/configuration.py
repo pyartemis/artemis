@@ -40,7 +40,8 @@ class VisualisationConfigurationProvider:
         Method.PERFORMANCE_BASED: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
                                    VisualisationType.HEATMAP],
         Method.VARIABLE_INTERACTION: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                      VisualisationType.HEATMAP]
+                                      VisualisationType.HEATMAP],
+        Method.CONDITIONAL_MINIMAL_DEPTH: []
     }
 
     @classmethod
@@ -51,6 +52,8 @@ class VisualisationConfigurationProvider:
             return cls._var_inter_config()
         elif method == Method.PERFORMANCE_BASED:
             return cls._perf_based_config()
+        elif method == Method.CONDITIONAL_MINIMAL_DEPTH:
+            return cls._cond_depth_config()
         else:
             raise MethodNotSupportedException(method)
 
@@ -71,6 +74,10 @@ class VisualisationConfigurationProvider:
         return VisualisationConfiguration(
             accepted_visualisations=cls.accepted_visualisations[Method.PERFORMANCE_BASED],
             interaction_graph=graph_config)
+
+    @classmethod
+    def _cond_depth_config(cls):
+        return VisualisationConfiguration(accepted_visualisations=cls.accepted_visualisations[Method.CONDITIONAL_MINIMAL_DEPTH])
 
 
 @dataclass

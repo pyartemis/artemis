@@ -6,6 +6,7 @@ class Method:
     H_STATISTIC: str = "Friedman H-statistic"
     VARIABLE_INTERACTION: str = "Greenwell Variable Interaction"
     PERFORMANCE_BASED: str = "Sejong Oh Performance Based"
+    CONDITIONAL_MINIMAL_DEPTH: str = "Conditional Minimal Depth"
 
 
 @dataclass
