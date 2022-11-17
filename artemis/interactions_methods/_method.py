@@ -26,7 +26,7 @@ class FeatureInteractionMethod:
 
         self.visualisation.plot(self.ovo, vis_type)
 
-    def interaction_value(self, f1, f2):
+    def interaction_value(self, f1: str, f2: str):
 
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
@@ -35,3 +35,9 @@ class FeatureInteractionMethod:
             ((self.ovo["Feature 1"] == f1) & (self.ovo["Feature 2"] == f2)) |
             ((self.ovo["Feature 1"] == f2) & (self.ovo["Feature 2"] == f1))
             ][self.method].values[0]
+
+    def sorted_ovo(self):
+        if self.ovo is None:
+            raise MethodNotFittedException(self.method)
+
+        return self.ovo.sort_values(by=self.method, ascending=False, ignore_index=True)

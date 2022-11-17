@@ -26,3 +26,10 @@ class VisualisationType:
 class ProblemType:
     REGRESSION: str = "regression"
     CLASSIFICATION: str = "classification"
+
+
+@dataclass
+class CorrelationMethod:
+    PEARSON: str = "pearson"
+    KENDALL: str = "kendall"
+    SPEARMAN: str = "spearman"
