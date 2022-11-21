@@ -39,7 +39,7 @@ def center(x: np.array):
     return x - np.mean(x)
 
 
-def point_on_circle(x, y, r):
-    alpha = 2 * math.pi * random.random()
+def point_left_side_circle(x, y, r):
+    alpha = math.pi * random.random() + math.pi / 2
 
     return r * math.cos(alpha) + x, r * math.sin(alpha) + y

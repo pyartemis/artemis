@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.domain import CorrelationMethod
 from artemis.utilities.exceptions import MethodNotFittedException
-from artemis.utilities.ops import point_on_circle
+from artemis.utilities.ops import point_left_side_circle
 from artemis.visualisation.configuration import InteractionGraphConfiguration
 
 
@@ -38,21 +38,25 @@ class FeatureInteractionMethodComparator:
     def comparison_plot(self,
                         method1: FeatureInteractionMethod,
                         method2: FeatureInteractionMethod,
-                        n_labels: int = 5,
+                        n_labels: int = 3,
                         add_correlation_box: bool = False):
         m1_name, m2_name = method1.method, method2.method
         fig, ax = plt.subplots(figsize=(12, 8))
 
-        circle_r = 0.05 * min(max(method1.ovo[m1_name]), max(method2.ovo[m2_name]))
+        circle_r = 0.2 * min(max(method1.ovo[m1_name]), max(method2.ovo[m2_name]))
 
+        x, y = list(), list()
         for index, row in method1.ovo.iterrows():
 
             f1, f2 = row["Feature 1"], row["Feature 2"]
-            v1, v2 = row[method1.method], method2.interaction_value(f1, f2)
-            ax.scatter(v1, v2, color=InteractionGraphConfiguration.NODE_COLOR)
+            x_curr, y_curr = row[method1.method], method2.interaction_value(f1, f2)
+            x.append(x_curr)
+            y.append(y_curr)
 
             if index < n_labels:
-                _add_arrow(ax, circle_r, f1, f2, v1, v2)
+                _add_arrow(ax, circle_r, f1, f2, x_curr, y_curr)
+
+        ax.scatter(x, y, color=InteractionGraphConfiguration.NODE_COLOR)
 
         if add_correlation_box:
 
@@ -62,7 +66,7 @@ class FeatureInteractionMethodComparator:
 
             _add_correlation_box(ax, corr)
 
-        _customize_plot(ax, m1_name, m2_name)
+        _title_x_y(ax, m1_name, m2_name)
 
         return fig, ax
 
@@ -86,7 +90,7 @@ def _rank_interaction_values_encoded(method1, method2):
     return rank_features_encoded
 
 
-def _customize_plot(ax, m1_name, m2_name):
+def _title_x_y(ax, m1_name, m2_name):
     ax.set_xlabel(m1_name)
     ax.set_ylabel(m2_name)
     ax.set_title(f"{m1_name} and {m2_name} comparison")
@@ -102,7 +106,7 @@ def _add_correlation_box(ax, correlations):
     lines.insert(0, "Feature pairs rank correlation")
     correlation_box_text = '\n'.join(lines)
 
-    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    props = dict(boxstyle='round', alpha=0.5, color=InteractionGraphConfiguration.EDGE_COLOR)
     ax.text(0.95, 0.05,
             correlation_box_text, transform=ax.transAxes, fontsize=10,
             verticalalignment='bottom', horizontalalignment="right", bbox=props)
@@ -112,15 +116,15 @@ def _add_arrow(ax, circle_r, f1, f2, v1, v2):
     ax.annotate("-".join([f1, f2]),
                 xy=(v1, v2),
                 xycoords='data',
-                xytext=point_on_circle(v1, v2, circle_r),
+                xytext=point_left_side_circle(v1, v2, circle_r),
                 textcoords='data',
                 size=8,
-                bbox=dict(boxstyle="round", alpha=0.1),
+                bbox=dict(boxstyle="round", alpha=0.1, color=InteractionGraphConfiguration.EDGE_COLOR),
                 arrowprops=dict(
                     arrowstyle="simple",
                     fc="0.6",
-                    connectionstyle="arc3, rad=0.3",
-                    color=InteractionGraphConfiguration.EDGE_COLOR_POS))
+                    connectionstyle="arc3",
+                    color=InteractionGraphConfiguration.EDGE_COLOR))
 
 
 def _assert_fitted_ovo(method1: FeatureInteractionMethod, method2: FeatureInteractionMethod):
