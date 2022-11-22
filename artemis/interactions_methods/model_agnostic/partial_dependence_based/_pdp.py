@@ -1,21 +1,34 @@
 from abc import abstractmethod
 from itertools import combinations
-from typing import List, Dict, Callable
+from typing import List
 
-import numpy as np
 import pandas as pd
-from numpy import ndarray
 from tqdm import tqdm
 
-from artemis.utilities.domain import InteractionCalculationStrategy
+from artemis.importance_methods.model_agnostic import PartialDependenceBasedImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
+from artemis.utilities.domain import InteractionCalculationStrategy
 from artemis.utilities.ops import sample_if_not_none, all_if_none
 
 
 class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
     def __init__(self, method: str):
-        super().__init__(method)
+        super().__init__(method, )
+
+    def fit(self,
+            model,
+            X: pd.DataFrame,
+            n: int = None,
+            features: List[str] = None,
+            show_progress: bool = False,
+            pdp_cache: dict = None):
+        self.sample_ovo(model, X, n, features, show_progress)
+
+        self.variable_importance = PartialDependenceBasedImportance().importance(model, self.X_sampled,
+                                                                                 features=self.features_included,
+                                                                                 show_progress=show_progress,
+                                                                                 precalculated_pdp=pdp_cache)
 
     def sample_ovo(self,
                    model,
@@ -38,12 +51,6 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
             by=self.method, ascending=False, ignore_index=True
         )
-
-    @staticmethod
-    def partial_dependence_value(df: pd.DataFrame, change_dict: Dict, predict_function: Callable) -> ndarray:
-        assert all(column in df.columns for column in change_dict.keys())
-        df_changed = df.assign(**change_dict)
-        return np.mean(predict_function(df_changed))
 
     @abstractmethod
     def _calculate_i_versus(self, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:

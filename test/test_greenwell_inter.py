@@ -1,7 +1,7 @@
 import unittest
 
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
-from artemis.utilities.domain import Method, VisualisationType
+from artemis.utilities.domain import InteractionMethod, VisualisationType
 from artemis.interactions_methods.model_agnostic import GreenwellMethod
 from artemis.utilities.exceptions import VisualisationNotSupportedException
 from artemis.visualisation.configuration import VisualisationConfigurationProvider
@@ -20,7 +20,7 @@ class GreenwellMethodUnitTest(unittest.TestCase):
         # then
 
         # expected columns
-        self.assertSetEqual(set(greenwell_inter.ovo.columns), {"Feature 1", "Feature 2", Method.VARIABLE_INTERACTION})
+        self.assertSetEqual(set(greenwell_inter.ovo.columns), {"Feature 1", "Feature 2", InteractionMethod.VARIABLE_INTERACTION})
 
         # sample size taken into account
         self.assertEqual(len(greenwell_inter.X_sampled), SAMPLE_SIZE)
@@ -45,7 +45,7 @@ class GreenwellMethodUnitTest(unittest.TestCase):
         greenwell_inter.fit(self.model, self.X, SAMPLE_SIZE)
 
         # then
-        ovo_vals = list(greenwell_inter.ovo[Method.VARIABLE_INTERACTION])
+        ovo_vals = list(greenwell_inter.ovo[InteractionMethod.VARIABLE_INTERACTION])
 
         # ovo have values sorted in decreasing order
         self.assertTrue(has_decreasing_order(ovo_vals))
@@ -56,7 +56,7 @@ class GreenwellMethodUnitTest(unittest.TestCase):
         greenwell_inter.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # allowed plots are generated without exception
-        accepted_vis = VisualisationConfigurationProvider.get(Method.VARIABLE_INTERACTION).accepted_visualisations
+        accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.VARIABLE_INTERACTION).accepted_visualisations
         for vis in accepted_vis:
             greenwell_inter.plot(vis)
 

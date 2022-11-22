@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.utilities.domain import Method, ProblemType
+from artemis.importance_methods.model_agnostic import PermutationImportance
+from artemis.utilities.domain import InteractionMethod, ProblemType
 from artemis.utilities.metrics import Metric, RMSE
 from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.ops import all_if_none, sample_both_if_not_none
@@ -13,33 +14,40 @@ from artemis.utilities.ops import all_if_none, sample_both_if_not_none
 
 class SejongOhMethod(FeatureInteractionMethod):
     def __init__(self, metric: Metric = RMSE()):
-        super().__init__(Method.PERFORMANCE_BASED)
+        super().__init__(InteractionMethod.PERFORMANCE_BASED)
         self.metric = metric
         self.y_sampled = None
 
     def fit(
-        self,
-        model,
-        X: pd.DataFrame,
-        y_true: np.array = None,  # to comply with signature
-        n: int = None,
-        n_repeat: int = 10,
-        features: List[str] = None,
-        show_progress: bool = False,
+            self,
+            model,
+            X: pd.DataFrame,
+            y_true: np.array = None,  # to comply with signature
+            n: int = None,
+            n_repeat: int = 10,
+            features: List[str] = None,
+            show_progress: bool = False,
     ):
         self.X_sampled, self.y_sampled = sample_both_if_not_none(X, y_true, n)
         self.features_included = all_if_none(X, features)
         self.ovo = _perf_based_ovo(self, model, self.X_sampled, self.y_sampled, n_repeat, show_progress)
 
+        # calculate variable importance
+        permutation_importance = PermutationImportance(self.metric)
+        self.variable_importance = permutation_importance.importance(model, X=self.X_sampled, y_true=self.y_sampled,
+                                                                     n_repeat=n_repeat,
+                                                                     features=self.features_included,
+                                                                     show_progress=show_progress)
+
 
 def _perf_based_ovo(
-    method_class: SejongOhMethod, model, X: pd.DataFrame, y_true: np.array, n_repeat: int, show_progress: bool
+        method_class: SejongOhMethod, model, X: pd.DataFrame, y_true: np.array, n_repeat: int, show_progress: bool
 ):
     original_performance = method_class.metric.calculate(y_true, model.predict(X))
     pairs = list(combinations(method_class.features_included, 2))
     interactions = list()
 
-    for f1, f2 in tqdm(pairs, disable=not show_progress):
+    for f1, f2 in tqdm(pairs, disable=not show_progress, desc="Calculating feature interactions"):
         inter = [
             _inter(method_class, model, X, y_true, f1, f2, original_performance) for _ in range(n_repeat)
         ]
@@ -51,13 +59,13 @@ def _perf_based_ovo(
 
 
 def _inter(
-    method_class: SejongOhMethod,
-    model,
-    X: pd.DataFrame,
-    y_true: np.array,
-    f1: str,
-    f2: str,
-    reference_performance: float,
+        method_class: SejongOhMethod,
+        model,
+        X: pd.DataFrame,
+        y_true: np.array,
+        f1: str,
+        f2: str,
+        reference_performance: float,
 ):
     score_f1_permuted = _permute_score(method_class, model, X, y_true, [f1], reference_performance)
     score_f2_permuted = _permute_score(method_class, model, X, y_true, [f2], reference_performance)
@@ -67,12 +75,12 @@ def _inter(
 
 
 def _permute_score(
-    method_class: SejongOhMethod,
-    model,
-    X: pd.DataFrame,
-    y_true: np.array,
-    features: List[str],
-    reference_performance: float,
+        method_class: SejongOhMethod,
+        model,
+        X: pd.DataFrame,
+        y_true: np.array,
+        features: List[str],
+        reference_performance: float,
 ):
     X_copy_permuted = X.copy()
 

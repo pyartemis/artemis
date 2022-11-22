@@ -25,7 +25,10 @@ class Visualisation:
     def accepts(self, vis_type: str) -> bool:
         return vis_type in self.vis_config.accepted_visualisations
 
-    def plot(self, ovo: pd.DataFrame, vis_type: str, ova: Optional[pd.DataFrame] = None):
+    def plot(self, ovo: pd.DataFrame, vis_type: str, ova: Optional[pd.DataFrame] = None,
+             var_importance: pd.DataFrame = None):
+
+        # TODO: use var_importance in visualisations
 
         if not self.accepts(vis_type):
             raise VisualisationNotSupportedException(self.method, vis_type)

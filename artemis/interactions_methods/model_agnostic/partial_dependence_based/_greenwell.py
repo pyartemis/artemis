@@ -3,28 +3,21 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-from artemis.utilities.domain import Method
+from artemis.utilities.domain import InteractionMethod
+from artemis.utilities.ops import partial_dependence_value
 from ._pdp import PartialDependenceBasedMethod
 
 
 class GreenwellMethod(PartialDependenceBasedMethod):
 
     def __init__(self):
-        super().__init__(Method.VARIABLE_INTERACTION)
-
-    def fit(self,
-            model,
-            X: pd.DataFrame,
-            n: int = None,
-            features: List[str] = None,
-            show_progress: bool = False):
-        super().sample_ovo(model, X, n, features, show_progress)
+        super().__init__(InteractionMethod.VARIABLE_INTERACTION)
 
     def _calculate_i_versus(self, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
         j = versus[0]  # only OvO
         pd_values = np.array(
             [
-                [PartialDependenceBasedMethod.partial_dependence_value(X_sampled, {i: x_i, j: x_j},
+                [partial_dependence_value(X_sampled, {i: x_i, j: x_j},
                                                                        model.predict) for x_i in
                  set(X_sampled[i])]
                 for x_j in set(X_sampled[j])
