@@ -23,6 +23,9 @@ class SejongOhMethodTestCase(unittest.TestCase):
         # sample size taken into account
         self.assertEqual(len(sejong_oh_inter.X_sampled), SAMPLE_SIZE)
 
+        # variable importance calculated
+        self.assertIsNotNone(sejong_oh_inter.variable_importance)
+
     def test_subset_of_features_sampled(self):
         # when
         sejong_oh_inter = SejongOhMethod()
