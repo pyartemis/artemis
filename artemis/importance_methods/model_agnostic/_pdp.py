@@ -29,7 +29,7 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
         return self.variable_importance
 
 
-def _map_to_df(X, features, precalculated_pdp: dict):
+def _map_to_df(X: pd.DataFrame, features: List[str], precalculated_pdp: dict):
     importance = list()
     num_features, cat_features = split_features_num_cat(X, features)
 
@@ -41,7 +41,7 @@ def _map_to_df(X, features, precalculated_pdp: dict):
     )
 
 
-def _pdp_importance(model, X, features, progress) -> pd.DataFrame:
+def _pdp_importance(model, X: pd.DataFrame, features: List[str], progress: bool) -> pd.DataFrame:
     importance = []
 
     num_features, cat_features = split_features_num_cat(X, features)
@@ -58,5 +58,5 @@ def _pdp_importance(model, X, features, progress) -> pd.DataFrame:
     )
 
 
-def _calc_importance(feature, pdp, is_numerical):
+def _calc_importance(feature: str, pdp: List, is_numerical: bool):
     return {"Feature": feature, "Value": np.std(pdp) if is_numerical else (np.max(pdp) - np.min(pdp)) / 4}

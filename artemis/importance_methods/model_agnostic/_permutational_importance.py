@@ -30,9 +30,10 @@ class PermutationImportance(VariableImportanceMethod):
         return self.variable_importance
 
 
-def _permutation_importance(model, X, y, metric, n_repeat, features, show_progress):
+def _permutation_importance(model, X: pd.DataFrame, y: np.array, metric: Metric, n_repeat: int, features: List[str],
+                            show_progress: bool):
     base_score = metric.calculate(y, model.predict(X))
-    corrupted_scores = _corrupted_scores(X, y, features, metric, model, n_repeat, show_progress)
+    corrupted_scores = _corrupted_scores(model, X, y, features, metric, n_repeat, show_progress)
 
     feature_importance = [
         {"Feature": f, "Value": _neg_if_class(metric, np.mean(corrupted_scores[f]) - base_score)}
@@ -44,7 +45,8 @@ def _permutation_importance(model, X, y, metric, n_repeat, features, show_progre
     )
 
 
-def _corrupted_scores(X, y, features, metric, model, n_repeat, show_progress):
+def _corrupted_scores(model, X: pd.DataFrame, y: np.array, features: List[str], metric: Metric, n_repeat: int,
+                      show_progress: bool):
     X_copy_permuted = X.copy()
     corrupted_scores = {f: [] for f in features}
     for _ in tqdm(range(n_repeat), disable=not show_progress, desc=ProgressInfoLog.CALC_VAR_IMP):
