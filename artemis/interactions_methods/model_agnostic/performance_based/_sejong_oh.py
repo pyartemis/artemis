@@ -51,7 +51,7 @@ def _perf_based_ovo(
         inter = [
             _inter(method_class, model, X, y_true, f1, f2, original_performance) for _ in range(n_repeat)
         ]
-        interactions.append([f1, f2, sum(inter) / len(inter)])
+        interactions.append([f1, f2, abs(sum(inter) / len(inter))])
 
     return pd.DataFrame(interactions, columns=["Feature 1", "Feature 2", method_class.method]).sort_values(
         by=method_class.method, ascending=False, ignore_index=True

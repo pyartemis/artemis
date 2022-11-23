@@ -4,10 +4,9 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.utilities.domain import VisualisationType, InteractionMethod, InteractionCalculationStrategy, \
-    ProgressInfoLog
-from ._pdp import PartialDependenceBasedMethod
+from artemis.utilities.domain import VisualisationType, InteractionMethod, ProgressInfoLog
 from artemis.utilities.ops import remove_element, center, partial_dependence_value
+from ._pdp import PartialDependenceBasedMethod
 
 
 class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
@@ -30,7 +29,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
     def plot(self, vis_type: str = VisualisationType.SUMMARY):
         assert self.ovo is not None and self.ova is not None, "Before executing plot() method, fit() must be executed!"
 
-        self.visualisation.plot(self.ovo, vis_type, self.ova)
+        self.visualisation.plot(self.ovo, vis_type, self.ova, self.variable_importance)
 
     def _ova(self, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
         h_stat_one_vs_all = [
@@ -60,7 +59,10 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             pd_versus_list = np.append(pd_versus_list, pd_versus)
             pd_i_versus_list = np.append(pd_i_versus_list, pd_i_versus)
 
-        self._pdp_cache[i] = pd_i_list
+        if len(versus) == 1:
+            self._pdp_cache[i] = pd_i_list
+            self._pdp_cache[versus[0]] = pd_versus_list
+
         nominator = (center(pd_i_versus_list) - center(pd_i_list) - center(pd_versus_list)) ** 2
         denominator = center(pd_i_versus_list) ** 2
         return np.sum(nominator) / np.sum(denominator)

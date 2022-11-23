@@ -15,7 +15,7 @@ class InteractionGraphConfiguration:
     EDGE_COLOR_POS: str = "#24E9D0"
     EDGE_COLOR_NEG: str = "#DB162F"
     NODE_COLOR: str = "#DBDFAC"
-    NODE_SIZE: int = 1500
+    NODE_SIZE: int = 1800
     TITLE: str = "Interaction graph"
     MIN_RELEVANT_INTERACTION: float = 0.05
 

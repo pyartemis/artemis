@@ -22,26 +22,26 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
                    precalculated_pdp: dict = None):
 
         if precalculated_pdp is None:
-            self.variable_importance = _pdp_importance(model, X, features, show_progress, self.method)
+            self.variable_importance = _pdp_importance(model, X, features, show_progress)
         else:
-            self.variable_importance = _map_to_df(X, features, precalculated_pdp, self.method)
+            self.variable_importance = _map_to_df(X, features, precalculated_pdp)
 
         return self.variable_importance
 
 
-def _map_to_df(X, features, precalculated_pdp: dict, method):
+def _map_to_df(X, features, precalculated_pdp: dict):
     importance = list()
     num_features, cat_features = split_features_num_cat(X, features)
 
     for f in precalculated_pdp.keys():
-        importance.append(_calc_importance(f, method, precalculated_pdp[f], f in num_features))
+        importance.append(_calc_importance(f, precalculated_pdp[f], f in num_features))
 
     return pd.DataFrame.from_records(importance).sort_values(
-        by=method, ascending=False, ignore_index=True
+        by="Value", ascending=False, ignore_index=True
     )
 
 
-def _pdp_importance(model, X, features, progress, method) -> pd.DataFrame:
+def _pdp_importance(model, X, features, progress) -> pd.DataFrame:
     importance = []
 
     num_features, cat_features = split_features_num_cat(X, features)
@@ -51,12 +51,12 @@ def _pdp_importance(model, X, features, progress, method) -> pd.DataFrame:
         for _, row in X.iterrows():
             pdp.append(partial_dependence_value(X, {feature: row[feature]}, model.predict))
 
-        importance.append(_calc_importance(feature, method, pdp, feature in num_features))
+        importance.append(_calc_importance(feature, pdp, feature in num_features))
 
     return pd.DataFrame.from_records(importance).sort_values(
-        by=method, ascending=False, ignore_index=True
+        by="Value", ascending=False, ignore_index=True
     )
 
 
-def _calc_importance(feature, method, pdp, is_numerical):
-    return {"Feature": feature, method: np.std(pdp) if is_numerical else (np.max(pdp) - np.min(pdp)) / 4}
+def _calc_importance(feature, pdp, is_numerical):
+    return {"Feature": feature, "Value": np.std(pdp) if is_numerical else (np.max(pdp) - np.min(pdp)) / 4}

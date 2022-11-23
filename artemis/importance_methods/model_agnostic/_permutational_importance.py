@@ -26,21 +26,21 @@ class PermutationImportance(VariableImportanceMethod):
     ):
         self.variable_importance = _permutation_importance(model, X, y_true, self.metric,
                                                            n_repeat, features,
-                                                           show_progress, self.method)
+                                                           show_progress)
         return self.variable_importance
 
 
-def _permutation_importance(model, X, y, metric, n_repeat, features, show_progress, method):
+def _permutation_importance(model, X, y, metric, n_repeat, features, show_progress):
     base_score = metric.calculate(y, model.predict(X))
     corrupted_scores = _corrupted_scores(X, y, features, metric, model, n_repeat, show_progress)
 
     feature_importance = [
-        {"Feature": f, method: _neg_if_class(metric, np.mean(corrupted_scores[f]) - base_score)}
+        {"Feature": f, "Value": _neg_if_class(metric, np.mean(corrupted_scores[f]) - base_score)}
         for f in corrupted_scores.keys()
     ]
 
     return pd.DataFrame.from_records(feature_importance).sort_values(
-        by=method, ascending=False, ignore_index=True
+        by="Value", ascending=False, ignore_index=True
     )
 
 
