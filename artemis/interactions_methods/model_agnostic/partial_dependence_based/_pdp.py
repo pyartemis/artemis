@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from artemis.importance_methods.model_agnostic import PartialDependenceBasedImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import InteractionCalculationStrategy
+from artemis.utilities.domain import ProgressInfoLog
 from artemis.utilities.ops import sample_if_not_none, all_if_none
 
 
@@ -45,7 +45,7 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         pairs = list(combinations(features, 2))
         value_pairs = [
             [c1, c2, self._calculate_i_versus(model, X_sampled, c1, [c2])]
-            for c1, c2 in tqdm(pairs, desc=InteractionCalculationStrategy.ONE_VS_ONE, disable=not show_progress)
+            for c1, c2 in tqdm(pairs, desc=ProgressInfoLog.CALC_OVO, disable=not show_progress)
         ]
 
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(

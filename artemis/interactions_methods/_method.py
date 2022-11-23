@@ -22,4 +22,4 @@ class FeatureInteractionMethod:
 
     def plot(self, vis_type: str = VisualisationType.SUMMARY):
         assert self.ovo is not None, "Before executing plot() method, fit() must be executed!"
-        self.visualisation.plot(self.ovo, vis_type, self.variable_importance)
+        self.visualisation.plot(self.ovo, vis_type, var_importance=self.variable_importance)

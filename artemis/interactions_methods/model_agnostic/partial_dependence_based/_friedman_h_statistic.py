@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.utilities.domain import VisualisationType, InteractionMethod, InteractionCalculationStrategy
+from artemis.utilities.domain import VisualisationType, InteractionMethod, InteractionCalculationStrategy, \
+    ProgressInfoLog
 from ._pdp import PartialDependenceBasedMethod
 from artemis.utilities.ops import remove_element, center, partial_dependence_value
 
@@ -34,7 +35,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
     def _ova(self, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
         h_stat_one_vs_all = [
             [column, self._calculate_i_versus(model, X, column, remove_element(X.columns, column))]
-            for column in tqdm(features, desc=InteractionCalculationStrategy.ONE_VS_ALL, disable=not progress)
+            for column in tqdm(features, desc=ProgressInfoLog.CALC_OVA, disable=not progress)
         ]
 
         return pd.DataFrame(h_stat_one_vs_all, columns=["Feature", InteractionMethod.H_STATISTIC]).sort_values(

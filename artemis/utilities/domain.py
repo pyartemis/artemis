@@ -1,23 +1,11 @@
 from dataclasses import dataclass
 
-from artemis.utilities.exceptions import MethodNotSupportedException
-
 
 @dataclass
 class InteractionMethod:
     H_STATISTIC: str = "Friedman H-statistic"
     VARIABLE_INTERACTION: str = "Greenwell Variable Interaction"
     PERFORMANCE_BASED: str = "Sejong Oh Performance Based"
-
-    @staticmethod
-    def get_corresponding_importance(interaction_method: str):
-
-        if interaction_method in [InteractionMethod.H_STATISTIC, InteractionMethod.VARIABLE_INTERACTION]:
-            return ImportanceMethod.PDP_BASED_IMPORTANCE
-        elif interaction_method == InteractionMethod.PERFORMANCE_BASED:
-            return ImportanceMethod.PERMUTATION_IMPORTANCE
-        else:
-            raise MethodNotSupportedException(interaction_method)
 
 
 @dataclass
@@ -44,3 +32,10 @@ class VisualisationType:
 class ProblemType:
     REGRESSION: str = "regression"
     CLASSIFICATION: str = "classification"
+
+
+@dataclass
+class ProgressInfoLog:
+    CALC_OVO: str = f'Calculating {InteractionCalculationStrategy.ONE_VS_ONE} profile'
+    CALC_OVA: str = f'Calculating {InteractionCalculationStrategy.ONE_VS_ALL} profile'
+    CALC_VAR_IMP: str = 'Calculating variable importance'

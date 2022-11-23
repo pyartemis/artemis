@@ -6,7 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from artemis.importance_methods.model_agnostic import PermutationImportance
-from artemis.utilities.domain import InteractionMethod, ProblemType
+from artemis.utilities.domain import InteractionMethod, ProblemType, ProgressInfoLog
 from artemis.utilities.metrics import Metric, RMSE
 from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.ops import all_if_none, sample_both_if_not_none
@@ -47,7 +47,7 @@ def _perf_based_ovo(
     pairs = list(combinations(method_class.features_included, 2))
     interactions = list()
 
-    for f1, f2 in tqdm(pairs, disable=not show_progress, desc="Calculating feature interactions"):
+    for f1, f2 in tqdm(pairs, disable=not show_progress, desc=ProgressInfoLog.CALC_OVO):
         inter = [
             _inter(method_class, model, X, y_true, f1, f2, original_performance) for _ in range(n_repeat)
         ]

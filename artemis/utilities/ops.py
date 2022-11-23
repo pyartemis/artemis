@@ -42,3 +42,10 @@ def partial_dependence_value(df: pd.DataFrame, change_dict: Dict, predict_functi
     assert all(column in df.columns for column in change_dict.keys())
     df_changed = df.assign(**change_dict)
     return np.mean(predict_function(df_changed))
+
+
+def split_features_num_cat(X, features):
+    numerical_cols_set = set(X._get_numeric_data().columns)
+    features_set = set(features)
+
+    return features_set.intersection(numerical_cols_set), features_set.difference(numerical_cols_set)
