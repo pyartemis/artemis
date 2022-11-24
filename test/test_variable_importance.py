@@ -1,10 +1,11 @@
-import random
 import unittest
 
 import pandas as pd
+from pandas.testing import assert_frame_equal
 
 from artemis.importance_methods.model_agnostic import PermutationImportance, PartialDependenceBasedImportance
-from test.util import toy_input, N
+from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod
+from test.util import toy_input
 
 
 class VariableImportanceUnitTest(unittest.TestCase):
@@ -24,16 +25,15 @@ class VariableImportanceUnitTest(unittest.TestCase):
         self._assert_var_imp_calculated_correctly(importance)
 
     def test_use_cached_pdp_for_variable_importance(self):
-        calculator = PartialDependenceBasedImportance()
-        pdp_cache = {
-            "important_feature": list(range(N)),
-            "noise_feature": [random.random() for _ in range(N)]
-        }
+        importance_no_cache = PartialDependenceBasedImportance().importance(self.model, self.X,
+                                                                            features=list(self.X.columns))
 
-        importance = calculator.importance(self.model, self.X, features=list(self.X.columns),
-                                           precalculated_pdp=pdp_cache)
+        h_stat = FriedmanHStatisticMethod()
+        h_stat.fit(self.model, self.X)
+        importance_cache = h_stat.variable_importance
 
-        self._assert_var_imp_calculated_correctly(importance)
+        self.assertIsNotNone(h_stat._pdp_cache)  # cache was used
+        assert_frame_equal(importance_cache, importance_no_cache, check_less_precise=1)  # up to first decimal point
 
     def _assert_var_imp_calculated_correctly(self, importance):
         self.assertEqual(type(importance), pd.DataFrame)  # resulting type - dataframe

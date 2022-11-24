@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import List
 
 import numpy as np
@@ -33,8 +34,12 @@ def _map_to_df(X: pd.DataFrame, features: List[str], precalculated_pdp: dict):
     importance = list()
     num_features, cat_features = split_features_num_cat(X, features)
 
-    for f in precalculated_pdp.keys():
-        importance.append(_calc_importance(f, precalculated_pdp[f], f in num_features))
+    feature_to_pdp = defaultdict(list)
+    for feature, val in precalculated_pdp.keys():
+        feature_to_pdp[feature].append(val)
+
+    for feature in feature_to_pdp.keys():
+        importance.append(_calc_importance(feature, feature_to_pdp[feature], feature in num_features))
 
     return pd.DataFrame.from_records(importance).sort_values(
         by="Value", ascending=False, ignore_index=True

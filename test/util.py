@@ -24,7 +24,7 @@ def toy_input():
     X = pd.DataFrame(
         {
             "important_feature": target,
-            "noise_feature": [random.random() for _ in range(N)]
+            "noise_feature": [1 for _ in range(N)]
         }
     )
     y = target

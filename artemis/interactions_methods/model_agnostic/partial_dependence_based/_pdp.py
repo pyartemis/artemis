@@ -14,7 +14,7 @@ from artemis.utilities.ops import sample_if_not_none, all_if_none
 class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
     def __init__(self, method: str):
-        super().__init__(method, )
+        super().__init__(method)
 
     def fit(self,
             model,
