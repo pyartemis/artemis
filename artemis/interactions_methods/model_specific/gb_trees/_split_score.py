@@ -4,19 +4,19 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from ....utilities.domain import Method
+from ....utilities.domain import InteractionMethod
 from ..._method import FeatureInteractionMethod
 from ._handler import GBTreesHandler
 
 
 class SplitScoreMethod(FeatureInteractionMethod):
     def __init__(self):
-        super().__init__(Method.SPLIT_SCORE)
+        super().__init__(InteractionMethod.SPLIT_SCORE)
 
     def fit(
         self,
         model: GBTreesHandler,
-        X: pd.DataFrame,  # unused as explanations are calculated only for trained model, left for compatibility
+        X: pd.DataFrame = None,  # unused as explanations are calculated only for trained model, left for compatibility
         show_progress: bool = False,
         only_def_interactions: bool = True,
     ):
@@ -35,7 +35,7 @@ def _calculate_full_result(trees_df: pd.DataFrame, model_package: str, show_prog
             _prepare_stats, model_package
         )
     else:
-        full_result = trees_df.groupby("tree").apply(_prepare_stats, model_package)
+        full_result = trees_df.groupby("tree", group_keys=True).apply(_prepare_stats, model_package).reset_index(drop=True)
     return full_result[
         [
             "tree",
