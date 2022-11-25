@@ -1,12 +1,13 @@
 from re import search
+import pandas as pd
 
 from artemis.utilities.exceptions import ModelNotSupportedException
 
 
 class GBTreesHandler:
-    def __init__(self, model) -> None:
+    def __init__(self, model = None) -> None:
         if model is not None:
-            self.unify_structure(self, model)
+            self.unify_structure(model)
 
     def unify_structure(self, model) -> None:
         model_class = search("(?<=<class ').*(?='>)", str(type(model)))[0]
@@ -20,7 +21,7 @@ class GBTreesHandler:
         self.trees_df = _get_unified_trees_df(model, self.package)
 
 
-def _get_unified_trees_df(model, package):
+def _get_unified_trees_df(model, package: str) -> pd.DataFrame:
     trees_df = model.trees_to_dataframe()
     if package == "xgboost":
         trees_df = trees_df.rename(columns=_xgboost_col_dict).drop(
@@ -48,6 +49,7 @@ def _get_unified_trees_df(model, package):
     return trees_df
 
 
+# handler config
 _xgboost_col_dict = {
     "Tree": "tree",
     "Node": "node",
