@@ -18,16 +18,17 @@ class SplitScoreMethod(FeatureInteractionMethod):
         model: GBTreesHandler,
         X: pd.DataFrame,  # unused as explanations are calculated only for trained model, left for compatibility
         show_progress: bool = False,
+        only_def_interactions: bool = True,
     ):
         if not isinstance(model, GBTreesHandler):
             model = GBTreesHandler(model)
         self.full_result = _calculate_full_result(
             model.trees_df, model.package, show_progress
         )
-        self.ovo = _get_ovo_summary(self.full_result)
+        self.ovo = _get_ovo_summary(self.full_result, only_def_interactions)
 
 
-def _calculate_full_result(trees_df, model_package, show_progress):
+def _calculate_full_result(trees_df: pd.DataFrame, model_package: str, show_progress: bool):
     if show_progress:
         tqdm.pandas()
         full_result = trees_df.groupby("tree").progress_apply(
@@ -52,7 +53,7 @@ def _calculate_full_result(trees_df, model_package, show_progress):
     ]
 
 
-def _prepare_stats(tree, package):
+def _prepare_stats(tree: pd.DataFrame, package: str):
     non_leaf_nodes = tree.loc[tree["leaf"] == False].index
     for i in non_leaf_nodes:
         if package == "xgboost":
@@ -83,7 +84,7 @@ def _prepare_stats(tree, package):
     return tree
 
 
-def _get_ovo_summary(full_result, only_def_interactions=True):
+def _get_ovo_summary(full_result: pd.DataFrame, only_def_interactions: bool = True):
     if only_def_interactions:
         interaction_rows = full_result.loc[full_result["interaction"] == True]
     else:
