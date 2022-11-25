@@ -1,3 +1,3 @@
-from .gbtrees import SplitScoreMethod
+from .gb_trees import SplitScoreMethod
 
 __all__ = ["SplitScoreMethod"]
