@@ -40,6 +40,8 @@ class VisualisationConfigurationProvider:
         InteractionMethod.PERFORMANCE_BASED: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
                                               VisualisationType.HEATMAP],
         InteractionMethod.VARIABLE_INTERACTION: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
+                                                 VisualisationType.HEATMAP],
+        InteractionMethod.SPLIT_SCORE: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
                                                  VisualisationType.HEATMAP]
     }
 
@@ -51,6 +53,8 @@ class VisualisationConfigurationProvider:
             return cls._var_inter_config()
         elif method == InteractionMethod.PERFORMANCE_BASED:
             return cls._perf_based_config()
+        elif method == InteractionMethod.SPLIT_SCORE:
+            return cls._split_score_config()
         else:
             raise MethodNotSupportedException(method)
 
@@ -71,7 +75,15 @@ class VisualisationConfigurationProvider:
         return VisualisationConfiguration(
             accepted_visualisations=cls.accepted_visualisations[InteractionMethod.PERFORMANCE_BASED],
             interaction_graph=graph_config)
+    
+    @classmethod
+    def _split_score_config(cls):
+        graph_config = InteractionGraphConfiguration()
+        graph_config.MIN_RELEVANT_INTERACTION = 0.1
 
+        return VisualisationConfiguration(
+            accepted_visualisations=cls.accepted_visualisations[InteractionMethod.SPLIT_SCORE],
+            interaction_graph=graph_config)
 
 @dataclass
 class VisualisationConfiguration:
