@@ -1,6 +1,6 @@
 import unittest
 
-from artemis.utilities.domain import Method
+from artemis.utilities.domain import InteractionMethod
 from artemis.interactions_methods.model_agnostic import SejongOhMethod
 from artemis.visualisation.configuration import VisualisationConfigurationProvider
 from .util import california_housing_random_forest, SAMPLE_SIZE, N_REPEAT, CALIFORNIA_SUBSET, has_decreasing_order
@@ -18,10 +18,13 @@ class SejongOhMethodTestCase(unittest.TestCase):
         # then
 
         # expected columns
-        self.assertSetEqual(set(sejong_oh_inter.ovo.columns), {"Feature 1", "Feature 2", Method.PERFORMANCE_BASED})
+        self.assertSetEqual(set(sejong_oh_inter.ovo.columns), {"Feature 1", "Feature 2", InteractionMethod.PERFORMANCE_BASED})
 
         # sample size taken into account
         self.assertEqual(len(sejong_oh_inter.X_sampled), SAMPLE_SIZE)
+
+        # variable importance calculated
+        self.assertIsNotNone(sejong_oh_inter.variable_importance)
 
     def test_subset_of_features_sampled(self):
         # when
@@ -43,7 +46,7 @@ class SejongOhMethodTestCase(unittest.TestCase):
         sejong_oh_inter.fit(self.model, self.X, self.y, SAMPLE_SIZE)
 
         # then
-        ovo_vals = list(sejong_oh_inter.ovo[Method.PERFORMANCE_BASED])
+        ovo_vals = list(sejong_oh_inter.ovo[InteractionMethod.PERFORMANCE_BASED])
 
         # ovo have values sorted in decreasing order
         self.assertTrue(has_decreasing_order(ovo_vals))
@@ -54,7 +57,7 @@ class SejongOhMethodTestCase(unittest.TestCase):
         sejong_oh_inter.fit(self.model, self.X, self.y, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # allowed plots are generated without exception
-        accepted_vis = VisualisationConfigurationProvider.get(Method.PERFORMANCE_BASED).accepted_visualisations
+        accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.PERFORMANCE_BASED).accepted_visualisations
         for vis in accepted_vis:
             sejong_oh_inter.plot(vis)
 

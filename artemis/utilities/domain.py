@@ -2,10 +2,16 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Method:
+class InteractionMethod:
     H_STATISTIC: str = "Friedman H-statistic"
     VARIABLE_INTERACTION: str = "Greenwell Variable Interaction"
     PERFORMANCE_BASED: str = "Sejong Oh Performance Based"
+
+
+@dataclass
+class ImportanceMethod:
+    PERMUTATION_IMPORTANCE: str = "Permutation importance"
+    PDP_BASED_IMPORTANCE: str = "Partial dependence based"
 
 
 @dataclass
@@ -26,3 +32,10 @@ class VisualisationType:
 class ProblemType:
     REGRESSION: str = "regression"
     CLASSIFICATION: str = "classification"
+
+
+@dataclass
+class ProgressInfoLog:
+    CALC_OVO: str = f'Calculating {InteractionCalculationStrategy.ONE_VS_ONE} profile'
+    CALC_OVA: str = f'Calculating {InteractionCalculationStrategy.ONE_VS_ALL} profile'
+    CALC_VAR_IMP: str = 'Calculating variable importance'

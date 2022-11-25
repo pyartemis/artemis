@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Dict, Callable
 
 import numpy as np
 import pandas as pd
+from numpy import ndarray
 
 
 def remove_element(columns: pd.Index, column) -> List[str]:
@@ -35,3 +36,16 @@ def all_if_none(X: pd.DataFrame, columns: List[str]):
 
 def center(x: np.array):
     return x - np.mean(x)
+
+
+def partial_dependence_value(df: pd.DataFrame, change_dict: Dict, predict_function: Callable) -> ndarray:
+    assert all(column in df.columns for column in change_dict.keys())
+    df_changed = df.assign(**change_dict)
+    return np.mean(predict_function(df_changed))
+
+
+def split_features_num_cat(X, features):
+    numerical_cols_set = set(X._get_numeric_data().columns)
+    features_set = set(features)
+
+    return features_set.intersection(numerical_cols_set), features_set.difference(numerical_cols_set)

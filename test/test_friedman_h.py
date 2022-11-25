@@ -1,6 +1,6 @@
 import unittest
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
-from artemis.utilities.domain import Method
+from artemis.utilities.domain import InteractionMethod
 from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod
 from artemis.visualisation.configuration import VisualisationConfigurationProvider
 
@@ -19,8 +19,8 @@ class FriedmanHStatisticMethodTestCase(unittest.TestCase):
         # then
 
         # expected columns
-        self.assertSetEqual(set(h_stat.ova.columns), {"Feature", Method.H_STATISTIC})
-        self.assertSetEqual(set(h_stat.ovo.columns), {"Feature 1", "Feature 2", Method.H_STATISTIC})
+        self.assertSetEqual(set(h_stat.ova.columns), {"Feature", InteractionMethod.H_STATISTIC})
+        self.assertSetEqual(set(h_stat.ovo.columns), {"Feature 1", "Feature 2", InteractionMethod.H_STATISTIC})
 
         # ova calculated for all columns
         self.assertSetEqual(set(self.X.columns), set(h_stat.ova["Feature"]))
@@ -49,8 +49,8 @@ class FriedmanHStatisticMethodTestCase(unittest.TestCase):
         h_stat.fit(self.model, self.X, SAMPLE_SIZE)
 
         # then
-        ovo_vals = list(h_stat.ovo[Method.H_STATISTIC])
-        ova_vals = list(h_stat.ova[Method.H_STATISTIC])
+        ovo_vals = list(h_stat.ovo[InteractionMethod.H_STATISTIC])
+        ova_vals = list(h_stat.ova[InteractionMethod.H_STATISTIC])
 
         # both ovo and ova have values sorted in decreasing order
         self.assertTrue(has_decreasing_order(ovo_vals))
@@ -62,12 +62,21 @@ class FriedmanHStatisticMethodTestCase(unittest.TestCase):
         h_stat.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # allowed plots are generated without exception
-        accepted_vis = VisualisationConfigurationProvider.get(Method.H_STATISTIC).accepted_visualisations
+        accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.H_STATISTIC).accepted_visualisations
         for vis in accepted_vis:
             h_stat.plot(vis)
 
         # then
         # nothing crashes!
+
+    def test_cache_pdp_for_var_imp(self):
+        # when
+        h_stat = FriedmanHStatisticMethod()
+        h_stat.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
+
+        # then
+        self.assertIsNotNone(h_stat._pdp_cache)
+        self.assertIsNotNone(h_stat.variable_importance)
 
 
 if __name__ == '__main__':
