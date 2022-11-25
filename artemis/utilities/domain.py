@@ -6,6 +6,7 @@ class InteractionMethod:
     H_STATISTIC: str = "Friedman H-statistic"
     VARIABLE_INTERACTION: str = "Greenwell Variable Interaction"
     PERFORMANCE_BASED: str = "Sejong Oh Performance Based"
+    SPLIT_SCORE: str = "Split Score"
 
 
 @dataclass
@@ -16,8 +17,8 @@ class ImportanceMethod:
 
 @dataclass
 class InteractionCalculationStrategy:
-    ONE_VS_ONE: str = 'one vs one'
-    ONE_VS_ALL: str = 'one vs all'
+    ONE_VS_ONE: str = "one vs one"
+    ONE_VS_ALL: str = "one vs all"
 
 
 @dataclass
@@ -36,6 +37,10 @@ class ProblemType:
 
 @dataclass
 class ProgressInfoLog:
-    CALC_OVO: str = f'Calculating {InteractionCalculationStrategy.ONE_VS_ONE} profile'
-    CALC_OVA: str = f'Calculating {InteractionCalculationStrategy.ONE_VS_ALL} profile'
-    CALC_VAR_IMP: str = 'Calculating variable importance'
+    CALC_OVO: str = (
+        f"Calculating {InteractionCalculationStrategy.ONE_VS_ONE} interactions"
+    )
+    CALC_OVA: str = (
+        f"Calculating {InteractionCalculationStrategy.ONE_VS_ALL} interactions"
+    )
+    CALC_VAR_IMP: str = "Calculating variable importance"
