@@ -33,7 +33,7 @@ class VariableImportanceUnitTest(unittest.TestCase):
         importance_cache = h_stat.variable_importance
 
         self.assertIsNotNone(h_stat._pdp_cache)  # cache was used
-        assert_frame_equal(importance_cache, importance_no_cache, check_less_precise=1)  # up to first decimal point
+        assert_frame_equal(importance_cache, importance_no_cache, rtol=1e-1)  # up to first decimal point
 
     def _assert_var_imp_calculated_correctly(self, importance):
         self.assertEqual(type(importance), pd.DataFrame)  # resulting type - dataframe
