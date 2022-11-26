@@ -39,9 +39,10 @@ class FeatureInteractionMethodComparator:
                         method1: FeatureInteractionMethod,
                         method2: FeatureInteractionMethod,
                         n_labels: int = 3,
-                        add_correlation_box: bool = False):
+                        add_correlation_box: bool = False,
+                        figsize: tuple = (12, 8)):
         m1_name, m2_name = method1.method, method2.method
-        fig, ax = plt.subplots(figsize=(12, 8))
+        fig, ax = plt.subplots(figsize=figsize)
 
         circle_r = 0.2 * min(max(method1.ovo[m1_name]), max(method2.ovo[m2_name]))
 
