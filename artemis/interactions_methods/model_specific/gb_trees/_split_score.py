@@ -7,6 +7,8 @@ from tqdm import tqdm
 from ....utilities.domain import InteractionMethod
 from ..._method import FeatureInteractionMethod
 from ._handler import GBTreesHandler
+from artemis.importance_methods.model_specific import SplitScoreImportance
+from artemis.utilities.split_score_metrics import SplitScoreMetric
 
 
 class SplitScoreMethod(FeatureInteractionMethod):
@@ -18,6 +20,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
         model: GBTreesHandler,
         X: pd.DataFrame = None,  # unused as explanations are calculated only for trained model, left for compatibility
         show_progress: bool = False,
+        selected_metric: SplitScoreMetric = SplitScoreMetric.SUM_GAIN,
         only_def_interactions: bool = True,
     ):
         if not isinstance(model, GBTreesHandler):
@@ -26,6 +29,13 @@ class SplitScoreMethod(FeatureInteractionMethod):
             model.trees_df, model.package, show_progress
         )
         self.ovo = _get_ovo_summary(self.full_result, only_def_interactions)
+
+        # calculate variable importance
+        split_score_importance = SplitScoreImportance()
+        self.variable_importance = split_score_importance.importance(
+            model = model, 
+            selected_metric = selected_metric, 
+            trees_df = model.trees_df)
 
 
 def _calculate_full_result(trees_df: pd.DataFrame, model_package: str, show_progress: bool):
@@ -103,5 +113,5 @@ def _get_ovo_summary(full_result: pd.DataFrame, only_def_interactions: bool = Tr
         .sort_values("sum_gain", ascending=False)
     ).rename(
         columns={"parent_name": "parent_variable", "split_feature": "child_variable"}
-    )
+    ).reset_index(drop=True)
     return interactions_result
