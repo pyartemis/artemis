@@ -24,5 +24,12 @@ class ModelNotSupportedException(Exception):
         self.model_class = model_class
         self.package = package
         super().__init__(
-            f"Model of class {self.model_class} from package {self.package} is not supported"
+            f"Model of class {self.model_class} from the {self.package} package is not supported"
         )
+
+
+class MetricNotSupportedException(Exception):
+    def __init__(self, package: str, metric: str):
+        self.metric = metric
+        self.package = package
+        super().__init__(f"Metric {self.metric} is not supported for model from the {self.package} package")

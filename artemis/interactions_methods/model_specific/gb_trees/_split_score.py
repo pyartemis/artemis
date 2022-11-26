@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+from ....utilities.exceptions import MetricNotSupportedException
 from ....utilities.domain import InteractionMethod
 from ..._method import FeatureInteractionMethod
 from ._handler import GBTreesHandler
@@ -11,6 +12,7 @@ from artemis.importance_methods.model_specific import SplitScoreImportance
 from artemis.utilities.split_score_metrics import (
     SplitScoreImportanceMetric,
     SplitScoreInteractionMetric,
+    _LGBM_UNSUPPORTED_METRICS
 )
 
 
@@ -29,6 +31,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
     ):
         if not isinstance(model, GBTreesHandler):
             model = GBTreesHandler(model)
+        _check_metrics_with_available_info(model.package, interaction_selected_metric, importance_selected_metric)
         self.full_result = _calculate_full_result(
             model.trees_df, model.package, show_progress
         )
@@ -134,6 +137,12 @@ def _get_ovo(
         .sort_values(by=method_class.method, ascending=False, ignore_index=True)
     )
 
+def _check_metrics_with_available_info(package, interaction_selected_metric, importance_selected_metric):
+    if package == "lightgbm":
+        if interaction_selected_metric in _LGBM_UNSUPPORTED_METRICS:
+            raise MetricNotSupportedException(package, interaction_selected_metric)
+        if importance_selected_metric in _LGBM_UNSUPPORTED_METRICS:
+            raise MetricNotSupportedException(package, importance_selected_metric)
 
 _COLUMNS_TO_CHOSE = [
             "tree",
