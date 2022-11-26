@@ -31,9 +31,9 @@ class SplitScoreMethod(FeatureInteractionMethod):
 def _calculate_full_result(trees_df: pd.DataFrame, model_package: str, show_progress: bool):
     if show_progress:
         tqdm.pandas()
-        full_result = trees_df.groupby("tree").progress_apply(
+        full_result = trees_df.groupby("tree", group_keys=True).progress_apply(
             _prepare_stats, model_package
-        )
+        ).reset_index(drop=True)
     else:
         full_result = trees_df.groupby("tree", group_keys=True).apply(_prepare_stats, model_package).reset_index(drop=True)
     return full_result[
