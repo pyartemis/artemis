@@ -1,7 +1,7 @@
 from artemis.importance_methods._method import VariableImportanceMethod
 from artemis.utilities.domain import ImportanceMethod
 from artemis.interactions_methods.model_specific.gb_trees._handler import GBTreesHandler
-from artemis.utilities.split_score_metrics import SplitScoreMetric
+from artemis.utilities.split_score_metrics import SplitScoreImportanceMetric
 
 import pandas as pd
 import numpy as np
@@ -17,7 +17,7 @@ class SplitScoreImportance(VariableImportanceMethod):
                    model,
                    X: pd.DataFrame = None, # unused as explanations are calculated only for trained model, left for compatibility
                    features: List[str] = None,
-                   selected_metric: SplitScoreMetric = SplitScoreMetric.SUM_GAIN,
+                   selected_metric: SplitScoreImportanceMetric = SplitScoreImportanceMetric.SUM_GAIN,
                    show_progress: bool = False,
                    trees_df: pd.DataFrame = None,):
 
@@ -32,7 +32,7 @@ class SplitScoreImportance(VariableImportanceMethod):
         self.variable_importance = _select_metric(self.full_result, selected_metric)
         return self.variable_importance
     
-def _calculate_all_variable_importance(trees_df: pd.DataFrame, features: List[str] = None, selected_metric:  SplitScoreMetric = SplitScoreMetric.SUM_GAIN): 
+def _calculate_all_variable_importance(trees_df: pd.DataFrame, features: List[str] = None, selected_metric: SplitScoreImportanceMetric = SplitScoreImportanceMetric.SUM_GAIN): 
     if features is not None:
         trees_df = trees_df.loc[trees_df["split_feature"].isin(features)]
     else: 
@@ -67,7 +67,7 @@ def calculate_root_metrics(trees_df: pd.DataFrame):
 def calculate_mean_weighted_depth_metric(trees_df: pd.DataFrame):
     return pd.Series(trees_df.groupby("split_feature").apply(lambda x: np.average(x.depth, weights=x.gain)), name = "mean_weighted_depth")
 
-def _select_metric(importance_full_result: pd.DataFrame, selected_metric: SplitScoreMetric):
+def _select_metric(importance_full_result: pd.DataFrame, selected_metric: SplitScoreImportanceMetric):
     variable_importance = (importance_full_result[["split_feature", selected_metric]]
                     .rename(columns = {"split_feature": "Feature", selected_metric: "Value"})
                     )

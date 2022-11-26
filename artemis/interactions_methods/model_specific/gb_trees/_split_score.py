@@ -8,8 +8,7 @@ from ....utilities.domain import InteractionMethod
 from ..._method import FeatureInteractionMethod
 from ._handler import GBTreesHandler
 from artemis.importance_methods.model_specific import SplitScoreImportance
-from artemis.utilities.split_score_metrics import SplitScoreMetric
-
+from artemis.utilities.split_score_metrics import SplitScoreImportanceMetric, SplitScoreInteractionMetric
 
 class SplitScoreMethod(FeatureInteractionMethod):
     def __init__(self):
@@ -20,7 +19,8 @@ class SplitScoreMethod(FeatureInteractionMethod):
         model: GBTreesHandler,
         X: pd.DataFrame = None,  # unused as explanations are calculated only for trained model, left for compatibility
         show_progress: bool = False,
-        selected_metric: SplitScoreMetric = SplitScoreMetric.SUM_GAIN,
+        interaction_selected_metric: SplitScoreInteractionMetric = SplitScoreInteractionMetric.MEAN_GAIN,
+        importance_selected_metric: SplitScoreImportanceMetric = SplitScoreImportanceMetric.MEAN_GAIN,
         only_def_interactions: bool = True,
     ):
         if not isinstance(model, GBTreesHandler):
@@ -28,13 +28,14 @@ class SplitScoreMethod(FeatureInteractionMethod):
         self.full_result = _calculate_full_result(
             model.trees_df, model.package, show_progress
         )
-        self.ovo = _get_ovo_summary(self.full_result, only_def_interactions)
+        self.full_ovo = _get_summary(self.full_result, only_def_interactions)
+        self.ovo = _get_ovo(self, self.full_ovo, interaction_selected_metric)
 
         # calculate variable importance
         split_score_importance = SplitScoreImportance()
         self.variable_importance = split_score_importance.importance(
             model = model, 
-            selected_metric = selected_metric, 
+            selected_metric = importance_selected_metric, 
             trees_df = model.trees_df)
 
 
@@ -94,7 +95,7 @@ def _prepare_stats(tree: pd.DataFrame, package: str):
     return tree
 
 
-def _get_ovo_summary(full_result: pd.DataFrame, only_def_interactions: bool = True):
+def _get_summary(full_result: pd.DataFrame, only_def_interactions: bool = True):
     if only_def_interactions:
         interaction_rows = full_result.loc[full_result["interaction"] == True]
     else:
@@ -115,3 +116,12 @@ def _get_ovo_summary(full_result: pd.DataFrame, only_def_interactions: bool = Tr
         columns={"parent_name": "parent_variable", "split_feature": "child_variable"}
     ).reset_index(drop=True)
     return interactions_result
+
+def _get_ovo(method_class: SplitScoreMethod, full_ovo: pd.DataFrame, selected_metric: SplitScoreInteractionMetric):
+    return full_ovo[["parent_variable", "child_variable", selected_metric]].rename(
+        columns = 
+        {"parent_variable": "Feature 1", 
+        "child_variable": "Feature 2", 
+        selected_metric: method_class.method}).sort_values(
+        by=method_class.method, ascending=False, ignore_index=True
+    )
