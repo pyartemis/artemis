@@ -130,11 +130,10 @@ class Visualisation:
         ]
 
     def _edge_colors(self, G):
-
         return [
-            self.vis_config.interaction_graph.EDGE_COLOR_POS if elem > 0 else self.vis_config.interaction_graph.EDGE_COLOR_NEG
-            for elem in
-            nx.get_edge_attributes(G, self.method).values()]
+             self.vis_config.interaction_graph.EDGE_COLOR_POS if elem > 0 else self.vis_config.interaction_graph.EDGE_COLOR_NEG
+             for elem in
+             nx.get_edge_attributes(G, self.method).values()]
 
     def _edge_labels(self, ovo):
         return {

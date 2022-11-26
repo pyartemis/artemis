@@ -35,7 +35,6 @@ class ProblemType:
     REGRESSION: str = "regression"
     CLASSIFICATION: str = "classification"
 
-
 @dataclass
 class ProgressInfoLog:
     CALC_OVO: str = (
@@ -45,3 +44,9 @@ class ProgressInfoLog:
         f"Calculating {InteractionCalculationStrategy.ONE_VS_ALL} interactions"
     )
     CALC_VAR_IMP: str = "Calculating variable importance"
+
+@dataclass
+class CorrelationMethod:
+    PEARSON: str = "pearson"
+    KENDALL: str = "kendall"
+    SPEARMAN: str = "spearman"

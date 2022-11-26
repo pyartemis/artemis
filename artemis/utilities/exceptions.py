@@ -13,6 +13,12 @@ class MethodNotSupportedException(Exception):
         super().__init__(f"Method: {self.method} is not supported")
 
 
+class MethodNotFittedException(Exception):
+    def __init__(self, method: str):
+        self.method = method
+        super().__init__(f"Method: {self.method} is was not fitted. Execute fit() first.")
+
+
 class ModelNotSupportedException(Exception):
     def __init__(self, package: str, model_class: str):
         self.model_class = model_class
