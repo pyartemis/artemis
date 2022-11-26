@@ -12,6 +12,7 @@ class FeatureInteractionMethod:
     def __init__(self, method: str):
         self.method = method
         self.visualisation = Visualisation(method, VisualisationConfigurationProvider.get(method))
+        self.variable_importance = None
         self.ovo = None
         self.X_sampled = None
         self.features_included = None
