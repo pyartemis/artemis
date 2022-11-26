@@ -5,7 +5,7 @@ from artemis.utilities.exceptions import ModelNotSupportedException
 
 
 class GBTreesHandler:
-    def __init__(self, model = None) -> None:
+    def __init__(self, model=None) -> None:
         if model is not None:
             self.unify_structure(model)
 
@@ -24,14 +24,14 @@ class GBTreesHandler:
 def _get_unified_trees_df(model, package: str) -> pd.DataFrame:
     trees_df = model.trees_to_dataframe()
     if package == "xgboost":
-        trees_df = trees_df.rename(columns=_xgboost_col_dict).drop(
+        trees_df = trees_df.rename(columns=_XGBOOST_COL_DICT).drop(
             columns=["Split", "Missing", "Category"]
         )
         trees_df["leaf"] = trees_df["split_feature"] == "Leaf"
         trees_df["depth"] = None
 
     elif package == "lightgbm":
-        trees_df = trees_df.rename(columns=_lightgbm_col_dict).drop(
+        trees_df = trees_df.rename(columns=_LIGHTGBM_COL_DICT).drop(
             columns=[
                 "threshold",
                 "decision_type",
@@ -50,7 +50,7 @@ def _get_unified_trees_df(model, package: str) -> pd.DataFrame:
 
 
 # handler config
-_xgboost_col_dict = {
+_XGBOOST_COL_DICT = {
     "Tree": "tree",
     "Node": "node",
     "Feature": "split_feature",
@@ -60,7 +60,7 @@ _xgboost_col_dict = {
     "Cover": "cover",
 }
 
-_lightgbm_col_dict = {
+_LIGHTGBM_COL_DICT = {
     "tree_index": "tree",
     "node_depth": "depth",
     "node_index": "ID",
