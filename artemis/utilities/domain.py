@@ -11,8 +11,9 @@ class InteractionMethod:
 
 @dataclass
 class ImportanceMethod:
-    PERMUTATION_IMPORTANCE: str = "Permutation importance"
-    PDP_BASED_IMPORTANCE: str = "Partial dependence based"
+    PERMUTATION_IMPORTANCE: str = "Permutation Importance"
+    PDP_BASED_IMPORTANCE: str = "Partial Dependence Based Importance"
+    SPLIT_SCORE_IMPORTANCE: str = "Split Score Based Importance"
 
 
 @dataclass
