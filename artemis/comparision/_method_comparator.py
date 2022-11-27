@@ -40,7 +40,7 @@ class FeatureInteractionMethodComparator:
                         method2: FeatureInteractionMethod,
                         n_labels: int = 3,
                         add_correlation_box: bool = False,
-                        figsize: tuple = (12, 8)):
+                        figsize: tuple = (8, 6)):
         m1_name, m2_name = method1.method, method2.method
         fig, ax = plt.subplots(figsize=figsize)
 
