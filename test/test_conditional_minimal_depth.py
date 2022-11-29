@@ -1,7 +1,7 @@
 import unittest
 
 from artemis.interactions_methods.model_specific import ConditionalMinimalDepthMethod
-from artemis.utilities.domain import Method
+from artemis.utilities.domain import InteractionMethod
 from artemis.visualisation.configuration import VisualisationConfigurationProvider
 from test.util import california_housing_random_forest
 
@@ -25,12 +25,21 @@ class ConditionalMinimalDepthTestCase(unittest.TestCase):
         cond_min.fit(self.model, self.X)
 
         # allowed plots are generated without exception
-        accepted_vis = VisualisationConfigurationProvider.get(Method.CONDITIONAL_MINIMAL_DEPTH).accepted_visualisations
+        accepted_vis = VisualisationConfigurationProvider.get(
+            InteractionMethod.CONDITIONAL_MINIMAL_DEPTH).accepted_visualisations
         for vis in accepted_vis:
             cond_min.plot(vis)
 
         # then
         # nothing crashes!
+
+    def test_minimal_depth_variable_importance(self):
+        # when
+        cond_min = ConditionalMinimalDepthMethod()
+        cond_min.fit(self.model, self.X)
+
+        # then
+        self.assertSetEqual(set(cond_min.variable_importance["Feature"]), set(self.X.columns))
 
 
 if __name__ == '__main__':

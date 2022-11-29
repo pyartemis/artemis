@@ -2,17 +2,26 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Method:
+class InteractionMethod:
     H_STATISTIC: str = "Friedman H-statistic"
     VARIABLE_INTERACTION: str = "Greenwell Variable Interaction"
     PERFORMANCE_BASED: str = "Sejong Oh Performance Based"
+    SPLIT_SCORE: str = "Split Score"
     CONDITIONAL_MINIMAL_DEPTH: str = "Conditional Minimal Depth"
 
 
 @dataclass
+class ImportanceMethod:
+    PERMUTATION_IMPORTANCE: str = "Permutation Importance"
+    PDP_BASED_IMPORTANCE: str = "Partial Dependence Based Importance"
+    SPLIT_SCORE_IMPORTANCE: str = "Split Score Based Importance"
+    MINIMAL_DEPTH_IMPORTANCE: str = "Minimal Depth Based Importance"
+
+
+@dataclass
 class InteractionCalculationStrategy:
-    ONE_VS_ONE: str = 'one vs one'
-    ONE_VS_ALL: str = 'one vs all'
+    ONE_VS_ONE: str = "one vs one"
+    ONE_VS_ALL: str = "one vs all"
 
 
 @dataclass
@@ -27,3 +36,21 @@ class VisualisationType:
 class ProblemType:
     REGRESSION: str = "regression"
     CLASSIFICATION: str = "classification"
+
+
+@dataclass
+class ProgressInfoLog:
+    CALC_OVO: str = (
+        f"Calculating {InteractionCalculationStrategy.ONE_VS_ONE} interactions"
+    )
+    CALC_OVA: str = (
+        f"Calculating {InteractionCalculationStrategy.ONE_VS_ALL} interactions"
+    )
+    CALC_VAR_IMP: str = "Calculating variable importance"
+
+
+@dataclass
+class CorrelationMethod:
+    PEARSON: str = "pearson"
+    KENDALL: str = "kendall"
+    SPEARMAN: str = "spearman"

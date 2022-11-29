@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Union, List
+from typing import Union, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -7,13 +7,14 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 from tqdm import tqdm
 
+from artemis.importance_methods.model_specific import MinimalDepthImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import Method, VisualisationType
+from artemis.utilities.domain import InteractionMethod, VisualisationType
 
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     def __init__(self):
-        super().__init__(Method.CONDITIONAL_MINIMAL_DEPTH)
+        super().__init__(InteractionMethod.CONDITIONAL_MINIMAL_DEPTH)
 
     def fit(
             self,
@@ -22,8 +23,9 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
             show_progress: bool = False,
     ):
         column_dict = _make_column_dict(X)
-        raw_result_df = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
+        raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
         self.ovo = _summarise_results(raw_result_df, column_dict, self.method)
+        self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
 
     def plot(self, vis_type: str = VisualisationType.SUMMARY):
         assert self.ovo is not None, "Before executing plot() method, fit() must be executed!"
@@ -31,20 +33,23 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                                 vis_type,
                                 feature_column_name_1="root_variable",
                                 feature_column_name_2="variable",
-                                directed=True)
+                                directed=True,
+                                variable_importance=self.variable_importance)
 
 
 def _calculate_conditional_minimal_depths(
         trees: List[Union[DecisionTreeClassifier, DecisionTreeRegressor]], column_size: int, show_progress: bool
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, dict]:
     tree_result_list = list()
+    tree_id_to_depth_split = dict()
     for tree_id in tqdm(range(len(trees)), disable=not show_progress):
         tree_repr = _tree_representation(trees[tree_id].tree_)
         depths, split_variable_to_node_id = bfs(tree_repr)
+        tree_id_to_depth_split[tree_id] = [depths, split_variable_to_node_id]
         tree_result_list.append(_conditional_minimal_depth(split_variable_to_node_id, depths, tree_id, column_size))
 
     forest_result = pd.concat(tree_result_list, ignore_index=True)
-    return forest_result
+    return forest_result, tree_id_to_depth_split
 
 
 def bfs(tree):
