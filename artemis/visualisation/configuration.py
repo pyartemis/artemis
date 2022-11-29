@@ -41,7 +41,8 @@ class VisualisationConfigurationProvider:
                                    VisualisationType.HEATMAP],
         Method.VARIABLE_INTERACTION: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
                                       VisualisationType.HEATMAP],
-        Method.CONDITIONAL_MINIMAL_DEPTH: []
+        Method.CONDITIONAL_MINIMAL_DEPTH: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
+                                           VisualisationType.HEATMAP]
     }
 
     @classmethod
@@ -77,7 +78,15 @@ class VisualisationConfigurationProvider:
 
     @classmethod
     def _cond_depth_config(cls):
-        return VisualisationConfiguration(accepted_visualisations=cls.accepted_visualisations[Method.CONDITIONAL_MINIMAL_DEPTH])
+
+        graph_config = InteractionGraphConfiguration()
+        graph_config.MIN_RELEVANT_INTERACTION = 0.6
+        graph_config.MAX_EDGE_WIDTH = 3
+
+        return VisualisationConfiguration(
+            accepted_visualisations=cls.accepted_visualisations[Method.CONDITIONAL_MINIMAL_DEPTH],
+            interaction_graph=graph_config
+        )
 
 
 @dataclass
