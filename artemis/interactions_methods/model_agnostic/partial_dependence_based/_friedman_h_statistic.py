@@ -29,7 +29,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
     def plot(self, vis_type: str = VisualisationType.SUMMARY):
         assert self.ovo is not None and self.ova is not None, "Before executing plot() method, fit() must be executed!"
 
-        self.visualisation.plot(self.ovo, vis_type, self.ova, self.variable_importance)
+        self.visualisation.plot(self.ovo, vis_type, self.ova, variable_importance=self.variable_importance)
 
     def _ova(self, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
         h_stat_one_vs_all = [

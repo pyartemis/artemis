@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class SplitScoreInteractionMetric:
     SUM_GAIN: str = "sum_gain"
@@ -7,6 +8,7 @@ class SplitScoreInteractionMetric:
     MEAN_GAIN: str = "mean_gain"
     MEAN_COVER: str = "mean_cover"
     MEAN_DEPTH: str = "mean_depth"
+
 
 @dataclass
 class SplitScoreImportanceMetric(SplitScoreInteractionMetric):

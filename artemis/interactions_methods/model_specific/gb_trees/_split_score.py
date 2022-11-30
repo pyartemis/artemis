@@ -1,17 +1,16 @@
-from typing import List, Optional, Union
+from typing import Optional
 
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from ....utilities.domain import InteractionMethod
-from ..._method import FeatureInteractionMethod
-from ._handler import GBTreesHandler
 from artemis.importance_methods.model_specific import SplitScoreImportance
 from artemis.utilities.split_score_metrics import (
     SplitScoreImportanceMetric,
     SplitScoreInteractionMetric,
 )
+from ._handler import GBTreesHandler
+from ..._method import FeatureInteractionMethod
+from ....utilities.domain import InteractionMethod
 
 
 class SplitScoreMethod(FeatureInteractionMethod):

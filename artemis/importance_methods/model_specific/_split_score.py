@@ -93,7 +93,7 @@ def _calculate_mean_weighted_depth_metric(trees_df: pd.DataFrame):
 
 
 def _select_metric(
-    importance_full_result: pd.DataFrame, selected_metric: SplitScoreImportanceMetric
+    importance_full_result: pd.DataFrame, selected_metric: str
 ):
     variable_importance = importance_full_result[
         ["split_feature", selected_metric]

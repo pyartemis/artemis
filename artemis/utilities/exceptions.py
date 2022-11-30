@@ -26,3 +26,14 @@ class ModelNotSupportedException(Exception):
         super().__init__(
             f"Model of class {self.model_class} from package {self.package} is not supported"
         )
+
+
+class FeatureImportanceWithoutInteractionException(Exception):
+
+    def __init__(self, feature_importance: str, feature_interaction: str):
+        self.feature_interaction = feature_interaction
+        self.feature_importance = feature_importance
+        super().__init__(
+            f"Feature importance method {self.feature_importance} can be only " +
+            f"calculated together with its {self.feature_interaction} counterpart. "
+        )

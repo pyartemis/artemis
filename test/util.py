@@ -10,11 +10,11 @@ N_REPEAT = 3
 N = 100
 
 
-def california_housing_random_forest():
+def california_housing_random_forest(max_depth: int = 6):
     california = fetch_california_housing()
     X = pd.DataFrame(california.data, columns=california.feature_names)
     y = california.target
-    model = RandomForestRegressor().fit(X, y)
+    model = RandomForestRegressor(max_depth=max_depth).fit(X, y)
 
     return model, X, y
 
