@@ -3,13 +3,14 @@ from typing import Union, List, Tuple
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 from tqdm import tqdm
 
 from artemis.importance_methods.model_specific import MinimalDepthImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.domain import InteractionMethod, VisualisationType
+from artemis.utilities.exceptions import MethodNotFittedException
 
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
@@ -18,7 +19,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
 
     def fit(
             self,
-            model: Union[RandomForestClassifier, RandomForestRegressor],
+            model: Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier],
             X: pd.DataFrame,
             show_progress: bool = False,
     ):
@@ -28,7 +29,10 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
 
     def plot(self, vis_type: str = VisualisationType.SUMMARY):
-        assert self.ovo is not None, "Before executing plot() method, fit() must be executed!"
+
+        if self.ovo is None:
+            raise MethodNotFittedException(self.method)
+
         self.visualisation.plot(self.ovo,
                                 vis_type,
                                 feature_column_name_1="root_variable",

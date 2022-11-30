@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 
 from artemis.importance_methods._method import VariableImportanceMethod
-from artemis.utilities.domain import ImportanceMethod
+from artemis.utilities.domain import ImportanceMethod, InteractionMethod
+from artemis.utilities.exceptions import FeatureImportanceWithoutInteractionException
 
 
 class MinimalDepthImportance(VariableImportanceMethod):
@@ -17,8 +18,8 @@ class MinimalDepthImportance(VariableImportanceMethod):
                    model,  # to comply with the signature
                    X: Optional[pd.DataFrame] = None,  # to comply with the signature
                    tree_id_to_depth_split: dict = None) -> pd.DataFrame:
-        message = f"{self.method} is calculated together with it's interaction counterpart"
-        assert tree_id_to_depth_split is not None, message
+
+        _check_preconditions(self.method, tree_id_to_depth_split)
 
         columns = _make_column_dict(X)
         feature_to_depth = defaultdict(list)
@@ -38,6 +39,10 @@ class MinimalDepthImportance(VariableImportanceMethod):
         return self.variable_importance
 
 
+def _check_preconditions(method: str, tree_id_to_depth_split: dict):
+    if tree_id_to_depth_split is None:
+        raise FeatureImportanceWithoutInteractionException(method, InteractionMethod.CONDITIONAL_MINIMAL_DEPTH)
+
+
 def _make_column_dict(X: pd.DataFrame) -> dict:
     return dict(zip(range(len(X.columns)), X.columns.to_list()))
-
