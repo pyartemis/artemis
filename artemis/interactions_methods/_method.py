@@ -34,9 +34,9 @@ class FeatureInteractionMethod:
         Base abstract method for calculating feature interaction method values.
 
         Args:
-            model: model for which interactions will be extracted. Must have implemented `predict` method
-            X: pd.DataFrame, data used to calculate interactions
-            **kwargs: parameters specific to a given feature interaction method
+            model:  model for which interactions will be extracted. Must have implemented `predict` method
+            X:  data used to calculate interactions
+            **kwargs:   parameters specific to a given feature interaction method
 
         Returns:
             object: None
