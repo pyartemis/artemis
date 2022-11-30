@@ -11,7 +11,13 @@ from artemis.utilities.ops import partial_dependence_value, split_features_num_c
 
 
 class PartialDependenceBasedImportance(VariableImportanceMethod):
+    """
+    Class implementing partial dependence feature importance.
+    It is used for establishing feature importance for partial dependence based feature interaction -
+    Friedman H-statistic and Greenwell methods.
 
+    Specifics on PDP-based importance is calculated: https://christophm.github.io/interpretable-ml-book/pdp.html
+    """
     def __init__(self):
         super().__init__(ImportanceMethod.PDP_BASED_IMPORTANCE)
 
@@ -21,7 +27,19 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
                    features: List[str] = None,
                    show_progress: bool = False,
                    precalculated_pdp: dict = None):
+        """
+        Calculate partial dependence feature importance.
 
+        Args:
+            model:              model for which importance will be extracted, must have implemented predict method
+            X:                  data used to calculate importance
+            features:           list of features that will be used during importance calculation
+            show_progress:      determine whether to show the progress bar
+            precalculated_pdp:  precalculated partial dependence profiles, if None calculated from scratch
+
+        Returns:
+            partial dependence variable importance
+        """
         if precalculated_pdp is None:
             self.variable_importance = _pdp_importance(model, X, features, show_progress)
         else:
