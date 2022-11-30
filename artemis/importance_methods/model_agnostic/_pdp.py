@@ -16,7 +16,7 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
     It is used for establishing feature importance for partial dependence based feature interaction -
     Friedman H-statistic and Greenwell methods.
 
-    Specifics on PDP-based importance is calculated: https://christophm.github.io/interpretable-ml-book/pdp.html
+    Specifics on PDP-based importance: https://christophm.github.io/interpretable-ml-book/pdp.html
     """
     def __init__(self):
         super().__init__(ImportanceMethod.PDP_BASED_IMPORTANCE)
