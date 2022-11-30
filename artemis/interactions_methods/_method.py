@@ -12,12 +12,12 @@ class FeatureInteractionMethod:
     """Abstract base class for interaction methods. This class should not be used directly. Use derived classes instead.
 
         Attributes:
-            method      [str], name of interaction method
+            method              [str], name of interaction method
             visualisation       [Visualisation], automatically created on the basis of a method and used to create visualisations
-            variable_importance     [pd.DataFrame], object that stores variable importance values after fitting
-            ovo     [pd.DataFrame], stores one versus one variable interaction values after fitting
-            X_sampled       [pd.DataFrame], data used to calculate interactions
-            features_included       [List[str]], list of features that will be used during interactions calculation, if None is passed, all features will be used
+            variable_importance [pd.DataFrame], object that stores variable importance values after fitting
+            ovo                 [pd.DataFrame], stores one versus one variable interaction values after fitting
+            X_sampled           [pd.DataFrame], data used to calculate interactions
+            features_included   [List[str]], list of features that will be used during interactions calculation, if None is passed, all features will be used
     """
 
     def __init__(self, method: str):
