@@ -45,7 +45,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         Additionally, it passes one vs all feature interaction profile to the visualiser class, to be included
         in visualisations.
         """
-        if self.ovo is not None or self.ova is not None:
+        if self.ova is None:
             raise MethodNotFittedException(self.method)
 
         self.visualisation.plot(self.ovo, vis_type, self.ova, variable_importance=self.variable_importance)
