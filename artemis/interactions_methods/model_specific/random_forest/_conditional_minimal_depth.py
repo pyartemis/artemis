@@ -52,9 +52,9 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
 
         self.visualizer.plot(self.ovo,
                                 vis_type,
-                                feature_column_name_1="root_variable",
-                                feature_column_name_2="variable",
-                                directed=True,
+                                _feature_column_name_1="root_variable",
+                                _feature_column_name_2="variable",
+                                _directed=True,
                                 variable_importance=self.variable_importance, 
                                  figsize=figsize, show=show, **kwargs
                                 )

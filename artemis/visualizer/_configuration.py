@@ -26,17 +26,23 @@ class InteractionMatrixConfiguration:
     TITLE: str = "Interaction matrix"
     INTERACTION_COLOR_MAP: str = "Purples"
     IMPORTANCE_COLOR_MAP: str = "Greens"
+    ANNOT_FMT: str = ".3f"
+    LINEWIDTHS: float = 0.5 
+    LINECOLOR: str = 'white'
+    CBAR_SHRINK: float = 0.8
 
 
 @dataclass
 class InteractionVersusAllConfiguration:
     TITLE: str = "Interaction with all other features"
-    N_HIGHEST: int = 5
+    TOP_K: int = 10
+    COLOR: str = "lightblue"
 
 @dataclass
 class InteractionVersusOneConfiguration:
     TITLE: str = "Pair interactions"
-    N_HIGHEST: int = 10
+    TOP_K: int = 10
+    COLOR: str = "lightblue"
 
 class VisualisationConfigurationProvider:
     accepted_visualisations = {
