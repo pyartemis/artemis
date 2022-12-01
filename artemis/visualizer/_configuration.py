@@ -24,8 +24,8 @@ class InteractionGraphConfiguration:
 @dataclass
 class InteractionMatrixConfiguration:
     TITLE: str = "Interaction matrix"
-    INTERACTION_COLOR_MAP: str = "crest"
-    IMPORTANCE_COLOR_MAP: str = "flare"
+    INTERACTION_COLOR_MAP: str = "Purples"
+    IMPORTANCE_COLOR_MAP: str = "Greens"
 
 
 @dataclass

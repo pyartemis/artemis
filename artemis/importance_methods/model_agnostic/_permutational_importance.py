@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from artemis.importance_methods._method import VariableImportanceMethod
 from artemis.utilities.domain import ImportanceMethod, ProgressInfoLog, ProblemType
-from artemis.utilities.metrics import Metric, RMSE
+from artemis.utilities.performance_metrics import Metric, RMSE
 
 
 class PermutationImportance(VariableImportanceMethod):

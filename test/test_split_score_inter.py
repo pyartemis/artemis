@@ -5,7 +5,7 @@ from artemis.utilities.domain import InteractionMethod, VisualisationType
 from artemis.utilities.split_score_metrics import SplitScoreInteractionMetric, SplitScoreImportanceMetric, _LGBM_UNSUPPORTED_METRICS
 from artemis.interactions_methods.model_specific import SplitScoreMethod
 from artemis.utilities.exceptions import VisualisationNotSupportedException, MetricNotSupportedException, ModelNotSupportedException
-from artemis.visualisation.configuration import VisualisationConfigurationProvider
+from artemis.visualizer._configuration import VisualisationConfigurationProvider
 from dataclasses import fields
 
     

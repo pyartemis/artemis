@@ -2,7 +2,7 @@ import unittest
 
 from artemis.interactions_methods.model_specific import ConditionalMinimalDepthMethod
 from artemis.utilities.domain import InteractionMethod
-from artemis.visualisation.configuration import VisualisationConfigurationProvider
+from artemis.visualizer._configuration import VisualisationConfigurationProvider
 from test.util import california_housing_random_forest
 
 

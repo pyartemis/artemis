@@ -8,7 +8,7 @@ from tqdm import tqdm
 from artemis.importance_methods.model_agnostic import PermutationImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.domain import InteractionMethod, ProblemType, ProgressInfoLog
-from artemis.utilities.metrics import Metric, RMSE
+from artemis.utilities.performance_metrics import Metric, RMSE
 from artemis.utilities.ops import all_if_none, sample_both_if_not_none
 
 
@@ -17,8 +17,8 @@ class SejongOhMethod(FeatureInteractionMethod):
         Method is described in the following paper: https://www.mdpi.com/2076-3417/9/23/5191.
 
         Attributes:
-            metric         [Metric], metric used for assessing model performance
-            y_sampled  [np.array], sampled target values used in calculation
+            metric      [Metric], metric used for assessing model performance
+            y_sampled   [np.array], sampled target values used in calculation
 
         """
 

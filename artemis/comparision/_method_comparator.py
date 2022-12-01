@@ -7,7 +7,7 @@ from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.domain import CorrelationMethod
 from artemis.utilities.exceptions import MethodNotFittedException
 from artemis.utilities.ops import point_left_side_circle
-from artemis.visualisation.configuration import InteractionGraphConfiguration
+from artemis.visualizer._configuration import InteractionGraphConfiguration
 
 
 class FeatureInteractionMethodComparator:
@@ -43,7 +43,7 @@ class FeatureInteractionMethodComparator:
                         figsize: tuple = (8, 6)):
         m1_name, m2_name = method1.method, method2.method
         fig, ax = plt.subplots(figsize=figsize)
-
+        plt.grid(True)
         circle_r = 0.2 * min(max(method1.ovo[m1_name]), max(method2.ovo[m2_name]))
 
         x, y = list(), list()
@@ -94,9 +94,7 @@ def _rank_interaction_values_encoded(method1, method2):
 def _title_x_y(ax, m1_name, m2_name):
     ax.set_xlabel(m1_name)
     ax.set_ylabel(m2_name)
-    ax.set_title(f"{m1_name} and {m2_name} comparison")
-    ax.set_xticks([])
-    ax.set_yticks([])
+    ax.set_title(f"{m1_name}\nand\n{m2_name}\nComparison")
 
 
 def _add_correlation_box(ax, correlations):

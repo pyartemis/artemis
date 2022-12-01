@@ -4,8 +4,8 @@ import pandas as pd
 
 from artemis.utilities.domain import VisualisationType
 from artemis.utilities.exceptions import MethodNotFittedException
-from artemis.visualisation.configuration import VisualisationConfigurationProvider
-from artemis.visualisation.visualisator import Visualizator
+from artemis.visualizer._configuration import VisualisationConfigurationProvider
+from artemis.visualizer._visualizer import Visualizer
 
 
 class FeatureInteractionMethod:
@@ -13,7 +13,7 @@ class FeatureInteractionMethod:
 
         Attributes:
             method              [str], name of interaction method
-            visualisation       [Visualisation], automatically created on the basis of a method and used to create visualisations
+            visualizer          [Visualizer], automatically created on the basis of a method and used to create visualisations
             variable_importance [pd.DataFrame], object that stores variable importance values after fitting
             ovo                 [pd.DataFrame], stores one versus one variable interaction values after fitting
             X_sampled           [pd.DataFrame], data used to calculate interactions
@@ -22,7 +22,7 @@ class FeatureInteractionMethod:
 
     def __init__(self, method: str):
         self.method = method
-        self.visualisation = Visualizator(method, VisualisationConfigurationProvider.get(method))
+        self.visualizer = Visualizer(method, VisualisationConfigurationProvider.get(method))
         self.variable_importance = None
         self.ovo = None
         self.X_sampled = None
@@ -48,7 +48,7 @@ class FeatureInteractionMethod:
         Base method for creating requested type of plot. Can be used only after `fit` method.
 
         Args:
-            vis_type: str, {"summary", "graph", "bar chart", "heatmap"} visualisation type, default "summary"
+            vis_type: str, {"summary", "graph", "bar chart", "heatmap"} visualizer type, default "summary"
 
         Returns:
             object: None
@@ -56,7 +56,7 @@ class FeatureInteractionMethod:
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
 
-        self.visualisation.plot(self.ovo, vis_type, variable_importance=self.variable_importance, figsize=figsize, show=show, kwargs=kwargs)
+        self.visualizer.plot(self.ovo, vis_type, variable_importance=self.variable_importance, figsize=figsize, show=show, **kwargs)
        
 
     def interaction_value(self, f1: str, f2: str):

@@ -4,7 +4,7 @@ from .util import california_housing_random_forest, has_decreasing_order, CALIFO
 from artemis.utilities.domain import InteractionMethod, VisualisationType
 from artemis.interactions_methods.model_agnostic import GreenwellMethod
 from artemis.utilities.exceptions import VisualisationNotSupportedException
-from artemis.visualisation.configuration import VisualisationConfigurationProvider
+from artemis.visualizer._configuration import VisualisationConfigurationProvider
 
 
 class GreenwellMethodUnitTest(unittest.TestCase):
