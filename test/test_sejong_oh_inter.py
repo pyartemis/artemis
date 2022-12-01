@@ -59,7 +59,7 @@ class SejongOhMethodTestCase(unittest.TestCase):
         # allowed plots are generated without exception
         accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.PERFORMANCE_BASED).accepted_visualisations
         for vis in accepted_vis:
-            sejong_oh_inter.plot(vis)
+            sejong_oh_inter.plot(vis, show=False)
 
         # then
         # nothing crashes!

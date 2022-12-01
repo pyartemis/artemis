@@ -61,7 +61,7 @@ class GreenwellMethodUnitTest(unittest.TestCase):
         # allowed plots are generated without exception
         accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.VARIABLE_INTERACTION).accepted_visualisations
         for vis in accepted_vis:
-            greenwell_inter.plot(vis)
+            greenwell_inter.plot(vis, show=False)
 
         # then
         # nothing crashes!

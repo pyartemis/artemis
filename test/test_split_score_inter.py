@@ -84,8 +84,8 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
         # allowed plots are generated without exception
         accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.SPLIT_SCORE).accepted_visualisations
         for vis in accepted_vis:
-            inter.plot(vis)
-            inter2.plot(vis)
+            inter.plot(vis, show=False)
+            inter2.plot(vis, show=False)
         # then
         # nothing crashes!
 
