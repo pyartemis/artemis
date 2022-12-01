@@ -33,3 +33,14 @@ class MetricNotSupportedException(Exception):
         self.metric = metric
         self.package = package
         super().__init__(f"Metric {self.metric} is not supported for model from the {self.package} package")
+
+
+class FeatureImportanceWithoutInteractionException(Exception):
+
+    def __init__(self, feature_importance: str, feature_interaction: str):
+        self.feature_interaction = feature_interaction
+        self.feature_importance = feature_importance
+        super().__init__(
+            f"Feature importance method {self.feature_importance} can be only " +
+            f"calculated together with its {self.feature_interaction} counterpart. "
+        )
