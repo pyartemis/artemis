@@ -1,6 +1,5 @@
-from typing import List, Optional, Union
+from typing import Optional
 
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
@@ -14,6 +13,9 @@ from artemis.utilities.split_score_metrics import (
     SplitScoreInteractionMetric,
     _LGBM_UNSUPPORTED_METRICS
 )
+from ._handler import GBTreesHandler
+from ..._method import FeatureInteractionMethod
+from ....utilities.domain import InteractionMethod
 
 
 class SplitScoreMethod(FeatureInteractionMethod):

@@ -4,7 +4,8 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib import gridspec, pyplot as plt
+from matplotlib import gridspec
+from matplotlib import pyplot as plt
 
 from artemis.utilities.domain import VisualisationType
 from artemis.utilities.exceptions import VisualisationNotSupportedException
@@ -25,29 +26,50 @@ class Visualizator:
     def accepts(self, vis_type: str) -> bool:
         return vis_type in self.vis_config.accepted_visualisations
 
-    def plot(self, ovo: pd.DataFrame, vis_type: str, ova: Optional[pd.DataFrame] = None,
-             variable_importance: Optional[pd.DataFrame] = None, figsize: tuple = (8, 6),  
+    def plot(self,
+             ovo: pd.DataFrame,
+             vis_type: str,
+             ova: Optional[pd.DataFrame] = None,
+             variable_importance: Optional[pd.DataFrame] = None, 
+             feature_column_name_1: str = "Feature 1", 
+             feature_column_name_2: str = "Feature 2",
+             directed: bool = False,
+             figsize: tuple = (8, 6),  
              show: bool = True, **kwargs):
 
         if not self.accepts(vis_type):
             raise VisualisationNotSupportedException(self.method, vis_type)
 
         if vis_type == VisualisationType.SUMMARY:
-            self.plot_summary(ovo, variable_importance, ova, figsize = figsize, show = show)
+            self.plot_summary(ovo, variable_importance, ova, figsize = figsize, show = show, f1_name=feature_column_name_1,
+                              f2_name=feature_column_name_2, directed=directed)
         elif vis_type == VisualisationType.INTERACTION_GRAPH:
-            self.plot_interaction_graph(ovo, variable_importance, figsize = figsize, show = show)
+            self.plot_interaction_graph(ovo, variable_importance, figsize = figsize, show = show, f1_name=feature_column_name_1,
+                                        f2_name=feature_column_name_2,
+                                        directed=directed)
         elif vis_type == VisualisationType.BAR_CHART_OVA:
             self.plot_barchart_ova(ova, figsize = figsize, show = show)
         elif vis_type == VisualisationType.HEATMAP:
-            self.plot_heatmap(ovo, variable_importance, figsize = figsize, show = show)
+            self.plot_heatmap(ovo, variable_importance, figsize = figsize, show = show, f1_name=feature_column_name_1, f2_name=feature_column_name_2,
+                              directed=directed)
         elif vis_type == VisualisationType.BAR_CHART_OVO:
-            self.plot_barchart_ovo(ovo, figsize = figsize, show = show)
+            self.plot_barchart_ovo(ovo, figsize = figsize, show = show, f1_name = feature_column_name_1, f2_name = feature_column_name_2)
 
-    def plot_heatmap(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None):
-        ovo_copy = ovo.copy()
-        ovo_copy["Feature 1"], ovo_copy["Feature 2"] = ovo_copy["Feature 2"], ovo_copy["Feature 1"]
-        var_imp_diag = self._variable_importance_diag(ovo, variable_importance)
-        ovo_all_pairs = pd.concat([ovo, ovo_copy, var_imp_diag])
+    def plot_heatmap(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None,
+                     f1_name: str = "Feature 1",
+                     f2_name: str = "Feature 2", directed: bool = False):
+    
+        if not directed:
+            ovo_copy = ovo.copy()
+            ovo_copy[f1_name], ovo_copy[f2_name] = ovo_copy[f2_name], ovo_copy[f1_name]
+            ovo_all_pairs = pd.concat([ovo, ovo_copy])
+        else:
+            ovo_all_pairs = ovo
+
+        if variable_importance is not None:
+            var_imp_diag = self._variable_importance_diag(ovo, variable_importance, f1_name=f1_name, f2_name=f2_name)
+            ovo_all_pairs = pd.concat([ovo_all_pairs, var_imp_diag])
+
         fig = None
         if ax is not None:
             ax.set_title(self.vis_config.interaction_matrix.TITLE)
@@ -55,7 +77,7 @@ class Visualizator:
             fig, ax = plt.subplots(figsize=figsize)
             plt.title(self.vis_config.interaction_matrix.TITLE)
 
-        matrix = ovo_all_pairs.pivot_table(self.method, "Feature 1", "Feature 2", aggfunc='first')
+        matrix = ovo_all_pairs.pivot_table(self.method, f1_name, f2_name, aggfunc='first')
         off_diag_mask = np.eye(matrix.shape[0], dtype=bool)
 
         sns.heatmap(matrix, 
@@ -74,15 +96,19 @@ class Visualizator:
             plt.close()
             return fig 
 
-    def plot_summary(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, ova: Optional[pd.DataFrame] = None, figsize: tuple = (8, 6), show: bool = True):
+    def plot_summary(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, ova: Optional[pd.DataFrame] = None,
+                     f1_name: str = "Feature 1",
+                     f2_name: str = "Feature 2",
+                     directed: bool = False,
+                     figsize: tuple = (8, 6), show: bool = True,):
         nrows = 1 if ova is None else 2
         fig = plt.figure(figsize=(18, nrows * 6))
         gs = gridspec.GridSpec(nrows, 4, hspace=0.4, wspace=0.1)
         ax1 = fig.add_subplot(gs[0, :2])
         ax2 = fig.add_subplot(gs[0, 2:])
 
-        self.plot_heatmap(ovo, variable_importance, ax=ax1, show=False)
-        self.plot_interaction_graph(ovo, variable_importance, ax=ax2, show=False)
+        self.plot_heatmap(ovo, variable_importance, ax=ax1, show=False, f1_name = f1_name, f2_name = f2_name, directed=directed)
+        self.plot_interaction_graph(ovo, variable_importance, ax=ax2, show=False, f1_name = f1_name, f2_name = f2_name, directed=directed)
 
         if ova is not None:
             ax3 = fig.add_subplot(gs[1, 1:3])
@@ -96,7 +122,9 @@ class Visualizator:
             return fig 
 
 
-    def plot_interaction_graph(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None):
+    def plot_interaction_graph(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None,
+       f1_name: str = "Feature 1",
+                               f2_name: str = "Feature 2", directed: bool = False):
         config = self.vis_config.interaction_graph
         fig = None
         if ax is not None:
@@ -104,10 +132,13 @@ class Visualizator:
         else:
             fig, ax = plt.subplots(figsize=figsize)
             plt.title(config.TITLE)
+  
+
         ovo_copy = ovo.copy()
         ovo_copy.loc[ovo_copy[self.method] < config.MIN_RELEVANT_INTERACTION, self.method] = 0
         G = nx.from_pandas_edgelist(ovo_copy,
-                                    source="Feature 1", target="Feature 2", edge_attr=self.method)
+                                    source=f1_name, target=f2_name, edge_attr=self.method,
+                                    create_using=nx.DiGraph if directed else nx.Graph)
         pos = nx.spring_layout(G, k=4, weight=self.method, iterations=300)
         nx.draw(
             G,
@@ -115,21 +146,22 @@ class Visualizator:
             ax=ax,
             width=self._edge_widths(G),
             with_labels=True,
-            nodelist=variable_importance["Feature"],
+            nodelist=list(variable_importance["Feature"]) if variable_importance is not None else None,
             node_size=[config.NODE_SIZE * val / max(variable_importance["Value"]) for val in
-                       variable_importance["Value"]],
+                       variable_importance["Value"]] if variable_importance is not None else config.NODE_SIZE,
             font_size=config.FONT_SIZE,
             font_weight=config.FONT_WEIGHT,
             font_color=config.FONT_COLOR,
             node_color=config.NODE_COLOR,
             edge_color=self._edge_colors(G),
+            connectionstyle="arc3,rad=0.3"
         )
 
         nx.draw_networkx_edge_labels(
             G,
             pos,
             ax=ax,
-            edge_labels=self._edge_labels(ovo_copy),
+            edge_labels=self._edge_labels(ovo_copy, f1_name, f2_name),
             font_color=config.FONT_COLOR,
             font_weight=config.FONT_WEIGHT,
         )
@@ -141,7 +173,8 @@ class Visualizator:
 
 
 
-    def plot_barchart_ovo(self, ovo: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None):
+    def plot_barchart_ovo(self, ovo: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None, f1_name: str = "Feature 1",
+                               f2_name: str = "Feature 2",):
         config = self.vis_config.interaction_bar_chart_ovo
         fig = None
         if ax is not None:
@@ -150,7 +183,7 @@ class Visualizator:
             fig, ax = plt.subplots(figsize=figsize)
             plt.title(config.TITLE)
         ovo_copy = ovo.copy()
-        ovo_copy["Interaction"] = ovo_copy["Feature 1"] + ":" + ovo_copy["Feature 2"]
+        ovo_copy["Interaction"] = ovo_copy[f1_name] + ":" + ovo_copy[f2_name]
 
         ovo_copy.head(config.N_HIGHEST).plot.barh(
             x="Interaction",
@@ -199,21 +232,22 @@ class Visualizator:
 
     def _edge_colors(self, G):
         return [
-             self.vis_config.interaction_graph.EDGE_COLOR_POS if elem > 0 else self.vis_config.interaction_graph.EDGE_COLOR_NEG
-             for elem in
-             nx.get_edge_attributes(G, self.method).values()]
+            self.vis_config.interaction_graph.EDGE_COLOR_POS if elem > 0 else self.vis_config.interaction_graph.EDGE_COLOR_NEG
+            for elem in
+            nx.get_edge_attributes(G, self.method).values()]
 
-    def _edge_labels(self, ovo):
+    def _edge_labels(self, ovo: pd.DataFrame, f1_name: str, f2_name: str):
         return {
-            (row["Feature 1"], row["Feature 2"]): round(row[self.method], 2)
+            (row[f1_name], row[f2_name]): round(row[self.method], 2)
             for index, row in filter(lambda x: x[1][self.method] > 0,
                                      ovo.head(self.vis_config.interaction_graph.N_HIGHEST_WITH_LABELS).iterrows())
         }
 
-    def _variable_importance_diag(self, ovo, variable_importance: pd.DataFrame):
-        all_features = set(list(ovo["Feature 1"]) + list(ovo["Feature 2"]))
-        var_imp_diag = pd.DataFrame.from_records([{"Feature 1": f,
-                                                   "Feature 2": f,
+    def _variable_importance_diag(self, ovo, variable_importance: pd.DataFrame, f1_name: str = "Feature 1",
+                                  f2_name: str = "Feature 2"):
+        all_features = set(list(ovo[f1_name]) + list(ovo[f2_name]))
+        var_imp_diag = pd.DataFrame.from_records([{f1_name: f,
+                                                   f2_name: f,
                                                    self.method:
                                                        variable_importance[variable_importance["Feature"] == f][
                                                            "Value"].values[0]}

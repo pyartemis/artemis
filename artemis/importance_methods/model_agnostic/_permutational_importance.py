@@ -10,6 +10,17 @@ from artemis.utilities.metrics import Metric, RMSE
 
 
 class PermutationImportance(VariableImportanceMethod):
+    """
+        Class implementing permutation based feature importance.
+        It is used for establishing feature importance for performance based feature interaction - Sejong Oh method.
+
+        Specifics on permutation-based importance:
+        https://christophm.github.io/interpretable-ml-book/feature-importance.html
+
+        Attributes:
+            metric  [Metric], performance measure to use when assessing model performance
+
+    """
 
     def __init__(self, metric: Metric = RMSE()):
         super().__init__(ImportanceMethod.PERMUTATION_IMPORTANCE)
@@ -24,6 +35,20 @@ class PermutationImportance(VariableImportanceMethod):
             features: List[str] = None,
             show_progress: bool = False,
     ):
+        """
+            Calculate permutation based feature importance.
+
+            Args:
+                model:              model for which importance will be extracted, must have implemented predict method
+                X:                  data used to calculate importance
+                y_true:             target values for `X`
+                n_repeat:           amount of permutations to generate
+                features:           list of features that will be used during importance calculation
+                show_progress:      determine whether to show the progress bar
+
+            Returns:
+                permutation based variable importance
+        """
         self.variable_importance = _permutation_importance(model, X, y_true, self.metric,
                                                            n_repeat, features,
                                                            show_progress)

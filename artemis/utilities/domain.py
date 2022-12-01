@@ -7,6 +7,7 @@ class InteractionMethod:
     VARIABLE_INTERACTION: str = "Greenwell Variable Interaction Measure"
     PERFORMANCE_BASED: str = "Sejong Oh Performance Based Interaction Measure"
     SPLIT_SCORE: str = "Split Score Interaction Measure"
+    CONDITIONAL_MINIMAL_DEPTH: str = "Conditional Minimal Depth Measure"
 
 
 @dataclass
@@ -14,6 +15,7 @@ class ImportanceMethod:
     PERMUTATION_IMPORTANCE: str = "Permutation Importance"
     PDP_BASED_IMPORTANCE: str = "Partial Dependence Based Importance"
     SPLIT_SCORE_IMPORTANCE: str = "Split Score Based Importance"
+    MINIMAL_DEPTH_IMPORTANCE: str = "Minimal Depth Based Importance"
 
 
 @dataclass
@@ -36,6 +38,7 @@ class ProblemType:
     REGRESSION: str = "regression"
     CLASSIFICATION: str = "classification"
 
+
 @dataclass
 class ProgressInfoLog:
     CALC_OVO: str = (
@@ -45,6 +48,7 @@ class ProgressInfoLog:
         f"Calculating {InteractionCalculationStrategy.ONE_VS_ALL} interactions"
     )
     CALC_VAR_IMP: str = "Calculating variable importance"
+
 
 @dataclass
 class CorrelationMethod:

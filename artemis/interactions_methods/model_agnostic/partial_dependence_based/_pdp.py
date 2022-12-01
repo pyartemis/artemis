@@ -23,6 +23,20 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
             features: List[str] = None,
             show_progress: bool = False,
             pdp_cache: dict = None):
+        """
+        Calculate one versus one feature interaction and partial dependence based variable importance.
+
+        Args:
+            model: model for which interactions will be extracted, must have implemented predict method
+            X: data used to calculate interactions
+            n: number of rows to be sampled, if None full data will be taken
+            features: list of features included in interactions calculation; if None all features will be used
+            show_progress: determine whether to show the progress bar
+            pdp_cache: previously calculated partial dependence values that can be used to calculate interactions values
+
+        Returns:
+            object: None
+        """
         self.predict_function = get_predict_function(model)
         self.model = model
         self.sample_ovo(self.predict_function, self.model, X, n, features, show_progress)
@@ -53,8 +67,21 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
             by=self.method, ascending=False, ignore_index=True
-        )
+        ).fillna(0)
 
     @abstractmethod
     def _calculate_i_versus(self, predict_function, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
+        """
+        Abstract interaction value calculation between feature (i) and a list of features (versus).
+        Derived classes need to implement this method to provide its interaction values.
+
+        Args:
+            model: model for which interactions will be extracted, must have implemented predict method
+            X_sampled: data used to calculate interactions
+            i: distinguished feature for which interactions with versus will be calculated
+            versus: list of features for which interactions with feature `i` will be calculated
+
+        Returns:
+            value of the interaction
+        """
         ...

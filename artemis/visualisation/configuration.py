@@ -47,8 +47,10 @@ class VisualisationConfigurationProvider:
                                               VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
         InteractionMethod.VARIABLE_INTERACTION: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
                                                 VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
+        InteractionMethod.CONDITIONAL_MINIMAL_DEPTH: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
+                                                      VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
         InteractionMethod.SPLIT_SCORE: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                        VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP]
+                                                VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP]
     }
 
     @classmethod
@@ -61,12 +63,15 @@ class VisualisationConfigurationProvider:
             return cls._perf_based_config()
         elif method == InteractionMethod.SPLIT_SCORE:
             return cls._split_score_config()
+        elif method == InteractionMethod.CONDITIONAL_MINIMAL_DEPTH:
+            return cls._cond_depth_config()
         else:
             raise MethodNotSupportedException(method)
 
     @classmethod
     def _h_stat_config(cls):
-        return VisualisationConfiguration(accepted_visualisations=cls.accepted_visualisations[InteractionMethod.H_STATISTIC])
+        return VisualisationConfiguration(
+            accepted_visualisations=cls.accepted_visualisations[InteractionMethod.H_STATISTIC])
 
     @classmethod
     def _var_inter_config(cls):
@@ -81,7 +86,7 @@ class VisualisationConfigurationProvider:
         return VisualisationConfiguration(
             accepted_visualisations=cls.accepted_visualisations[InteractionMethod.PERFORMANCE_BASED],
             interaction_graph=graph_config)
-    
+
     @classmethod
     def _split_score_config(cls):
         graph_config = InteractionGraphConfiguration()
@@ -90,6 +95,19 @@ class VisualisationConfigurationProvider:
         return VisualisationConfiguration(
             accepted_visualisations=cls.accepted_visualisations[InteractionMethod.SPLIT_SCORE],
             interaction_graph=graph_config)
+
+    @classmethod
+    def _cond_depth_config(cls):
+
+        graph_config = InteractionGraphConfiguration()
+        graph_config.MIN_RELEVANT_INTERACTION = 0.6
+        graph_config.MAX_EDGE_WIDTH = 3
+
+        return VisualisationConfiguration(
+            accepted_visualisations=cls.accepted_visualisations[InteractionMethod.CONDITIONAL_MINIMAL_DEPTH],
+            interaction_graph=graph_config
+        )
+
 
 @dataclass
 class VisualisationConfiguration:
