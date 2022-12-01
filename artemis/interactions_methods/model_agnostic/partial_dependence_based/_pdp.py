@@ -8,7 +8,7 @@ from tqdm import tqdm
 from artemis.importance_methods.model_agnostic import PartialDependenceBasedImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.domain import ProgressInfoLog
-from artemis.utilities.ops import sample_if_not_none, all_if_none
+from artemis.utilities.ops import get_predict_function, sample_if_not_none, all_if_none
 
 
 class PartialDependenceBasedMethod(FeatureInteractionMethod):
@@ -23,14 +23,17 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
             features: List[str] = None,
             show_progress: bool = False,
             pdp_cache: dict = None):
-        self.sample_ovo(model, X, n, features, show_progress)
+        self.predict_function = get_predict_function(model)
+        self.model = model
+        self.sample_ovo(self.predict_function, self.model, X, n, features, show_progress)
 
-        self.variable_importance = PartialDependenceBasedImportance().importance(model, self.X_sampled,
+        self.variable_importance = PartialDependenceBasedImportance().importance(self.model, self.X_sampled,
                                                                                  features=self.features_included,
                                                                                  show_progress=show_progress,
                                                                                  precalculated_pdp=pdp_cache)
 
     def sample_ovo(self,
+                   predict_function,
                    model,
                    X: pd.DataFrame,
                    n: int = None,
@@ -39,12 +42,12 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         self.X_sampled = sample_if_not_none(X, n)
         self.features_included = all_if_none(X, features)
 
-        self.ovo = self._ovo(model, self.X_sampled, show_progress, self.features_included)
+        self.ovo = self._ovo(predict_function, model, self.X_sampled, show_progress, self.features_included)
 
-    def _ovo(self, model, X_sampled: pd.DataFrame, show_progress: bool, features: List[str]):
+    def _ovo(self, predict_function, model, X_sampled: pd.DataFrame, show_progress: bool, features: List[str]):
         pairs = list(combinations(features, 2))
         value_pairs = [
-            [c1, c2, self._calculate_i_versus(model, X_sampled, c1, [c2])]
+            [c1, c2, self._calculate_i_versus(predict_function, model, X_sampled, c1, [c2])]
             for c1, c2 in tqdm(pairs, desc=ProgressInfoLog.CALC_OVO, disable=not show_progress)
         ]
 
@@ -53,5 +56,5 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         )
 
     @abstractmethod
-    def _calculate_i_versus(self, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
+    def _calculate_i_versus(self, predict_function, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
         ...
