@@ -64,7 +64,7 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
             by=self.method, ascending=False, ignore_index=True
-        )
+        ).fillna(0)
 
     @abstractmethod
     def _calculate_i_versus(self, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
