@@ -46,7 +46,6 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         in visualisations.
         """
         if self.ova is None:
-            
             raise MethodNotFittedException(self.method)
 
         self.visualisation.plot(self.ovo, vis_type, self.ova, variable_importance=self.variable_importance)
