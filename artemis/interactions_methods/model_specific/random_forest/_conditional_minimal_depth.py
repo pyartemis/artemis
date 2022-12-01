@@ -14,6 +14,14 @@ from artemis.utilities.exceptions import MethodNotFittedException
 
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
+    """
+    Class implementing tree-based Conditional Minimal Depth feature interaction method.
+    This method is applicable to scikit-learn tree-based models.
+    Method is described in the following thesis:
+    https://cdn.staticaly.com/gh/geneticsMiNIng/BlackBoxOpener/master/randomForestExplainer_Master_thesis.pdf.
+
+    """
+
     def __init__(self):
         super().__init__(InteractionMethod.CONDITIONAL_MINIMAL_DEPTH)
 
@@ -23,13 +31,22 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
             X: pd.DataFrame,
             show_progress: bool = False,
     ):
+        """
+        Calculate directed one vs one feature interaction profile using Conditional Minimal Depth method.
+        Additionally, asses feature importance using average minimal depth importance method.
+
+        Args:
+            model:          tree-based model implementing sklearn-like API for which interactions will be extracted
+            X:              data used to calculate interactions
+            show_progress:  determine whether to show the progress bar
+        """
         column_dict = _make_column_dict(X)
         raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
         self.ovo = _summarise_results(raw_result_df, column_dict, self.method)
         self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
 
     def plot(self, vis_type: str = VisualisationType.SUMMARY):
-
+        """See `plot` documentation in `FeatureInteractionMethod`."""
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
 
@@ -44,11 +61,25 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
 def _calculate_conditional_minimal_depths(
         trees: List[Union[DecisionTreeClassifier, DecisionTreeRegressor]], column_size: int, show_progress: bool
 ) -> Tuple[pd.DataFrame, dict]:
+    """
+    Calculate conditional minimal depth for all `trees`.
+    For further use in variable importance, it also returns dictionary of depths and split variables
+    for each tree in `trees`.
+
+    Args:
+        trees:          list of decision trees
+        column_size:    number of features in the data
+        show_progress:  determine whether to show the progress bar
+
+    Returns:
+        Conditional minimal depths, depths and split variables of all trees
+
+    """
     tree_result_list = list()
     tree_id_to_depth_split = dict()
     for tree_id in tqdm(range(len(trees)), disable=not show_progress):
         tree_repr = _tree_representation(trees[tree_id].tree_)
-        depths, split_variable_to_node_id = bfs(tree_repr)
+        depths, split_variable_to_node_id = _bfs(tree_repr)
         tree_id_to_depth_split[tree_id] = [depths, split_variable_to_node_id]
         tree_result_list.append(_conditional_minimal_depth(split_variable_to_node_id, depths, tree_id, column_size))
 
@@ -56,7 +87,17 @@ def _calculate_conditional_minimal_depths(
     return forest_result, tree_id_to_depth_split
 
 
-def bfs(tree):
+def _bfs(tree: pd.DataFrame):
+    """
+    Run BFS algorithm for a given `tree`.
+    Calculates depth of each node and creates a map of split_variable to nodes using this split_variable.
+    This representation is useful for efficient conditional minimal depth calculation.
+
+    Args:
+        tree: tree representation
+    Returns:
+        depth of each node, nodes grouped by split_variable
+    """
     current_lvl_ids = [0]
     depth = np.zeros(len(tree)).astype(int)
     current_depth = 0
@@ -76,6 +117,7 @@ def bfs(tree):
 
 
 def _tree_representation(decision_tree_object):
+    """Efficient, sklearn-like table tree representation. Row = node in the tree."""
     return pd.DataFrame({
         "id": range(decision_tree_object.node_count),
         "left_child": decision_tree_object.children_left,
@@ -85,6 +127,16 @@ def _tree_representation(decision_tree_object):
 
 
 def _conditional_minimal_depth(split_var_to_nodes: dict, depths: np.array, tree_id: int, column_size: int):
+    """
+    Main algorithm for efficient conditional minimal depth calculation.
+    Intuition: for each pair of features (f_1, f_2), find lowest-depth nodes (N) splitting f_1 and calculate distance to
+    the closest node in N subtree, using f_2 as a split variable. f_1 -> f_2 conditional minimal distance is minimum
+    over all such distances.
+
+    Specifics can be found in:
+    https://cdn.staticaly.com/gh/geneticsMiNIng/BlackBoxOpener/master/randomForestExplainer_Master_thesis.pdf
+    """
+
     conditional_depths = []
 
     n_nodes = len(depths)
@@ -122,6 +174,7 @@ def _make_column_dict(X: pd.DataFrame) -> dict:
 
 
 def _summarise_results(raw_result_df: pd.DataFrame, column_dict: dict, method_name: str) -> pd.DataFrame:
+    """Average result over trees, rename columns, fill missing data."""
     final_result = pd.melt(
         raw_result_df, id_vars=["tree_id", "split_variable"], value_vars=list(range(len(column_dict)))
     )
@@ -143,10 +196,13 @@ def _summarise_results(raw_result_df: pd.DataFrame, column_dict: dict, method_na
 
 
 def _delete_leaves(split_variable_to_node_id: dict):
+    """Leaves are indicated by -2, and have no split variable."""
     del split_variable_to_node_id[-2]
 
 
 def _calculate_maximal_id_in_subtree(current_root_depth: int, current_root_id: int, depths: np.array, n_nodes: int):
+
+    """Determine the greatest id of the node in a subtree rooted in `current_root_id` """
     upper_bound_set = np.where((depths <= current_root_depth) & (np.arange(n_nodes) > current_root_id))[0]
     upper_bound = n_nodes
 
@@ -157,6 +213,7 @@ def _calculate_maximal_id_in_subtree(current_root_depth: int, current_root_id: i
 
 
 def _next_level(current_lvl_ids: list, tree: pd.DataFrame):
+    """BFS one step, add `current_lvl_ids` ancestors to process."""
     current_lvl_ids = np.hstack((tree.loc[current_lvl_ids, "left_child"], tree.loc[current_lvl_ids, "right_child"]))
     current_lvl_ids = list(current_lvl_ids[current_lvl_ids >= 0].astype(int))  # -1 denotes termination node
 
