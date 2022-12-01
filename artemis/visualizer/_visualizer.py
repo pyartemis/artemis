@@ -48,7 +48,7 @@ class Visualizer:
                                         f2_name=feature_column_name_2,
                                         directed=directed, **kwargs)
         elif vis_type == VisualisationType.BAR_CHART_OVA:
-            self.plot_barchart_ova(ova, figsize = figsize, show = show  **kwargs)
+            self.plot_barchart_ova(ova, figsize = figsize, show = show, **kwargs)
         elif vis_type == VisualisationType.HEATMAP:
             self.plot_heatmap(ovo, variable_importance, figsize = figsize, show = show, f1_name=feature_column_name_1, f2_name=feature_column_name_2,
                               directed=directed, **kwargs)
@@ -153,7 +153,8 @@ class Visualizer:
             G,
             pos,
             ax=ax,
-            width=self._edge_widths(G),
+            width=[config.MAX_EDGE_WIDTH * val / max( ovo_copy[self.method]) for val in
+                       ovo_copy[self.method]], 
             with_labels=True,
             nodelist=list(variable_importance["Feature"]) if variable_importance is not None else None,
             node_size=[config.NODE_SIZE * val / max(variable_importance["Value"]) for val in
