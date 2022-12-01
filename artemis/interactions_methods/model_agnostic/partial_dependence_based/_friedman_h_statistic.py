@@ -39,7 +39,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         super().fit(model, X, n, features, show_progress, self._pdp_cache)
         self.ova = self._ova(self.predict_function, self.model, self.X_sampled, show_progress, self.features_included)
 
-    def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True ):
+    def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """
         See `plot` documentation in `PartialDependenceBasedMethod`.
         Additionally, it passes one vs all feature interaction profile to the visualiser class, to be included
@@ -48,7 +48,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         if self.ova is None:
             raise MethodNotFittedException(self.method)
 
-        self.visualizer.plot(self.ovo, vis_type, self.ova, variable_importance=self.variable_importance, figsize=figsize, show=show)
+        self.visualizer.plot(self.ovo, vis_type, self.ova, variable_importance=self.variable_importance, figsize=figsize, show=show, **kwargs)
 
     def _ova(self, predict_function, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
         """
