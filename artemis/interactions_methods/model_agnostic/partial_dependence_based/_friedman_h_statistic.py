@@ -16,13 +16,15 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
 
     Attributes:
         ova         [pd.DataFrame], object used for storing one vs all feature interaction profiles
+        normalized  [bool], flag determining whether to normalize the interaction values
         _pdp_cache  [Dict], object used for caching partial dependence values calculations
 
     """
 
-    def __init__(self):
+    def __init__(self, normalized: bool = True):
         super().__init__(InteractionMethod.H_STATISTIC)
         self.ova = None
+        self.normalized = normalized
         self._pdp_cache = dict()
 
     def fit(self,
@@ -30,8 +32,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             X: pd.DataFrame,
             n: int = None,
             features: List[str] = None,
-            show_progress: bool = False,
-            **kwargs):
+            show_progress: bool = False):
         """
         See `fit` documentation in `PartialDependenceBasedMethod`.
         Additionally, it calculates one vs all feature interaction profile.
@@ -102,7 +103,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
 
         nominator = (center(pd_i_versus_list) - center(pd_i_list) - center(pd_versus_list)) ** 2
         denominator = center(pd_i_versus_list) ** 2
-        return np.sum(nominator) / np.sum(denominator)
+        return np.sum(nominator) / np.sum(denominator) if self.normalized else np.sqrt(np.sum(nominator))
 
 
 def _pdp_cache_key(column, row):
