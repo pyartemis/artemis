@@ -64,7 +64,7 @@ class FriedmanHStatisticMethodTestCase(unittest.TestCase):
         # allowed plots are generated without exception
         accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.H_STATISTIC).accepted_visualisations
         for vis in accepted_vis:
-            h_stat.plot(vis)
+            h_stat.plot(vis, show=False)
 
         # then
         # nothing crashes!

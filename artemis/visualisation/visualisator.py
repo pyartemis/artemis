@@ -1,6 +1,7 @@
 from typing import Optional
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import gridspec
@@ -13,7 +14,7 @@ from artemis.visualisation.configuration import (
 )
 
 
-class Visualisation:
+class Visualizator:
     def __init__(
             self,
             method: str,
@@ -29,49 +30,35 @@ class Visualisation:
              ovo: pd.DataFrame,
              vis_type: str,
              ova: Optional[pd.DataFrame] = None,
-             feature_column_name_1: str = "Feature 1", feature_column_name_2: str = "Feature 2",
+             variable_importance: Optional[pd.DataFrame] = None, 
+             feature_column_name_1: str = "Feature 1", 
+             feature_column_name_2: str = "Feature 2",
              directed: bool = False,
-             variable_importance: Optional[pd.DataFrame] = None):
+             figsize: tuple = (8, 6),  
+             show: bool = True, **kwargs):
 
         if not self.accepts(vis_type):
             raise VisualisationNotSupportedException(self.method, vis_type)
 
         if vis_type == VisualisationType.SUMMARY:
-            self.plot_summary(ovo, variable_importance, ova, f1_name=feature_column_name_1,
+            self.plot_summary(ovo, variable_importance, ova, figsize = figsize, show = show, f1_name=feature_column_name_1,
                               f2_name=feature_column_name_2, directed=directed)
         elif vis_type == VisualisationType.INTERACTION_GRAPH:
-            self.plot_interaction_graph(ovo, variable_importance, f1_name=feature_column_name_1,
+            self.plot_interaction_graph(ovo, variable_importance, figsize = figsize, show = show, f1_name=feature_column_name_1,
                                         f2_name=feature_column_name_2,
                                         directed=directed)
-        elif vis_type == VisualisationType.BAR_CHART:
-            self.plot_barchart(ova)
+        elif vis_type == VisualisationType.BAR_CHART_OVA:
+            self.plot_barchart_ova(ova, figsize = figsize, show = show)
         elif vis_type == VisualisationType.HEATMAP:
-            self.plot_heatmap(ovo, variable_importance, f1_name=feature_column_name_1, f2_name=feature_column_name_2,
+            self.plot_heatmap(ovo, variable_importance, figsize = figsize, show = show, f1_name=feature_column_name_1, f2_name=feature_column_name_2,
                               directed=directed)
+        elif vis_type == VisualisationType.BAR_CHART_OVO:
+            self.plot_barchart_ovo(ovo, figsize = figsize, show = show, f1_name = feature_column_name_1, f2_name = feature_column_name_2)
 
-    def plot_summary(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, ova: Optional[pd.DataFrame] = None,
-                     f1_name: str = "Feature 1",
-                     f2_name: str = "Feature 2",
-                     directed: bool = False):
-        nrows = 1 if ova is None else 2
-        fig = plt.figure(figsize=(18, nrows * 6))
-        gs = gridspec.GridSpec(nrows, 4, hspace=0.4, wspace=0.1)
-        ax1 = fig.add_subplot(gs[0, :2])
-        ax2 = fig.add_subplot(gs[0, 2:])
-
-        self.plot_heatmap(ovo, variable_importance, ax1, f1_name, f2_name, directed=directed)
-        self.plot_interaction_graph(ovo, variable_importance, ax2, f1_name, f2_name, directed=directed)
-
-        if ova is not None:
-            ax3 = fig.add_subplot(gs[1, 1:3])
-            self.plot_barchart(ova, ax3)
-
-        fig.suptitle(f"{self.method} summary")
-
-    def plot_heatmap(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, ax=None,
+    def plot_heatmap(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None,
                      f1_name: str = "Feature 1",
                      f2_name: str = "Feature 2", directed: bool = False):
-
+    
         if not directed:
             ovo_copy = ovo.copy()
             ovo_copy[f1_name], ovo_copy[f2_name] = ovo_copy[f2_name], ovo_copy[f1_name]
@@ -83,23 +70,71 @@ class Visualisation:
             var_imp_diag = self._variable_importance_diag(ovo, variable_importance, f1_name=f1_name, f2_name=f2_name)
             ovo_all_pairs = pd.concat([ovo_all_pairs, var_imp_diag])
 
+        fig = None
         if ax is not None:
             ax.set_title(self.vis_config.interaction_matrix.TITLE)
         else:
+            fig, ax = plt.subplots(figsize=figsize)
             plt.title(self.vis_config.interaction_matrix.TITLE)
 
-        sns.heatmap(
-            ovo_all_pairs.pivot_table(self.method, f1_name, f2_name),
-            cmap=self.vis_config.interaction_matrix.COLOR_MAP,
-            annot=True,
-            ax=ax
-        )
+        matrix = ovo_all_pairs.pivot_table(self.method, f1_name, f2_name, aggfunc='first')
+        off_diag_mask = np.eye(matrix.shape[0], dtype=bool)
 
-    def plot_interaction_graph(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, ax=None,
-                               f1_name: str = "Feature 1",
+        sns.heatmap(matrix, 
+                    annot=True, 
+                    mask=~off_diag_mask, 
+                    cmap=self.vis_config.interaction_matrix.IMPORTANCE_COLOR_MAP,  
+                    ax=ax)
+        sns.heatmap(matrix, 
+                    annot=True, 
+                    mask=off_diag_mask, 
+                    cmap=self.vis_config.interaction_matrix.INTERACTION_COLOR_MAP, 
+                    ax=ax)
+        if show: 
+            plt.show()
+        else:
+            plt.close()
+            return fig 
+
+    def plot_summary(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, ova: Optional[pd.DataFrame] = None,
+                     f1_name: str = "Feature 1",
+                     f2_name: str = "Feature 2",
+                     directed: bool = False,
+                     figsize: tuple = (8, 6), show: bool = True,):
+        nrows = 1 if ova is None else 2
+        fig = plt.figure(figsize=(18, nrows * 6))
+        gs = gridspec.GridSpec(nrows, 4, hspace=0.4, wspace=0.1)
+        ax1 = fig.add_subplot(gs[0, :2])
+        ax2 = fig.add_subplot(gs[0, 2:])
+
+        self.plot_heatmap(ovo, variable_importance, ax=ax1, show=False, f1_name = f1_name, f2_name = f2_name, directed=directed)
+        self.plot_interaction_graph(ovo, variable_importance, ax=ax2, show=False, f1_name = f1_name, f2_name = f2_name, directed=directed)
+
+        if ova is not None:
+            ax3 = fig.add_subplot(gs[1, 1:3])
+            self.plot_barchart_ova(ova, ax=ax3, show=False)
+
+        fig.suptitle(f"{self.method} summary")
+        if show: 
+            plt.show()
+        else:
+            plt.close()
+            return fig 
+
+
+    def plot_interaction_graph(self, ovo: pd.DataFrame, variable_importance: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None,
+       f1_name: str = "Feature 1",
                                f2_name: str = "Feature 2", directed: bool = False):
-        ovo_copy = ovo.copy()
         config = self.vis_config.interaction_graph
+        fig = None
+        if ax is not None:
+            ax.set_title(config.TITLE)
+        else:
+            fig, ax = plt.subplots(figsize=figsize)
+            plt.title(config.TITLE)
+  
+
+        ovo_copy = ovo.copy()
         ovo_copy.loc[ovo_copy[self.method] < config.MIN_RELEVANT_INTERACTION, self.method] = 0
         G = nx.from_pandas_edgelist(ovo_copy,
                                     source=f1_name, target=f2_name, edge_attr=self.method,
@@ -130,15 +165,51 @@ class Visualisation:
             font_color=config.FONT_COLOR,
             font_weight=config.FONT_WEIGHT,
         )
+        if show: 
+            plt.show()
+        else:
+            plt.close()
+            return fig 
 
+
+
+    def plot_barchart_ovo(self, ovo: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None, f1_name: str = "Feature 1",
+                               f2_name: str = "Feature 2",):
+        config = self.vis_config.interaction_bar_chart_ovo
+        fig = None
         if ax is not None:
             ax.set_title(config.TITLE)
         else:
+            fig, ax = plt.subplots(figsize=figsize)
             plt.title(config.TITLE)
+        ovo_copy = ovo.copy()
+        ovo_copy["Interaction"] = ovo_copy[f1_name] + ":" + ovo_copy[f2_name]
 
-    def plot_barchart(self, ova: pd.DataFrame, ax=None):
-        config = self.vis_config.interaction_bar_chart
+        ovo_copy.head(config.N_HIGHEST).plot.barh(
+            x="Interaction",
+            y=self.method,
+            xlabel=self.method,
+            ylabel="Interaction",
+            cmap="crest",
+            title=config.TITLE,
+            ax=ax
+        )
+        plt.gca().invert_yaxis()
+        if show: 
+            plt.show()
+        else:
+            plt.close()
+            return fig 
 
+
+    def plot_barchart_ova(self, ova: pd.DataFrame, figsize: tuple = (8, 6), show: bool = True, ax=None):
+        config = self.vis_config.interaction_bar_chart_ova
+        fig = None
+        if ax is not None:
+            ax.set_title(config.TITLE)
+        else:
+            fig, ax = plt.subplots(figsize=figsize)
+            plt.title(config.TITLE)
         ova.head(config.N_HIGHEST).plot.barh(
             x="Feature",
             y=self.method,
@@ -147,6 +218,11 @@ class Visualisation:
             title=config.TITLE,
             ax=ax
         )
+        if show: 
+            plt.show()
+        else:
+            plt.close()
+            return fig 
 
     def _edge_widths(self, G):
         return [

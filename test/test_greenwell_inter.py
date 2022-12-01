@@ -61,7 +61,7 @@ class GreenwellMethodUnitTest(unittest.TestCase):
         # allowed plots are generated without exception
         accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.VARIABLE_INTERACTION).accepted_visualisations
         for vis in accepted_vis:
-            greenwell_inter.plot(vis)
+            greenwell_inter.plot(vis, show=False)
 
         # then
         # nothing crashes!
@@ -73,7 +73,7 @@ class GreenwellMethodUnitTest(unittest.TestCase):
 
         # barchart is not supported for greenwell (no OvA), so this should raise VisualisationNotSupportedException
         with self.assertRaises(VisualisationNotSupportedException):
-            greenwell_inter.plot(VisualisationType.BAR_CHART)
+            greenwell_inter.plot(VisualisationType.BAR_CHART_OVA)
 
 
 if __name__ == '__main__':

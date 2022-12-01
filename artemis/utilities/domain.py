@@ -3,11 +3,11 @@ from dataclasses import dataclass
 
 @dataclass
 class InteractionMethod:
-    H_STATISTIC: str = "Friedman H-statistic"
-    VARIABLE_INTERACTION: str = "Greenwell Variable Interaction"
-    PERFORMANCE_BASED: str = "Sejong Oh Performance Based"
-    SPLIT_SCORE: str = "Split Score"
-    CONDITIONAL_MINIMAL_DEPTH: str = "Conditional Minimal Depth"
+    H_STATISTIC: str = "Friedman H-statistic Interaction Measure"
+    VARIABLE_INTERACTION: str = "Greenwell Variable Interaction Measure"
+    PERFORMANCE_BASED: str = "Sejong Oh Performance Based Interaction Measure"
+    SPLIT_SCORE: str = "Split Score Interaction Measure"
+    CONDITIONAL_MINIMAL_DEPTH: str = "Conditional Minimal Depth Measure"
 
 
 @dataclass
@@ -27,8 +27,9 @@ class InteractionCalculationStrategy:
 @dataclass
 class VisualisationType:
     SUMMARY: str = "summary"
-    INTERACTION_GRAPH: str = "interaction graph"
-    BAR_CHART: str = "bar chart"
+    INTERACTION_GRAPH: str = "graph"
+    BAR_CHART_OVA: str = "bar_chart_ova"
+    BAR_CHART_OVO: str = "bar_chart"
     HEATMAP: str = "heatmap"
 
 

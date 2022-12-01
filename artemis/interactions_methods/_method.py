@@ -5,7 +5,7 @@ import pandas as pd
 from artemis.utilities.domain import VisualisationType
 from artemis.utilities.exceptions import MethodNotFittedException
 from artemis.visualisation.configuration import VisualisationConfigurationProvider
-from artemis.visualisation.visualisation import Visualisation
+from artemis.visualisation.visualisator import Visualizator
 
 
 class FeatureInteractionMethod:
@@ -22,7 +22,7 @@ class FeatureInteractionMethod:
 
     def __init__(self, method: str):
         self.method = method
-        self.visualisation = Visualisation(method, VisualisationConfigurationProvider.get(method))
+        self.visualisation = Visualizator(method, VisualisationConfigurationProvider.get(method))
         self.variable_importance = None
         self.ovo = None
         self.X_sampled = None
@@ -43,7 +43,7 @@ class FeatureInteractionMethod:
         """
         ...
 
-    def plot(self, vis_type: str = VisualisationType.SUMMARY):
+    def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """
         Base method for creating requested type of plot. Can be used only after `fit` method.
 
@@ -56,7 +56,8 @@ class FeatureInteractionMethod:
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
 
-        self.visualisation.plot(self.ovo, vis_type, variable_importance=self.variable_importance)
+        self.visualisation.plot(self.ovo, vis_type, variable_importance=self.variable_importance, figsize=figsize, show=show, kwargs=kwargs)
+       
 
     def interaction_value(self, f1: str, f2: str):
 

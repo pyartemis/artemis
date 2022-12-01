@@ -18,7 +18,7 @@ class GreenwellMethod(PartialDependenceBasedMethod):
     def __init__(self):
         super().__init__(InteractionMethod.VARIABLE_INTERACTION)
 
-    def _calculate_i_versus(self, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
+    def _calculate_i_versus(self, predict_function, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
         """
         See `_calculate_i_versus` documentation in `PartialDependenceBasedMethod`.
         Average of standard deviation over PDP profile for i-th, and j-th feature.
@@ -28,7 +28,7 @@ class GreenwellMethod(PartialDependenceBasedMethod):
         pd_values = np.array(
             [
                 [partial_dependence_value(X_sampled, {i: x_i, j: x_j},
-                                          model.predict) for x_i in
+                                                                       predict_function, model) for x_i in
                  set(X_sampled[i])]
                 for x_j in set(X_sampled[j])
             ]

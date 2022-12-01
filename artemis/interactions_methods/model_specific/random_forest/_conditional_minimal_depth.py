@@ -45,7 +45,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         self.ovo = _summarise_results(raw_result_df, column_dict, self.method)
         self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
 
-    def plot(self, vis_type: str = VisualisationType.SUMMARY):
+    def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """See `plot` documentation in `FeatureInteractionMethod`."""
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
@@ -55,7 +55,9 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                                 feature_column_name_1="root_variable",
                                 feature_column_name_2="variable",
                                 directed=True,
-                                variable_importance=self.variable_importance)
+                                variable_importance=self.variable_importance, 
+                                 figsize=figsize, show=show, kwargs=kwargs
+                                )
 
 
 def _calculate_conditional_minimal_depths(

@@ -24,7 +24,8 @@ class InteractionGraphConfiguration:
 @dataclass
 class InteractionMatrixConfiguration:
     TITLE: str = "Interaction matrix"
-    COLOR_MAP: str = "crest"
+    INTERACTION_COLOR_MAP: str = "crest"
+    IMPORTANCE_COLOR_MAP: str = "flare"
 
 
 @dataclass
@@ -32,20 +33,24 @@ class InteractionVersusAllConfiguration:
     TITLE: str = "Interaction with all other features"
     N_HIGHEST: int = 5
 
+@dataclass
+class InteractionVersusOneConfiguration:
+    TITLE: str = "Pair interactions"
+    N_HIGHEST: int = 10
 
 class VisualisationConfigurationProvider:
     accepted_visualisations = {
         InteractionMethod.H_STATISTIC: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                        VisualisationType.BAR_CHART,
+                                        VisualisationType.BAR_CHART_OVA, VisualisationType.BAR_CHART_OVO,
                                         VisualisationType.HEATMAP],
         InteractionMethod.PERFORMANCE_BASED: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                              VisualisationType.HEATMAP],
+                                              VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
         InteractionMethod.VARIABLE_INTERACTION: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                                 VisualisationType.HEATMAP],
+                                                VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
         InteractionMethod.CONDITIONAL_MINIMAL_DEPTH: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                                      VisualisationType.HEATMAP],
+                                                      VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
         InteractionMethod.SPLIT_SCORE: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                        VisualisationType.HEATMAP]
+                                                VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP]
     }
 
     @classmethod
@@ -109,4 +114,5 @@ class VisualisationConfiguration:
     accepted_visualisations: List[str]
     interaction_graph: InteractionGraphConfiguration = InteractionGraphConfiguration()
     interaction_matrix: InteractionMatrixConfiguration = InteractionMatrixConfiguration()
-    interaction_bar_chart: InteractionVersusAllConfiguration = InteractionVersusAllConfiguration()
+    interaction_bar_chart_ova: InteractionVersusAllConfiguration = InteractionVersusAllConfiguration()
+    interaction_bar_chart_ovo: InteractionVersusOneConfiguration = InteractionVersusOneConfiguration()

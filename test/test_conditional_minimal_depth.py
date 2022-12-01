@@ -28,7 +28,7 @@ class ConditionalMinimalDepthTestCase(unittest.TestCase):
         accepted_vis = VisualisationConfigurationProvider.get(
             InteractionMethod.CONDITIONAL_MINIMAL_DEPTH).accepted_visualisations
         for vis in accepted_vis:
-            cond_min.plot(vis)
+            cond_min.plot(vis, show=False)
 
         # then
         # nothing crashes!

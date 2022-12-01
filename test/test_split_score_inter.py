@@ -84,8 +84,8 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
         # allowed plots are generated without exception
         accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.SPLIT_SCORE).accepted_visualisations
         for vis in accepted_vis:
-            inter.plot(vis)
-            inter2.plot(vis)
+            inter.plot(vis, show=False)
+            inter2.plot(vis, show=False)
         # then
         # nothing crashes!
 
@@ -114,9 +114,9 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
 
         # barchart (OvA) is not supported 
         with self.assertRaises(VisualisationNotSupportedException):
-            inter.plot(VisualisationType.BAR_CHART)
+            inter.plot(VisualisationType.BAR_CHART_OVA)
         with self.assertRaises(VisualisationNotSupportedException):
-            inter2.plot(VisualisationType.BAR_CHART)
+            inter2.plot(VisualisationType.BAR_CHART_OVA)
 
     def test_should_raise_ModelNotSupportedException(self):
         with self.assertRaises(ModelNotSupportedException):
