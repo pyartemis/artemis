@@ -10,31 +10,35 @@ from artemis.utilities.exceptions import FeatureImportanceWithoutInteractionExce
 
 
 class MinimalDepthImportance(VariableImportanceMethod):
-    """
-    Class implementing Minimal Depth Feature Importance. It applies to tree-based models.
-    It uses data calculated in Conditional Minimal Depth method and so needs to be calculated together.
+    """Class implementing Minimal Depth Feature Importance. It applies to tree-based models like Random Forests.
+    It uses data calculated in ConditionalMinimalDepth method from `interactions_methods` module and so needs to be calculated together.
 
-    Importance of a feature in the forest is defined as average distance to terminal nodes from the highest node using
-    this feature as a split variable.
+    Importance of a feature is defined as the lowest depth of node using this feature as a split variable in a tree, averaged over all trees.
+
+    References:
+    - https://modeloriented.github.io/randomForestExplainer/
+    - https://doi.org/10.1198/jasa.2009.tm08622
     """
 
     def __init__(self):
+        """Constructor for MinimalDepthImportance"""
         super().__init__(ImportanceMethod.MINIMAL_DEPTH_IMPORTANCE)
 
-    def importance(self,
-                   model,  # to comply with the signature
-                   X: Optional[pd.DataFrame] = None,
-                   tree_id_to_depth_split: dict = None) -> pd.DataFrame:
-        """
-        Calculate minimal depth feature importance.
+    def importance(
+        self,
+        model,  # to comply with the signature
+        X: Optional[pd.DataFrame] = None,
+        tree_id_to_depth_split: dict = None,
+    ) -> pd.DataFrame:
+        """Calculates Minimal Depth Feature Importance.
 
-        Args:
-            model:                      unused, comply with signature
-            X:                          data to use for calculating importance on
-            tree_id_to_depth_split:     precalculated in ConditionalMinimalDepth depths and split_variables map
+        Arguments:
+            model (object) -- unused, comply with signature
+            X (Optional[pd.DataFrame]) --  data to use for calculating importance on
+            tree_id_to_depth_split (dict) -- dictionary containing minimal depth of each node in each tree
 
         Returns:
-            minimal depth feature importance
+            pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"
         """
         _check_preconditions(self.method, tree_id_to_depth_split)
 
@@ -47,18 +51,22 @@ class MinimalDepthImportance(VariableImportanceMethod):
 
         records_result = []
         for f in feature_to_depth.keys():
-            records_result.append({"Feature": columns[f], "Value": np.mean(feature_to_depth[f])})
+            records_result.append(
+                {"Feature": columns[f], "Value": np.mean(feature_to_depth[f])}
+            )
 
-        self.variable_importance = pd.DataFrame.from_records(records_result).sort_values(
-            by="Value", ignore_index=True
-        )
+        self.variable_importance = pd.DataFrame.from_records(
+            records_result
+        ).sort_values(by="Value", ignore_index=True)
 
         return self.variable_importance
 
 
 def _check_preconditions(method: str, tree_id_to_depth_split: dict):
     if tree_id_to_depth_split is None:
-        raise FeatureImportanceWithoutInteractionException(method, InteractionMethod.CONDITIONAL_MINIMAL_DEPTH)
+        raise FeatureImportanceWithoutInteractionException(
+            method, InteractionMethod.CONDITIONAL_MINIMAL_DEPTH
+        )
 
 
 def _make_column_dict(X: pd.DataFrame) -> dict:
