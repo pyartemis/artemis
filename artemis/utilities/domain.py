@@ -25,12 +25,13 @@ class InteractionCalculationStrategy:
 
 
 @dataclass
-class VisualisationType:
+class VisualizationType:
     SUMMARY: str = "summary"
     INTERACTION_GRAPH: str = "graph"
     BAR_CHART_OVA: str = "bar_chart_ova"
     BAR_CHART_OVO: str = "bar_chart"
     HEATMAP: str = "heatmap"
+    LOLLIPOP: str = "lollipop"
 
 
 @dataclass

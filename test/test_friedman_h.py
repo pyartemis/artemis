@@ -2,7 +2,7 @@ import unittest
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
 from artemis.utilities.domain import InteractionMethod
 from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod
-from artemis.visualizer._configuration import VisualisationConfigurationProvider
+from artemis.visualizer._configuration import VisualizationConfigurationProvider
 
 
 class FriedmanHStatisticMethodTestCase(unittest.TestCase):
@@ -62,7 +62,7 @@ class FriedmanHStatisticMethodTestCase(unittest.TestCase):
         h_stat.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # allowed plots are generated without exception
-        accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.H_STATISTIC).accepted_visualisations
+        accepted_vis = VisualizationConfigurationProvider.get(InteractionMethod.H_STATISTIC).accepted_visualizations
         for vis in accepted_vis:
             h_stat.plot(vis, show=False)
 

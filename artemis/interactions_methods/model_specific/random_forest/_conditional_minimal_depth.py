@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from artemis.importance_methods.model_specific import MinimalDepthImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import InteractionMethod, VisualisationType
+from artemis.utilities.domain import InteractionMethod, VisualizationType
 from artemis.utilities.exceptions import MethodNotFittedException
 
 
@@ -62,7 +62,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self.interactions_ascending_order)
         self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
 
-    def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """See `plot` documentation in `FeatureInteractionMethod`."""
         if self.ovo is None:
             raise MethodNotFittedException(self.method)

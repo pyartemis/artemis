@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.utilities.domain import VisualisationType, InteractionMethod, ProgressInfoLog
+from artemis.utilities.domain import VisualizationType, InteractionMethod, ProgressInfoLog
 from artemis.utilities.exceptions import MethodNotFittedException
 from artemis.utilities.ops import remove_element, center, partial_dependence_value
 from ._pdp import PartialDependenceBasedMethod
@@ -40,11 +40,11 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         super().fit(model, X, n, features, show_progress, self._pdp_cache)
         self.ova = self._ova(self.predict_function, self.model, self.X_sampled, show_progress, self.features_included)
 
-    def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """
         See `plot` documentation in `PartialDependenceBasedMethod`.
         Additionally, it passes one vs all feature interaction profile to the visualiser class, to be included
-        in visualisations.
+        in visualizations.
         """
         if self.ova is None:
             raise MethodNotFittedException(self.method)

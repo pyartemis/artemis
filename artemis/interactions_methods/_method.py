@@ -2,9 +2,9 @@ from abc import abstractmethod, ABC
 
 import pandas as pd
 
-from artemis.utilities.domain import VisualisationType
+from artemis.utilities.domain import VisualizationType
 from artemis.utilities.exceptions import MethodNotFittedException
-from artemis.visualizer._configuration import VisualisationConfigurationProvider
+from artemis.visualizer._configuration import VisualizationConfigurationProvider
 from artemis.visualizer._visualizer import Visualizer
 
 
@@ -13,7 +13,7 @@ class FeatureInteractionMethod(ABC):
 
         Attributes:
             method              [str], name of interaction method
-            visualizer          [Visualizer], automatically created on the basis of a method and used to create visualisations
+            visualizer          [Visualizer], automatically created on the basis of a method and used to create visualizations
             variable_importance [pd.DataFrame], object that stores variable importance values after fitting
             ovo                 [pd.DataFrame], stores one versus one variable interaction values after fitting
             X_sampled           [pd.DataFrame], data used to calculate interactions
@@ -22,7 +22,7 @@ class FeatureInteractionMethod(ABC):
 
     def __init__(self, method: str):
         self.method = method
-        self.visualizer = Visualizer(method, VisualisationConfigurationProvider.get(method))
+        self.visualizer = Visualizer(method, VisualizationConfigurationProvider.get(method))
         self.variable_importance = None
         self.ovo = None
         self.X_sampled = None
@@ -54,7 +54,7 @@ class FeatureInteractionMethod(ABC):
         """
         ...
 
-    def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """
         Base method for creating requested type of plot. Can be used only after `fit` method.
 
