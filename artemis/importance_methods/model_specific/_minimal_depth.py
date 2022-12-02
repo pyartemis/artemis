@@ -34,7 +34,7 @@ class MinimalDepthImportance(VariableImportanceMethod):
 
         Arguments:
             model (object) -- unused, comply with signature
-            X (Optional[pd.DataFrame]) --  data to use for calculating importance on
+            X (pd.DataFrame, optional) --  data to use for calculating importance on
             tree_id_to_depth_split (dict) -- dictionary containing minimal depth of each node in each tree
 
         Returns:

@@ -15,14 +15,21 @@ from artemis.utilities.exceptions import MethodNotFittedException
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     """
-    Class implementing tree-based Conditional Minimal Depth feature interaction method.
-    This method is applicable to scikit-learn tree-based models.
-    Method is described in the following thesis:
-    https://cdn.staticaly.com/gh/geneticsMiNIng/BlackBoxOpener/master/randomForestExplainer_Master_thesis.pdf.
+    Class implementing Conditional Minimal Depth Method for extraction of interactions.  t applies to tree-based models like Random Forests.
+    Currently scikit-learn forest models are supported, i.e., RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier. 
 
+    Attributes:
+        method (str) -- name of interaction method
+        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
+        variable_importance (pd.DataFrame) -- variable importance values 
+        ovo (pd.DataFrame) -- one versus one variable interaction values 
+    
+    References:
+    - https://modeloriented.github.io/randomForestExplainer/
+    - https://doi.org/10.1198/jasa.2009.tm08622
     """
-
     def __init__(self):
+        """Constructor for ConditionalMinimalDepthMethod"""
         super().__init__(InteractionMethod.CONDITIONAL_MINIMAL_DEPTH)
 
     @property
@@ -48,22 +55,28 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
             X: pd.DataFrame,
             show_progress: bool = False,
     ):
-        """
-        Calculate directed one vs one feature interaction profile using Conditional Minimal Depth method.
-        Additionally, asses feature importance using average minimal depth importance method.
+        """Calculates Conditional Minimal Depth Interactions and Minimal Depth Feature Importance for given model.
 
-        Args:
-            model:          tree-based model implementing sklearn-like API for which interactions will be extracted
-            X:              data used to calculate interactions
-            show_progress:  determine whether to show the progress bar
+        Parameters:
+            model (Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier]) -- tree-based model to be explained
+            X (pd.DataFrame, optional) -- unused as explanations are calculated only for trained model
+            show_progress (bool) -- whether to show progress bar 
         """
         column_dict = _make_column_dict(X)
         self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
         self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self.interactions_ascending_order)
         self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
 
-    def plot(self, vis_type: str = VisualizationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
-        """See `plot` documentation in `FeatureInteractionMethod`."""
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
+        """Plots interactions
+        
+        Parameters:
+            vis_type (str) -- type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'summary', 'bar_chart_conditional']
+            title (str) -- title of plot, default is 'default' which means that title will be automatically generated for selected visualization type
+            figsize (tuple) -- size of figure
+            show (bool) -- whether to show plot
+            **kwargs: additional arguments for plot 
+        """
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
 
@@ -73,6 +86,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                              _feature_column_name_2="variable",
                              _directed=True,
                              variable_importance=self.variable_importance,
+                             title = title,
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,

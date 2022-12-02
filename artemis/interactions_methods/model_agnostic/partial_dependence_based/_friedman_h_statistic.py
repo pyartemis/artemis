@@ -9,19 +9,28 @@ from artemis.utilities.exceptions import MethodNotFittedException
 from artemis.utilities.ops import remove_element, center, partial_dependence_value
 from ._pdp import PartialDependenceBasedMethod
 
-
 class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
-    """Class implementing Friedman H-statistic feature interaction method.
-    Method is described in the following paper: https://arxiv.org/pdf/0811.1679.pdf.
+    """Class implementing H-statistic for extraction of interactions. 
 
     Attributes:
-        ova         [pd.DataFrame], object used for storing one vs all feature interaction profiles
-        normalized  [bool], flag determining whether to normalize the interaction values
-        _pdp_cache  [Dict], object used for caching partial dependence values calculations
+        method (str) -- name of interaction method
+        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
+        variable_importance (pd.DataFrame) -- variable importance values 
+        ovo (pd.DataFrame) -- one versus one variable interaction values 
+        ova (pd.DataFrame) -- one vs all feature interactions
+        normalized (bool) -- flag determining whether to normalize the interaction values (unnrormalized version is proposed in https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935)
 
+    References:
+    - https://www.jstor.org/stable/pdf/30245114.pdf
+    - https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935
     """
 
     def __init__(self, normalized: bool = True):
+        """Constructor for FriedmanHStatisticMethod
+
+        Attributes:
+            normalized (bool, optional) -- flag determining whether to normalize the interaction values. Defaults to True.
+        """
         super().__init__(InteractionMethod.H_STATISTIC)
         self.ova = None
         self.normalized = normalized
@@ -33,18 +42,28 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             n: int = None,
             features: List[str] = None,
             show_progress: bool = False):
-        """
-        See `fit` documentation in `PartialDependenceBasedMethod`.
-        Additionally, it calculates one vs all feature interaction profile.
+        """Calculates H-statistic Interactions and Partial Dependence Based Importance for the given model. 
+        Despite pair interactions, this method also calculates one vs all interactions.
+
+        Parameters:
+            model -- model to be explained
+            X (pd.DataFrame, optional) -- data used to calculate interactions
+            n (int, optional) -- number of samples to be used for calculation of interactions
+            features (List[str], optional) -- list of features for which interactions will be calculated
+            show_progress (bool) -- whether to show progress bar 
         """
         super().fit(model, X, n, features, show_progress, self._pdp_cache)
         self.ova = self._ova(self.predict_function, self.model, self.X_sampled, show_progress, self.features_included)
 
-    def plot(self, vis_type: str = VisualizationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
-        """
-        See `plot` documentation in `PartialDependenceBasedMethod`.
-        Additionally, it passes one vs all feature interaction profile to the visualiser class, to be included
-        in visualizations.
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
+        """Plots interactions
+        
+        Parameters:
+            vis_type (str) -- type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'summary', 'bar_chart_ova']
+            title (str) -- title of plot, default is 'default' which means that title will be automatically generated for selected visualization type
+            figsize (tuple) -- size of figure
+            show (bool) -- whether to show plot
+            **kwargs: additional arguments for plot 
         """
         if self.ova is None:
             raise MethodNotFittedException(self.method)

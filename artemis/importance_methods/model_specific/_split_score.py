@@ -38,11 +38,11 @@ class SplitScoreImportance(VariableImportanceMethod):
 
         Arguments:
             model (object) -- model to be explained
-            X (Optional[pd.DataFrame]) -- unused as explanations are calculated only for trained model
-            features (Optional[List[str]]) -- list of features to be explained
+            X (pd.DataFrame, optional) -- unused as explanations are calculated only for trained model
+            features (List[str], optional) -- list of features to be explained
             selected_metric (str) -- metric to be used for calculating importance, one of ['sum_gain', 'sum_cover', 'mean_gain', 'mean_cover', 'mean_depth', 'mean_weighted_depth', 'root_frequency', 'weighted_root_frequency']
             show_progress (bool) -- whether to show progress bar
-            trees_df (Optional[pd.DataFrame]) -- DataFrame containing trees data, can be precalculated by SplitScore method
+            trees_df (pd.DataFrame, optional) -- DataFrame containing trees data, can be precalculated by SplitScore method
 
         Returns:
             pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"

@@ -11,13 +11,13 @@ from artemis.visualizer._visualizer import Visualizer
 class FeatureInteractionMethod(ABC):
     """Abstract base class for interaction methods. This class should not be used directly. Use derived classes instead.
 
-        Attributes:
-            method              [str], name of interaction method
-            visualizer          [Visualizer], automatically created on the basis of a method and used to create visualizations
-            variable_importance [pd.DataFrame], object that stores variable importance values after fitting
-            ovo                 [pd.DataFrame], stores one versus one variable interaction values after fitting
-            X_sampled           [pd.DataFrame], data used to calculate interactions
-            features_included   [List[str]], list of features that will be used during interactions calculation, if None is passed, all features will be used
+    Attributes:
+        method  (str) -- name of interaction method
+        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
+        variable_importance (pd.DataFrame) -- variable importance values 
+        ovo (pd.DataFrame) -- one versus one variable interaction values 
+        X_sampled (pd.DataFrame) -- data used to calculate interactions
+        features_included  (List[str]) -- list of features that will be used during interactions calculation, if None is passed, all features will be used
     """
 
     def __init__(self, method: str):
@@ -44,7 +44,7 @@ class FeatureInteractionMethod(ABC):
         """
         Base abstract method for calculating feature interaction method values.
 
-        Args:
+        Parameters:
             model:  model for which interactions will be extracted. Must have implemented `predict` method
             X:  data used to calculate interactions
             **kwargs:   parameters specific to a given feature interaction method
@@ -54,15 +54,15 @@ class FeatureInteractionMethod(ABC):
         """
         ...
 
-    def plot(self, vis_type: str = VisualizationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
-        """
-        Base method for creating requested type of plot. Can be used only after `fit` method.
-
-        Args:
-            vis_type: str, {"summary", "graph", "bar chart", "heatmap"} visualizer type, default "summary"
-
-        Returns:
-            object: None
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
+        """Plots interactions
+        
+        Parameters:
+            vis_type (str) -- type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'summary']
+            title (str) -- title of plot, default is 'default' which means that title will be automatically generated for selected visualization type
+            figsize (tuple) -- size of figure
+            show (bool) -- whether to show plot
+            **kwargs: additional arguments for plot 
         """
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
@@ -70,6 +70,7 @@ class FeatureInteractionMethod(ABC):
         self.visualizer.plot(self.ovo,
                              vis_type,
                              variable_importance=self.variable_importance,
+                             title=title,
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,

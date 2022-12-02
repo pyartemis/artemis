@@ -43,7 +43,7 @@ class PermutationImportance(VariableImportanceMethod):
             X (pd.DataFrame) -- data used to calculate importance
             y_true (np.array) -- target values for `X`
             n_repeat (int) -- amount of permutations to generate
-            features (Optional[List[str]]) -- list of features that will be used during importance calculation
+            features (List[str], optional) -- list of features that will be used during importance calculation
             show_progress (bool) -- determine whether to show the progress bar
 
         Returns:
