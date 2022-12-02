@@ -58,7 +58,14 @@ class SplitScoreMethod(FeatureInteractionMethod):
     def plot(self, vis_type: str = VisualizationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
-        self.visualizer.plot(self.ovo, vis_type, variable_importance=self.variable_importance, figsize=figsize, show=show, _full_result = self.full_result, **kwargs)
+        self.visualizer.plot(self.ovo,
+                             vis_type,
+                             variable_importance=self.variable_importance,
+                             figsize=figsize,
+                             show=show,
+                             interactions_ascending_order=self.interactions_ascending_order,
+                             _full_result=self.full_result,
+                             **kwargs)
 
 
 def _calculate_full_result(

@@ -49,7 +49,14 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         if self.ova is None:
             raise MethodNotFittedException(self.method)
 
-        self.visualizer.plot(self.ovo, vis_type, self.ova, variable_importance=self.variable_importance, figsize=figsize, show=show, **kwargs)
+        self.visualizer.plot(self.ovo,
+                             vis_type,
+                             self.ova,
+                             variable_importance=self.variable_importance,
+                             figsize=figsize,
+                             show=show,
+                             interactions_ascending_order=self.interactions_ascending_order,
+                             **kwargs)
 
     def _ova(self, predict_function, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
         """

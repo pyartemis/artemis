@@ -67,7 +67,13 @@ class FeatureInteractionMethod(ABC):
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
 
-        self.visualizer.plot(self.ovo, vis_type, variable_importance=self.variable_importance, figsize=figsize, show=show, **kwargs)
+        self.visualizer.plot(self.ovo,
+                             vis_type,
+                             variable_importance=self.variable_importance,
+                             figsize=figsize,
+                             show=show,
+                             interactions_ascending_order=self.interactions_ascending_order,
+                             **kwargs)
 
 
     def interaction_value(self, f1: str, f2: str):

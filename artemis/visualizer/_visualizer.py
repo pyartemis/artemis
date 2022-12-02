@@ -31,6 +31,7 @@ class Visualizer:
         title: Optional[str] = "default",
         figsize: tuple = (8, 6),
         show: bool = True,
+        interactions_ascending_order: bool = False,
         _full_result: Optional[pd.DataFrame] = None,
         _feature_column_name_1: str = "Feature 1",
         _feature_column_name_2: str = "Feature 2",
@@ -49,6 +50,7 @@ class Visualizer:
                 title=title,
                 figsize=figsize,
                 show=show,
+                interactions_ascending_order=interactions_ascending_order,
                 _f1_name=_feature_column_name_1,
                 _f2_name=_feature_column_name_2,
                 _directed=_directed,
@@ -75,6 +77,7 @@ class Visualizer:
                 title=title,
                 figsize=figsize,
                 show=show,
+                interactions_ascending_order=interactions_ascending_order,
                 _f1_name=_feature_column_name_1,
                 _f2_name=_feature_column_name_2,
                 _directed=_directed,
@@ -102,6 +105,7 @@ class Visualizer:
         title: str = "default",
         figsize: tuple = (8, 6),
         show: bool = True,
+        interactions_ascending_order: bool = False,
         ax=None,
         _f1_name: str = "Feature 1",
         _f2_name: str = "Feature 2",
@@ -110,8 +114,8 @@ class Visualizer:
     ):
         config = self.vis_config.interaction_matrix
         interaction_color_map = kwargs.pop(
-            "interaction_color_map", config.INTERACTION_COLOR_MAP
-        )
+            "interaction_color_map",
+            config.INTERACTION_COLOR_MAP if not interactions_ascending_order else config.INTERACTION_COLOR_MAP_REVERSE)
         importance_color_map = kwargs.pop(
             "importance_color_map", config.IMPORTANCE_COLOR_MAP
         )
@@ -351,6 +355,7 @@ class Visualizer:
         title: str = "default",
         figsize: tuple = (8, 6),
         show: bool = True,
+        interactions_ascending_order: bool = False,
         _f1_name: str = "Feature 1",
         _f2_name: str = "Feature 2",
         _directed: bool = False,
@@ -370,6 +375,7 @@ class Visualizer:
         self.plot_heatmap(
             ovo,
             variable_importance,
+            interactions_ascending_order=interactions_ascending_order,
             ax=ax1,
             _f1_name=_f1_name,
             _f2_name=_f2_name,
