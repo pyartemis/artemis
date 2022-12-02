@@ -12,10 +12,10 @@ class InteractionGraphConfiguration:
     FONT_COLOR: str = "#3B1F2B"
     FONT_WEIGHT: str = "bold"
     FONT_SIZE: int = 10
-    EDGE_COLOR: str = "#FFA500"
+    EDGE_COLOR: str = "rebeccapurple"
     EDGE_COLOR_POS: str = "#24E9D0"
     EDGE_COLOR_NEG: str = "#DB162F"
-    NODE_COLOR: str = "#DBDFAC"
+    NODE_COLOR: str = "green"
     NODE_SIZE: int = 1800
     TITLE: str = "Interaction graph"
     MIN_RELEVANT_INTERACTION: float = 0.05
@@ -36,13 +36,30 @@ class InteractionMatrixConfiguration:
 class InteractionVersusAllConfiguration:
     TITLE: str = "Interaction with all other features"
     TOP_K: int = 10
-    COLOR: str = "lightblue"
+    COLOR: str = "mediumpurple"
 
 @dataclass
 class InteractionVersusOneConfiguration:
     TITLE: str = "Pair interactions"
     TOP_K: int = 10
-    COLOR: str = "lightblue"
+    COLOR: str = "mediumpurple"
+ 
+@dataclass
+class LollipopSplitScoreConfiguration:
+    TITLE: str = "Lollipop boosting model summary"
+    SCALE: str = "linear" 
+    MAX_TREES: float = 0.2
+    LABEL_THRESHOLD: float = 0.1
+    COLORS = ['#e41a1c',
+            '#377eb8',
+            '#4daf4a',
+            '#984ea3',
+            '#ff7f00',
+            '#ffff33']
+    SHAPES = ["o" , "," , "v" , "^" , "<", ">"]
+    MAX_DEPTH: int = 1 
+    LABELS: bool = True
+
 
 class VisualisationConfigurationProvider:
     accepted_visualisations = {
@@ -56,7 +73,8 @@ class VisualisationConfigurationProvider:
         InteractionMethod.CONDITIONAL_MINIMAL_DEPTH: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
                                                       VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
         InteractionMethod.SPLIT_SCORE: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                                VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP]
+                                                VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP,
+                                                VisualisationType.LOLLIPOP]
     }
 
     @classmethod
@@ -122,3 +140,4 @@ class VisualisationConfiguration:
     interaction_matrix: InteractionMatrixConfiguration = InteractionMatrixConfiguration()
     interaction_bar_chart_ova: InteractionVersusAllConfiguration = InteractionVersusAllConfiguration()
     interaction_bar_chart_ovo: InteractionVersusOneConfiguration = InteractionVersusOneConfiguration()
+    lollipop: LollipopSplitScoreConfiguration = LollipopSplitScoreConfiguration()

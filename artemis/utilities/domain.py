@@ -31,6 +31,7 @@ class VisualisationType:
     BAR_CHART_OVA: str = "bar_chart_ova"
     BAR_CHART_OVO: str = "bar_chart"
     HEATMAP: str = "heatmap"
+    LOLLIPOP: str = "lollipop"
 
 
 @dataclass
