@@ -70,7 +70,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         ]
 
         return pd.DataFrame(h_stat_one_vs_all, columns=["Feature", InteractionMethod.H_STATISTIC]).sort_values(
-            by=InteractionMethod.H_STATISTIC, ascending=False, ignore_index=True
+            by=InteractionMethod.H_STATISTIC, ascending=self.interactions_ascending_order, ignore_index=True
         )
 
     def _calculate_i_versus(self, predict_function, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:

@@ -25,6 +25,23 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     def __init__(self):
         super().__init__(InteractionMethod.CONDITIONAL_MINIMAL_DEPTH)
 
+    @property
+    def interactions_ascending_order(self):
+        return True
+
+    @property
+    def _compare_ovo(self):
+        if self.ovo is None:
+            raise MethodNotFittedException(self.method)
+        compare_ovo = self.ovo.copy().rename(columns={"root_variable": "Feature 1", "variable": "Feature 2"})
+        compare_ovo['id'] = compare_ovo[["Feature 1", "Feature 2"]].apply(lambda x: "".join(sorted(x)), axis=1)
+        return (compare_ovo.groupby("id")
+                           .agg({"Feature 1": "first", "Feature 2": "first", self.method: "mean"})
+                           .sort_values("Conditional Minimal Depth Measure",
+                                        ascending=self.interactions_ascending_order,
+                                        ignore_index=True))
+
+
     def fit(
             self,
             model: Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier],
@@ -42,7 +59,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         """
         column_dict = _make_column_dict(X)
         self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
-        self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method)
+        self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self.interactions_ascending_order)
         self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
 
     def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
@@ -55,7 +72,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                                 _feature_column_name_1="root_variable",
                                 _feature_column_name_2="variable",
                                 _directed=True,
-                                variable_importance=self.variable_importance, 
+                                variable_importance=self.variable_importance,
                                  figsize=figsize, show=show, **kwargs
                                 )
 
@@ -148,7 +165,7 @@ def _conditional_minimal_depth(split_var_to_nodes: dict, depths: np.array, tree_
             occurence_flag = 0
             if f_1 in split_var_to_nodes and f_2 in split_var_to_nodes:
                 split_f1, split_f2 = split_var_to_nodes[f_1], split_var_to_nodes[f_2]
-                highest_maximal_split_f1 = split_f1[depths[split_f1] == depths[split_f1[0]]] 
+                highest_maximal_split_f1 = split_f1[depths[split_f1] == depths[split_f1[0]]]
                 for current_root_id in highest_maximal_split_f1:
                     current_root_depth = depths[current_root_id]
                     upper_bound = _calculate_maximal_id_in_subtree(current_root_depth, current_root_id, depths, n_nodes)
@@ -169,14 +186,14 @@ def _make_column_dict(X: pd.DataFrame) -> dict:
     return dict(zip(range(len(X.columns)), X.columns.to_list()))
 
 
-def _summarise_results(raw_result_df: pd.DataFrame, column_dict: dict, method_name: str) -> pd.DataFrame:
+def _summarise_results(raw_result_df: pd.DataFrame, column_dict: dict, method_name: str, ascending_order: bool) -> pd.DataFrame:
     """Average result over trees, rename columns, fill missing data."""
     final_result = (raw_result_df.groupby(["split_variable", "ancestor_variable"])
                     .agg({"value": "mean", "occur": "sum"})
                     .reset_index()
-                    .rename({"occur": "n_occurences", "value": method_name, 
+                    .rename({"occur": "n_occurences", "value": method_name,
                                 "split_variable": "root_variable", "ancestor_variable": "variable"}, axis=1)
-                    .sort_values(by=["n_occurences", method_name], ascending=[False, True])
+                    .sort_values(by=["n_occurences", method_name], ascending=[False, ascending_order])
                     .reset_index(drop=True)
     )
 

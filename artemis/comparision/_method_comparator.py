@@ -44,10 +44,10 @@ class FeatureInteractionMethodComparator:
         m1_name, m2_name = method1.method, method2.method
         fig, ax = plt.subplots(figsize=figsize)
         plt.grid(True)
-        circle_r = 0.2 * min(max(method1.ovo[m1_name]), max(method2.ovo[m2_name]))
+        circle_r = 0.2 * min(max(method1._compare_ovo[m1_name]), max(method2._compare_ovo[m2_name]))
 
         x, y = list(), list()
-        for index, row in method1.ovo.iterrows():
+        for index, row in method1._compare_ovo.iterrows():
 
             f1, f2 = row["Feature 1"], row["Feature 2"]
             x_curr, y_curr = row[method1.method], method2.interaction_value(f1, f2)
@@ -58,6 +58,11 @@ class FeatureInteractionMethodComparator:
                 _add_arrow(ax, circle_r, f1, f2, x_curr, y_curr)
 
         ax.scatter(x, y, color=InteractionGraphConfiguration.NODE_COLOR)
+        
+        if method1.interactions_ascending_order:
+            plt.gca().invert_xaxis()
+        if method2.interactions_ascending_order:
+            plt.gca().invert_yaxis()
 
         if add_correlation_box:
 
@@ -83,8 +88,8 @@ class FeatureInteractionMethodComparator:
 
 
 def _rank_interaction_values_encoded(method1, method2):
-    rank_features_m1 = method1.sorted_ovo().apply(lambda row: _alphabetical_order_pair(row), axis=1)
-    rank_features_m2 = method2.sorted_ovo().apply(lambda row: _alphabetical_order_pair(row), axis=1)
+    rank_features_m1 = method1._compare_ovo.apply(lambda row: _alphabetical_order_pair(row), axis=1)
+    rank_features_m2 = method2._compare_ovo.apply(lambda row: _alphabetical_order_pair(row), axis=1)
     rank_features_encoded = pd.concat(
         [rank_features_m1.astype('category').cat.codes, rank_features_m2.astype('category').cat.codes], axis=1)
 
@@ -135,7 +140,7 @@ def _assert_fitted_ovo(method1: FeatureInteractionMethod, method2: FeatureIntera
 
 
 def _suitable_for_ovo(method: FeatureInteractionMethod):
-    return method.ovo is not None
+    return method._compare_ovo is not None
 
 
 def _alphabetical_order_pair(row):

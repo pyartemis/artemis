@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 import pandas as pd
 
@@ -8,7 +8,7 @@ from artemis.visualizer._configuration import VisualisationConfigurationProvider
 from artemis.visualizer._visualizer import Visualizer
 
 
-class FeatureInteractionMethod:
+class FeatureInteractionMethod(ABC):
     """Abstract base class for interaction methods. This class should not be used directly. Use derived classes instead.
 
         Attributes:
@@ -27,6 +27,17 @@ class FeatureInteractionMethod:
         self.ovo = None
         self.X_sampled = None
         self.features_included = None
+
+    @property
+    @abstractmethod
+    def interactions_ascending_order(self):
+        ...
+
+    @property
+    def _compare_ovo(self):
+        if self.ovo is None:
+            raise MethodNotFittedException(self.method)
+        return self.ovo.sort_values(self.method, ascending=self.interactions_ascending_order, ignore_index=True)
 
     @abstractmethod
     def fit(self, model, X: pd.DataFrame, **kwargs):
@@ -57,20 +68,14 @@ class FeatureInteractionMethod:
             raise MethodNotFittedException(self.method)
 
         self.visualizer.plot(self.ovo, vis_type, variable_importance=self.variable_importance, figsize=figsize, show=show, **kwargs)
-       
+
 
     def interaction_value(self, f1: str, f2: str):
 
-        if self.ovo is None:
+        if self._compare_ovo is None:
             raise MethodNotFittedException(self.method)
 
-        return self.ovo[
-            ((self.ovo["Feature 1"] == f1) & (self.ovo["Feature 2"] == f2)) |
-            ((self.ovo["Feature 1"] == f2) & (self.ovo["Feature 2"] == f1))
+        return self._compare_ovo[
+            ((self._compare_ovo["Feature 1"] == f1) & (self._compare_ovo["Feature 2"] == f2)) |
+            ((self._compare_ovo["Feature 1"] == f2) & (self._compare_ovo["Feature 2"] == f1))
             ][self.method].values[0]
-
-    def sorted_ovo(self):
-        if self.ovo is None:
-            raise MethodNotFittedException(self.method)
-
-        return self.ovo.sort_values(by=self.method, ascending=False, ignore_index=True)

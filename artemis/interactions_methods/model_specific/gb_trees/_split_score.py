@@ -11,7 +11,8 @@ from artemis.importance_methods.model_specific import SplitScoreImportance
 from artemis.utilities.split_score_metrics import (
     SplitScoreImportanceMetric,
     SplitScoreInteractionMetric,
-    _LGBM_UNSUPPORTED_METRICS
+    _LGBM_UNSUPPORTED_METRICS,
+    _ASCENDING_ORDER_METRICS
 )
 from ._handler import GBTreesHandler
 from ..._method import FeatureInteractionMethod
@@ -21,6 +22,11 @@ from ....utilities.domain import InteractionMethod
 class SplitScoreMethod(FeatureInteractionMethod):
     def __init__(self):
         super().__init__(InteractionMethod.SPLIT_SCORE)
+        self.metric = None
+
+    @property
+    def interactions_ascending_order(self):
+        return self.metric in _ASCENDING_ORDER_METRICS
 
     def fit(
         self,
@@ -33,6 +39,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
     ):
         if not isinstance(model, GBTreesHandler):
             model = GBTreesHandler(model)
+        self.metric = interaction_selected_metric
         _check_metrics_with_available_info(model.package, interaction_selected_metric, importance_selected_metric)
         self.full_result = _calculate_full_result(
             model.trees_df, model.package, show_progress
@@ -136,7 +143,7 @@ def _get_ovo(
                 selected_metric: method_class.method,
             }
         )
-        .sort_values(by=method_class.method, ascending=False, ignore_index=True)
+        .sort_values(by=method_class.method, ascending=method_class.interactions_ascending_order, ignore_index=True)
     )
 
 def _check_metrics_with_available_info(package, interaction_selected_metric, importance_selected_metric):
