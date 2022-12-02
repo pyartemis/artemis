@@ -25,7 +25,7 @@ class InteractionCalculationStrategy:
 
 
 @dataclass
-class VisualisationType:
+class VisualizationType:
     SUMMARY: str = "summary"
     INTERACTION_GRAPH: str = "graph"
     BAR_CHART_OVA: str = "bar_chart_ova"

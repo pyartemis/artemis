@@ -4,7 +4,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from ....utilities.exceptions import MethodNotFittedException, MetricNotSupportedException
-from ....utilities.domain import InteractionMethod, VisualisationType
+from ....utilities.domain import InteractionMethod, VisualizationType
 from ..._method import FeatureInteractionMethod
 from ._handler import GBTreesHandler
 from artemis.importance_methods.model_specific import SplitScoreImportance
@@ -48,7 +48,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
             trees_df=model.trees_df,
         )
 
-    def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
         self.visualizer.plot(self.ovo, vis_type, variable_importance=self.variable_importance, figsize=figsize, show=show, _full_result = self.full_result, **kwargs)

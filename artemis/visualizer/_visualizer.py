@@ -7,20 +7,20 @@ import seaborn as sns
 from matplotlib import gridspec
 from matplotlib import pyplot as plt
 
-from artemis.utilities.domain import VisualisationType
-from artemis.utilities.exceptions import VisualisationNotSupportedException
+from artemis.utilities.domain import VisualizationType
+from artemis.utilities.exceptions import VisualizationNotSupportedException
 from artemis.visualizer._configuration import (
-    VisualisationConfiguration,
+    VisualizationConfiguration,
 )
 
 
 class Visualizer:
-    def __init__(self, method: str, vis_config: VisualisationConfiguration):
+    def __init__(self, method: str, vis_config: VisualizationConfiguration):
         self.vis_config = vis_config
         self.method = method
 
     def accepts(self, vis_type: str) -> bool:
-        return vis_type in self.vis_config.accepted_visualisations
+        return vis_type in self.vis_config.accepted_visualizations
 
     def plot(
         self,
@@ -39,9 +39,9 @@ class Visualizer:
     ):
 
         if not self.accepts(vis_type):
-            raise VisualisationNotSupportedException(self.method, vis_type)
+            raise VisualizationNotSupportedException(self.method, vis_type)
 
-        if vis_type == VisualisationType.SUMMARY:
+        if vis_type == VisualizationType.SUMMARY:
             self.plot_summary(
                 ovo,
                 variable_importance,
@@ -54,7 +54,7 @@ class Visualizer:
                 _directed=_directed,
                 **kwargs,
             )
-        elif vis_type == VisualisationType.INTERACTION_GRAPH:
+        elif vis_type == VisualizationType.INTERACTION_GRAPH:
             self.plot_interaction_graph(
                 ovo,
                 variable_importance,
@@ -66,9 +66,9 @@ class Visualizer:
                 _directed=_directed,
                 **kwargs,
             )
-        elif vis_type == VisualisationType.BAR_CHART_OVA:
+        elif vis_type == VisualizationType.BAR_CHART_OVA:
             self.plot_barchart_ova(ova, figsize=figsize, show=show, **kwargs)
-        elif vis_type == VisualisationType.HEATMAP:
+        elif vis_type == VisualizationType.HEATMAP:
             self.plot_heatmap(
                 ovo,
                 variable_importance,
@@ -80,7 +80,7 @@ class Visualizer:
                 _directed=_directed,
                 **kwargs,
             )
-        elif vis_type == VisualisationType.BAR_CHART_OVO:
+        elif vis_type == VisualizationType.BAR_CHART_OVO:
             self.plot_barchart_ovo(
                 ovo,
                 title=title,
@@ -90,7 +90,7 @@ class Visualizer:
                 _f2_name=_feature_column_name_2,
                 **kwargs,
             )
-        elif vis_type == VisualisationType.LOLLIPOP:
+        elif vis_type == VisualizationType.LOLLIPOP:
             self.plot_lollipop(
                 _full_result, title=title, figsize=figsize, show=show, **kwargs
             )

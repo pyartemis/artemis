@@ -1,10 +1,10 @@
 import unittest
 
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE
-from artemis.utilities.domain import InteractionMethod, VisualisationType
+from artemis.utilities.domain import InteractionMethod, VisualizationType
 from artemis.interactions_methods.model_agnostic import GreenwellMethod
-from artemis.utilities.exceptions import VisualisationNotSupportedException
-from artemis.visualizer._configuration import VisualisationConfigurationProvider
+from artemis.utilities.exceptions import VisualizationNotSupportedException
+from artemis.visualizer._configuration import VisualizationConfigurationProvider
 
 
 class GreenwellMethodUnitTest(unittest.TestCase):
@@ -59,21 +59,21 @@ class GreenwellMethodUnitTest(unittest.TestCase):
         greenwell_inter.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # allowed plots are generated without exception
-        accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.VARIABLE_INTERACTION).accepted_visualisations
+        accepted_vis = VisualizationConfigurationProvider.get(InteractionMethod.VARIABLE_INTERACTION).accepted_visualizations
         for vis in accepted_vis:
             greenwell_inter.plot(vis, show=False)
 
         # then
         # nothing crashes!
 
-    def test_should_raise_VisualisationNotSupportedException(self):
+    def test_should_raise_VisualizationNotSupportedException(self):
         # when
         greenwell_inter = GreenwellMethod()
         greenwell_inter.fit(self.model, self.X, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
-        # barchart is not supported for greenwell (no OvA), so this should raise VisualisationNotSupportedException
-        with self.assertRaises(VisualisationNotSupportedException):
-            greenwell_inter.plot(VisualisationType.BAR_CHART_OVA)
+        # barchart is not supported for greenwell (no OvA), so this should raise VisualizationNotSupportedException
+        with self.assertRaises(VisualizationNotSupportedException):
+            greenwell_inter.plot(VisualizationType.BAR_CHART_OVA)
 
 
 if __name__ == '__main__':

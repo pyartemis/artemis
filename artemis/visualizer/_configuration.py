@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from artemis.utilities.domain import InteractionMethod, VisualisationType
+from artemis.utilities.domain import InteractionMethod, VisualizationType
 from artemis.utilities.exceptions import MethodNotSupportedException
 
 
@@ -61,20 +61,20 @@ class LollipopSplitScoreConfiguration:
     LABELS: bool = True
 
 
-class VisualisationConfigurationProvider:
-    accepted_visualisations = {
-        InteractionMethod.H_STATISTIC: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                        VisualisationType.BAR_CHART_OVA, VisualisationType.BAR_CHART_OVO,
-                                        VisualisationType.HEATMAP],
-        InteractionMethod.PERFORMANCE_BASED: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                              VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
-        InteractionMethod.VARIABLE_INTERACTION: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                                VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
-        InteractionMethod.CONDITIONAL_MINIMAL_DEPTH: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                                      VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP],
-        InteractionMethod.SPLIT_SCORE: [VisualisationType.SUMMARY, VisualisationType.INTERACTION_GRAPH,
-                                                VisualisationType.BAR_CHART_OVO, VisualisationType.HEATMAP,
-                                                VisualisationType.LOLLIPOP]
+class VisualizationConfigurationProvider:
+    accepted_visualizations = {
+        InteractionMethod.H_STATISTIC: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
+                                        VisualizationType.BAR_CHART_OVA, VisualizationType.BAR_CHART_OVO,
+                                        VisualizationType.HEATMAP],
+        InteractionMethod.PERFORMANCE_BASED: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
+                                              VisualizationType.BAR_CHART_OVO, VisualizationType.HEATMAP],
+        InteractionMethod.VARIABLE_INTERACTION: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
+                                                VisualizationType.BAR_CHART_OVO, VisualizationType.HEATMAP],
+        InteractionMethod.CONDITIONAL_MINIMAL_DEPTH: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
+                                                      VisualizationType.BAR_CHART_OVO, VisualizationType.HEATMAP],
+        InteractionMethod.SPLIT_SCORE: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
+                                                VisualizationType.BAR_CHART_OVO, VisualizationType.HEATMAP,
+                                                VisualizationType.LOLLIPOP]
     }
 
     @classmethod
@@ -94,21 +94,21 @@ class VisualisationConfigurationProvider:
 
     @classmethod
     def _h_stat_config(cls):
-        return VisualisationConfiguration(
-            accepted_visualisations=cls.accepted_visualisations[InteractionMethod.H_STATISTIC])
+        return VisualizationConfiguration(
+            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.H_STATISTIC])
 
     @classmethod
     def _var_inter_config(cls):
-        return VisualisationConfiguration(
-            accepted_visualisations=cls.accepted_visualisations[InteractionMethod.VARIABLE_INTERACTION])
+        return VisualizationConfiguration(
+            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.VARIABLE_INTERACTION])
 
     @classmethod
     def _perf_based_config(cls):
         graph_config = InteractionGraphConfiguration()
         graph_config.MIN_RELEVANT_INTERACTION = 0.1
 
-        return VisualisationConfiguration(
-            accepted_visualisations=cls.accepted_visualisations[InteractionMethod.PERFORMANCE_BASED],
+        return VisualizationConfiguration(
+            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.PERFORMANCE_BASED],
             interaction_graph=graph_config)
 
     @classmethod
@@ -116,8 +116,8 @@ class VisualisationConfigurationProvider:
         graph_config = InteractionGraphConfiguration()
         graph_config.MIN_RELEVANT_INTERACTION = 0.1
 
-        return VisualisationConfiguration(
-            accepted_visualisations=cls.accepted_visualisations[InteractionMethod.SPLIT_SCORE],
+        return VisualizationConfiguration(
+            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.SPLIT_SCORE],
             interaction_graph=graph_config)
 
     @classmethod
@@ -127,15 +127,15 @@ class VisualisationConfigurationProvider:
         graph_config.MIN_RELEVANT_INTERACTION = 0.6
         graph_config.MAX_EDGE_WIDTH = 3
 
-        return VisualisationConfiguration(
-            accepted_visualisations=cls.accepted_visualisations[InteractionMethod.CONDITIONAL_MINIMAL_DEPTH],
+        return VisualizationConfiguration(
+            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.CONDITIONAL_MINIMAL_DEPTH],
             interaction_graph=graph_config
         )
 
 
 @dataclass
-class VisualisationConfiguration:
-    accepted_visualisations: List[str]
+class VisualizationConfiguration:
+    accepted_visualizations: List[str]
     interaction_graph: InteractionGraphConfiguration = InteractionGraphConfiguration()
     interaction_matrix: InteractionMatrixConfiguration = InteractionMatrixConfiguration()
     interaction_bar_chart_ova: InteractionVersusAllConfiguration = InteractionVersusAllConfiguration()
