@@ -40,7 +40,7 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
             X (pd.DataFrame) -- data used to calculate importance
             features (List[str], optional) -- list of features that will be used during importance calculation
             show_progress (bool) -- determine whether to show the progress bar
-            precalculated_pdp (dict):  precalculated partial dependence profiles, if None calculated from scratch
+            precalculated_pdp (dict) --  precalculated partial dependence profiles, if None calculated from scratch
 
         Returns:
             pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"
