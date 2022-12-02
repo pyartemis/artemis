@@ -26,6 +26,10 @@ class SejongOhMethod(FeatureInteractionMethod):
         super().__init__(InteractionMethod.PERFORMANCE_BASED)
         self.metric = metric
         self.y_sampled = None
+    
+    @property
+    def interactions_ascending_order(self):
+        return False
 
     def fit(
             self,
@@ -77,7 +81,7 @@ def _perf_based_ovo(
         interactions.append([f1, f2, abs(sum(inter) / len(inter))])
 
     return pd.DataFrame(interactions, columns=["Feature 1", "Feature 2", method_class.method]).sort_values(
-        by=method_class.method, ascending=False, ignore_index=True
+        by=method_class.method, ascending=method_class.interactions_ascending_order, ignore_index=True
     )
 
 

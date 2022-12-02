@@ -25,6 +25,7 @@ class InteractionGraphConfiguration:
 class InteractionMatrixConfiguration:
     TITLE: str = "Interaction matrix"
     INTERACTION_COLOR_MAP: str = "Purples"
+    INTERACTION_COLOR_MAP_REVERSE: str = "Purples_r"
     IMPORTANCE_COLOR_MAP: str = "Greens"
     ANNOT_FMT: str = ".3f"
     LINEWIDTHS: float = 0.5

@@ -16,6 +16,10 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
     def __init__(self, method: str):
         super().__init__(method)
 
+    @property
+    def interactions_ascending_order(self):
+        return False
+
     def fit(self,
             model,
             X: pd.DataFrame,
@@ -66,7 +70,7 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         ]
 
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
-            by=self.method, ascending=False, ignore_index=True
+            by=self.method, ascending=self.interactions_ascending_order, ignore_index=True
         ).fillna(0)
 
     @abstractmethod
