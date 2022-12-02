@@ -43,14 +43,14 @@ class MinimalDepthImportance(VariableImportanceMethod):
         for tree_id in tree_id_to_depth_split.keys():
             depth_tree, split_tree = tree_id_to_depth_split[tree_id]
             for f in split_tree.keys():
-                feature_to_depth[f].append(np.max(depth_tree) - depth_tree[split_tree[f][0]])
+                feature_to_depth[f].append(depth_tree[split_tree[f][0]])
 
         records_result = []
         for f in feature_to_depth.keys():
             records_result.append({"Feature": columns[f], "Value": np.mean(feature_to_depth[f])})
 
         self.variable_importance = pd.DataFrame.from_records(records_result).sort_values(
-            by="Value", ascending=False, ignore_index=True
+            by="Value", ignore_index=True
         )
 
         return self.variable_importance
