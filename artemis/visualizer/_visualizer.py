@@ -144,7 +144,7 @@ class Visualizer:
         plt.vlines(x=df_to_plot["Interaction"], ymin=df_to_plot[self.method], ymax=df_to_plot["unconditional_importance"], color=color, alpha=0.5)
         plt.scatter(df_to_plot["Interaction"], y=df_to_plot["unconditional_importance"], color=color, marker="o")
         ax.get_legend().remove()
-        ax.figure.colorbar(sm, label="Occurences")
+        plt.colorbar(sm, label="Occurences", ax=ax)
         plt.xticks(rotation=90, size=7)
         plt.grid()
         if show:
