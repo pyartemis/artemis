@@ -17,3 +17,4 @@ class SplitScoreImportanceMetric(SplitScoreInteractionMetric):
     WEIGHTED_ROOT_FREQUENCY: str = "weighted_root_frequency"
 
 _LGBM_UNSUPPORTED_METRICS = [SplitScoreInteractionMetric.MEAN_COVER, SplitScoreInteractionMetric.SUM_COVER]
+_ASCENDING_ORDER_METRICS = [SplitScoreInteractionMetric.MEAN_DEPTH]

@@ -2,7 +2,7 @@ import unittest
 
 from artemis.utilities.domain import InteractionMethod
 from artemis.interactions_methods.model_agnostic import SejongOhMethod
-from artemis.visualisation.configuration import VisualisationConfigurationProvider
+from artemis.visualizer._configuration import VisualizationConfigurationProvider
 from .util import california_housing_random_forest, SAMPLE_SIZE, N_REPEAT, CALIFORNIA_SUBSET, has_decreasing_order
 
 
@@ -57,7 +57,7 @@ class SejongOhMethodTestCase(unittest.TestCase):
         sejong_oh_inter.fit(self.model, self.X, self.y, SAMPLE_SIZE, features=CALIFORNIA_SUBSET)
 
         # allowed plots are generated without exception
-        accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.PERFORMANCE_BASED).accepted_visualisations
+        accepted_vis = VisualizationConfigurationProvider.get(InteractionMethod.PERFORMANCE_BASED).accepted_visualizations
         for vis in accepted_vis:
             sejong_oh_inter.plot(vis, show=False)
 

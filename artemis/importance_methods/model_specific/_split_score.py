@@ -10,19 +10,43 @@ from tqdm import tqdm
 
 
 class SplitScoreImportance(VariableImportanceMethod):
+    """Class implementing Split Score Feature Importance. It applies to gradient boosting tree-based models.
+    It can use data calculated in SplitScore method from `interactions_methods` module.
+
+    Importance of a feature is defined by the metric selected by user (default is sum of gains).
+
+    References:
+    - https://modeloriented.github.io/EIX/
+    """
+
     def __init__(self):
+        """Constructor for SplitScoreImportance"""
         super().__init__(ImportanceMethod.SPLIT_SCORE_IMPORTANCE)
 
     def importance(
         self,
         model,
-        X: Optional[pd.DataFrame] = None,  # unused as explanations are calculated only for trained model, left for compatibility
+        X: Optional[
+            pd.DataFrame
+        ] = None,  # unused as explanations are calculated only for trained model, left for compatibility
         features: Optional[List[str]] = None,
         selected_metric: str = SplitScoreImportanceMetric.SUM_GAIN,
         show_progress: bool = False,
         trees_df: Optional[pd.DataFrame] = None,
     ):
+        """Calculates Split Score Feature Importance.
 
+        Arguments:
+            model (object) -- model to be explained
+            X (pd.DataFrame, optional) -- unused as explanations are calculated only for trained model
+            features (List[str], optional) -- list of features to be explained
+            selected_metric (str) -- metric to be used for calculating importance, one of ['sum_gain', 'sum_cover', 'mean_gain', 'mean_cover', 'mean_depth', 'mean_weighted_depth', 'root_frequency', 'weighted_root_frequency']
+            show_progress (bool) -- whether to show progress bar
+            trees_df (pd.DataFrame, optional) -- DataFrame containing trees data, can be precalculated by SplitScore method
+
+        Returns:
+            pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"
+        """
         if trees_df is None:
             if not isinstance(model, GBTreesHandler):
                 model = GBTreesHandler(model)
@@ -92,9 +116,7 @@ def _calculate_mean_weighted_depth_metric(trees_df: pd.DataFrame):
     )
 
 
-def _select_metric(
-    importance_full_result: pd.DataFrame, selected_metric: str
-):
+def _select_metric(importance_full_result: pd.DataFrame, selected_metric: str):
     variable_importance = importance_full_result[
         ["split_feature", selected_metric]
     ].rename(columns={"split_feature": "Feature", selected_metric: "Value"})

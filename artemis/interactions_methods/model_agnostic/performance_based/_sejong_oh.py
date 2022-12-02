@@ -8,24 +8,31 @@ from tqdm import tqdm
 from artemis.importance_methods.model_agnostic import PermutationImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.domain import InteractionMethod, ProblemType, ProgressInfoLog
-from artemis.utilities.metrics import Metric, RMSE
+from artemis.utilities.performance_metrics import Metric, RMSE
 from artemis.utilities.ops import all_if_none, sample_both_if_not_none
 
 
 class SejongOhMethod(FeatureInteractionMethod):
-    """Class implementing Sejong Oh performance-based feature interaction method.
-        Method is described in the following paper: https://www.mdpi.com/2076-3417/9/23/5191.
-
-        Attributes:
-            metric         [Metric], metric used for assessing model performance
-            y_sampled  [np.array], sampled target values used in calculation
-
-        """
+    """Class implementing Sejong Oh Performance Based feature interaction method.
+    Attributes:
+        method (str) -- name of interaction method
+        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
+        variable_importance (pd.DataFrame) -- variable importance values 
+        ovo (pd.DataFrame) -- one versus one variable interaction values 
+        metric (Metric) -- metric used to calculate interactions
+    
+    References:
+    - https://www.mdpi.com/2076-3417/9/23/5191
+    """
 
     def __init__(self, metric: Metric = RMSE()):
         super().__init__(InteractionMethod.PERFORMANCE_BASED)
         self.metric = metric
         self.y_sampled = None
+    
+    @property
+    def interactions_ascending_order(self):
+        return False
 
     def fit(
             self,
@@ -37,18 +44,17 @@ class SejongOhMethod(FeatureInteractionMethod):
             features: List[str] = None,
             show_progress: bool = False,
     ):
-        """
-        Calculate one versus one feature interaction profile and variable importance. Both are performance-based.
-        Interactions are extracted using Sejong Oh method.
-        Variable importance is calculated using permutation importance.
-        Args:
-            model:          model for which interactions will be extracted, must have implemented predict method
-            X:              data used to calculate interactions
-            y_true:         target values for X data
-            n:              number of rows to be sampled, if None full data will be taken
-            n_repeat:       amount of times permutation importance should repeat
-            features:       list of features that will be used during interactions calculation; if None all features will be used
-            show_progress:  determine whether to show the progress bar
+
+        """Calculates Performance Based Interactions and Permutationl Based Feature Importance for the given model. 
+
+        Parameters:
+            model -- model to be explained
+            X (pd.DataFrame, optional) -- data used to calculate interactions
+            y_true (np.array) -- target values for X data
+            n (int, optional) -- number of samples to be used for calculation of interactions
+            n_repeat (int) -- number of permutations 
+            features (List[str], optional) -- list of features for which interactions will be calculated
+            show_progress (bool) -- whether to show progress bar 
         """
         self.X_sampled, self.y_sampled = sample_both_if_not_none(X, y_true, n)
         self.features_included = all_if_none(X, features)
@@ -77,7 +83,7 @@ def _perf_based_ovo(
         interactions.append([f1, f2, abs(sum(inter) / len(inter))])
 
     return pd.DataFrame(interactions, columns=["Feature 1", "Feature 2", method_class.method]).sort_values(
-        by=method_class.method, ascending=False, ignore_index=True
+        by=method_class.method, ascending=method_class.interactions_ascending_order, ignore_index=True
     )
 
 

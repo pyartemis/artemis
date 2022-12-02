@@ -11,11 +11,20 @@ from ._pdp import PartialDependenceBasedMethod
 
 class GreenwellMethod(PartialDependenceBasedMethod):
     """Class implementing Greenwell feature interaction method.
-    Method is described in the following paper: https://arxiv.org/pdf/1805.04755.pdf.
 
+    Attributes:
+        method (str) -- name of interaction method
+        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
+        variable_importance (pd.DataFrame) -- variable importance values 
+        ovo (pd.DataFrame) -- one versus one variable interaction values 
+    
+    References:
+    - https://arxiv.org/pdf/1805.04755.pdf
     """
 
+
     def __init__(self):
+        """Constructor for GreenwellMethod"""
         super().__init__(InteractionMethod.VARIABLE_INTERACTION)
 
     def _calculate_i_versus(self, predict_function, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:

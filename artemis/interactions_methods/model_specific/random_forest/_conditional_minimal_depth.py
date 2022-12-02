@@ -9,21 +9,45 @@ from tqdm import tqdm
 
 from artemis.importance_methods.model_specific import MinimalDepthImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import InteractionMethod, VisualisationType
+from artemis.utilities.domain import InteractionMethod, VisualizationType
 from artemis.utilities.exceptions import MethodNotFittedException
 
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     """
-    Class implementing tree-based Conditional Minimal Depth feature interaction method.
-    This method is applicable to scikit-learn tree-based models.
-    Method is described in the following thesis:
-    https://cdn.staticaly.com/gh/geneticsMiNIng/BlackBoxOpener/master/randomForestExplainer_Master_thesis.pdf.
+    Class implementing Conditional Minimal Depth Method for extraction of interactions.  t applies to tree-based models like Random Forests.
+    Currently scikit-learn forest models are supported, i.e., RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier. 
 
+    Attributes:
+        method (str) -- name of interaction method
+        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
+        variable_importance (pd.DataFrame) -- variable importance values 
+        ovo (pd.DataFrame) -- one versus one variable interaction values 
+    
+    References:
+    - https://modeloriented.github.io/randomForestExplainer/
+    - https://doi.org/10.1198/jasa.2009.tm08622
     """
-
     def __init__(self):
+        """Constructor for ConditionalMinimalDepthMethod"""
         super().__init__(InteractionMethod.CONDITIONAL_MINIMAL_DEPTH)
+
+    @property
+    def interactions_ascending_order(self):
+        return True
+
+    @property
+    def _compare_ovo(self):
+        if self.ovo is None:
+            raise MethodNotFittedException(self.method)
+        compare_ovo = self.ovo.copy().rename(columns={"root_variable": "Feature 1", "variable": "Feature 2"})
+        compare_ovo['id'] = compare_ovo[["Feature 1", "Feature 2"]].apply(lambda x: "".join(sorted(x)), axis=1)
+        return (compare_ovo.groupby("id")
+                           .agg({"Feature 1": "first", "Feature 2": "first", self.method: "mean"})
+                           .sort_values("Conditional Minimal Depth Measure",
+                                        ascending=self.interactions_ascending_order,
+                                        ignore_index=True))
+
 
     def fit(
             self,
@@ -31,33 +55,42 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
             X: pd.DataFrame,
             show_progress: bool = False,
     ):
-        """
-        Calculate directed one vs one feature interaction profile using Conditional Minimal Depth method.
-        Additionally, asses feature importance using average minimal depth importance method.
+        """Calculates Conditional Minimal Depth Interactions and Minimal Depth Feature Importance for given model.
 
-        Args:
-            model:          tree-based model implementing sklearn-like API for which interactions will be extracted
-            X:              data used to calculate interactions
-            show_progress:  determine whether to show the progress bar
+        Parameters:
+            model (Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier]) -- tree-based model to be explained
+            X (pd.DataFrame, optional) -- unused as explanations are calculated only for trained model
+            show_progress (bool) -- whether to show progress bar 
         """
         column_dict = _make_column_dict(X)
-        raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
-        self.ovo = _summarise_results(raw_result_df, column_dict, self.method)
+        self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
+        self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self.interactions_ascending_order)
         self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
 
-    def plot(self, vis_type: str = VisualisationType.HEATMAP, figsize: tuple = (8, 6), show: bool = True, **kwargs):
-        """See `plot` documentation in `FeatureInteractionMethod`."""
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
+        """Plots interactions
+        
+        Parameters:
+            vis_type (str) -- type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'summary', 'bar_chart_conditional']
+            title (str) -- title of plot, default is 'default' which means that title will be automatically generated for selected visualization type
+            figsize (tuple) -- size of figure
+            show (bool) -- whether to show plot
+            **kwargs: additional arguments for plot 
+        """
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
 
-        self.visualisation.plot(self.ovo,
-                                vis_type,
-                                feature_column_name_1="root_variable",
-                                feature_column_name_2="variable",
-                                directed=True,
-                                variable_importance=self.variable_importance, 
-                                 figsize=figsize, show=show, kwargs=kwargs
-                                )
+        self.visualizer.plot(self.ovo,
+                             vis_type,
+                             _feature_column_name_1="root_variable",
+                             _feature_column_name_2="variable",
+                             _directed=True,
+                             variable_importance=self.variable_importance,
+                             title = title,
+                             figsize=figsize,
+                             show=show,
+                             interactions_ascending_order=self.interactions_ascending_order,
+                             **kwargs)
 
 
 def _calculate_conditional_minimal_depths(
@@ -144,53 +177,42 @@ def _conditional_minimal_depth(split_var_to_nodes: dict, depths: np.array, tree_
     n_nodes = len(depths)
     for f_1 in range(column_size):
         for f_2 in range(column_size):
-
             min_val = float('+inf')
+            occurence_flag = 0
             if f_1 in split_var_to_nodes and f_2 in split_var_to_nodes:
-                visited = np.full(n_nodes, False)
                 split_f1, split_f2 = split_var_to_nodes[f_1], split_var_to_nodes[f_2]
-                for i in range(len(split_f1)):
-
-                    lower_bound = current_root_id = split_f1[i]
-                    if visited[current_root_id]:
-                        continue
-
+                highest_maximal_split_f1 = split_f1[depths[split_f1] == depths[split_f1[0]]]
+                for current_root_id in highest_maximal_split_f1:
                     current_root_depth = depths[current_root_id]
                     upper_bound = _calculate_maximal_id_in_subtree(current_root_depth, current_root_id, depths, n_nodes)
-
-                    visited[lower_bound:upper_bound] = True
-
                     id_f2_in_subtree = _f_2_split_nodes_in_f_1_subtree(current_root_id, split_f2, upper_bound)
                     if len(id_f2_in_subtree) > 0:
                         min_val = min(min_val, np.min(depths[split_f2[id_f2_in_subtree]]) - current_root_depth - 1)
-
-            conditional_depths.append({"split_variable": f_1, "ancestor_variable": f_2, "value": min_val})
+                        occurence_flag = 1
+                    else:
+                        min_val = min(min_val, depths[upper_bound] - current_root_depth)
+            conditional_depths.append({"split_variable": f_1, "ancestor_variable": f_2, "value": min_val, "occur": occurence_flag})
 
     res = pd.DataFrame.from_records(conditional_depths).replace({float("+inf"): None})
 
-    return _map_to_summarise_format(res, tree_id)
+    return res
 
 
 def _make_column_dict(X: pd.DataFrame) -> dict:
     return dict(zip(range(len(X.columns)), X.columns.to_list()))
 
 
-def _summarise_results(raw_result_df: pd.DataFrame, column_dict: dict, method_name: str) -> pd.DataFrame:
+def _summarise_results(raw_result_df: pd.DataFrame, column_dict: dict, method_name: str, ascending_order: bool) -> pd.DataFrame:
     """Average result over trees, rename columns, fill missing data."""
-    final_result = pd.melt(
-        raw_result_df, id_vars=["tree_id", "split_variable"], value_vars=list(range(len(column_dict)))
+    final_result = (raw_result_df.groupby(["split_variable", "ancestor_variable"])
+                    .agg({"value": "mean", "occur": "sum"})
+                    .reset_index()
+                    .rename({"occur": "n_occurences", "value": method_name,
+                                "split_variable": "root_variable", "ancestor_variable": "variable"}, axis=1)
+                    .sort_values(by=["n_occurences", method_name], ascending=[False, ascending_order])
+                    .reset_index(drop=True)
     )
-    final_result = (
-        final_result.rename({"split_variable": "variable", "variable": "root_variable"}, axis=1)[
-            ~pd.isna(final_result["value"])
-        ]
-        .groupby(["variable", "root_variable"])
-        .agg({"tree_id": "size", "value": "mean"})
-        .reset_index()
-        .rename({"tree_id": "n_occurences", "value": method_name}, axis=1)
-        .sort_values(by=["n_occurences", method_name], ascending=[False, True])
-        .reset_index(drop=True)
-    )
+
     final_result["variable"] = final_result["variable"].map(column_dict)
     final_result["root_variable"] = final_result["root_variable"].map(column_dict)
 
@@ -206,10 +228,10 @@ def _calculate_maximal_id_in_subtree(current_root_depth: int, current_root_id: i
 
     """Determine the greatest id of the node in a subtree rooted in `current_root_id` """
     upper_bound_set = np.where((depths <= current_root_depth) & (np.arange(n_nodes) > current_root_id))[0]
-    upper_bound = n_nodes
+    upper_bound = n_nodes-1
 
     if len(upper_bound_set) > 0:
-        upper_bound = np.min(upper_bound_set)
+        upper_bound = np.min(upper_bound_set)-1
 
     return upper_bound
 
@@ -232,13 +254,4 @@ def _split_var_to_ids(current_lvl_ids: list, tree: pd.DataFrame):
 
 
 def _f_2_split_nodes_in_f_1_subtree(current_root_id: int, split_f2: np.array, upper_bound: int):
-    return np.where((split_f2 > current_root_id) & (split_f2 < upper_bound))[0]
-
-
-def _map_to_summarise_format(res: pd.DataFrame, tree_id: int):
-    tree_result = res.pivot_table("value", "ancestor_variable", "split_variable").rename_axis(None).rename_axis(None,
-                                                                                                                axis=1)
-    tree_result.insert(0, "tree_id", tree_id)
-    tree_result.insert(0, "split_variable", range(len(tree_result)))
-
-    return tree_result
+    return np.where((split_f2 > current_root_id) & (split_f2 <= upper_bound))[0]
