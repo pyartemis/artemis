@@ -32,6 +32,7 @@ class VisualizationType:
     BAR_CHART_OVO: str = "bar_chart"
     HEATMAP: str = "heatmap"
     LOLLIPOP: str = "lollipop"
+    BAR_CHART_CONDITIONAL: str = "bar_chart_conditional"
 
 
 @dataclass

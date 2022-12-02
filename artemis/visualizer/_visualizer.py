@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import gridspec
+from matplotlib import colors
 from matplotlib import pyplot as plt
 
 from artemis.utilities.domain import VisualizationType
@@ -94,6 +95,59 @@ class Visualizer:
             self.plot_lollipop(
                 _full_result, title=title, figsize=figsize, show=show, **kwargs
             )
+        elif vis_type == VisualizationType.BAR_CHART_CONDITIONAL:
+            self.plot_barchart_conditional(
+                ovo,
+                variable_importance,
+                title=title,
+                figsize=figsize,
+                show=show,
+                **kwargs,
+            )
+
+    def plot_barchart_conditional(
+        self,
+        ovo: pd.DataFrame,
+        variable_importance: pd.DataFrame,
+        title: str = "default",
+        figsize: tuple = (8, 6),
+        show: bool = True,
+        ax=None,
+        **kwargs,
+    ):
+        config = self.vis_config.interaction_bar_chart_conditional
+        top_k = kwargs.pop("top_k", config.TOP_K)
+        colormap = kwargs.pop("cmap", config.COLOR_MAP)
+        color = kwargs.pop("color", config.COLOR)
+        title = config.TITLE if title == "default" else title
+        fig = None
+        if ax is not None:
+            ax.set_title(title)
+        else:
+            fig, ax = plt.subplots(figsize=figsize)
+            plt.title(title)
+        ax.set_axisbelow(True)
+
+        df_to_plot = ovo.copy()
+        df_to_plot["Interaction"] = df_to_plot["root_variable"] + ":" + df_to_plot["variable"]
+        df_to_plot = df_to_plot.iloc[:top_k]
+        df_to_plot = df_to_plot.join(variable_importance.set_index("Feature"), on="variable").rename(columns={"Value": "unconditional_importance"})
+        
+        norm = plt.Normalize(df_to_plot["n_occurences"].min(), df_to_plot["n_occurences"].max())
+        cmap = plt.get_cmap(colormap)
+        new_cmap = colors.LinearSegmentedColormap.from_list("new_cmap", cmap(np.linspace(0.5, 1, 100)))
+        sm = plt.cm.ScalarMappable(cmap=new_cmap, norm=norm)
+        ax = sns.barplot(df_to_plot, x="Interaction", y=self.method, hue="n_occurences", palette=sm.to_rgba(np.flip(df_to_plot["n_occurences"])), dodge=False)
+        plt.vlines(x=df_to_plot["Interaction"], ymin=df_to_plot[self.method], ymax=df_to_plot["unconditional_importance"], color=color, alpha=0.5)
+        plt.scatter(df_to_plot["Interaction"], y=df_to_plot["unconditional_importance"], color=color, marker="o")
+        ax.get_legend().remove()
+        ax.figure.colorbar(sm, label="Occurences")
+        plt.xticks(rotation=90, size=7)
+        plt.grid()
+        if show:
+            plt.show()
+        else:
+            return fig
 
     def plot_heatmap(
         self,
@@ -458,9 +512,9 @@ class Visualizer:
             & (full_result_copy["depth"] > 0)
             & (full_result_copy["depth"] <= max_depth)
         ].copy()
-        nodes.loc[
-            full_result_copy["interaction"] == True, "split_feature"
-        ] = nodes.loc[full_result_copy["interaction"] == True, "pair_name"]
+        nodes.loc[full_result_copy["interaction"] == True, "split_feature"] = nodes.loc[
+            full_result_copy["interaction"] == True, "pair_name"
+        ]
         nodes = nodes[nodes["tree"] < max_trees * nodes["tree"].max()]
 
         ax.set_axisbelow(True)
@@ -480,12 +534,17 @@ class Visualizer:
                 marker=markers[i],
             )
             if labels:
-                nodes_to_annotate = nodes_to_plot.loc[nodes_to_plot["interaction"] == True]
+                nodes_to_annotate = nodes_to_plot.loc[
+                    nodes_to_plot["interaction"] == True
+                ]
                 for j, node in nodes_to_annotate.iterrows():
                     plt.annotate(
                         node["pair_name"],
                         (node["tree"] + 1, node["gain"]),
-                        (node["tree"] + 1, node["gain"] + 0.025 * np.max(roots["gain"])),
+                        (
+                            node["tree"] + 1,
+                            node["gain"] + 0.025 * np.max(roots["gain"]),
+                        ),
                         rotation=90,
                         size=7,
                     ),

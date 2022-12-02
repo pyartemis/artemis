@@ -27,8 +27,8 @@ class InteractionMatrixConfiguration:
     INTERACTION_COLOR_MAP: str = "Purples"
     IMPORTANCE_COLOR_MAP: str = "Greens"
     ANNOT_FMT: str = ".3f"
-    LINEWIDTHS: float = 0.5 
-    LINECOLOR: str = 'white'
+    LINEWIDTHS: float = 0.5
+    LINECOLOR: str = "white"
     CBAR_SHRINK: float = 0.8
 
 
@@ -38,43 +38,69 @@ class InteractionVersusAllConfiguration:
     TOP_K: int = 10
     COLOR: str = "mediumpurple"
 
+
 @dataclass
 class InteractionVersusOneConfiguration:
     TITLE: str = "Pair interactions"
     TOP_K: int = 10
     COLOR: str = "mediumpurple"
- 
+
+
 @dataclass
 class LollipopSplitScoreConfiguration:
     TITLE: str = "Lollipop boosting model summary"
-    SCALE: str = "linear" 
+    SCALE: str = "linear"
     MAX_TREES: float = 0.2
     LABEL_THRESHOLD: float = 0.1
-    COLORS = ['#e41a1c',
-            '#377eb8',
-            '#4daf4a',
-            '#984ea3',
-            '#ff7f00',
-            '#ffff33']
-    SHAPES = ["o" , "," , "v" , "^" , "<", ">"]
-    MAX_DEPTH: int = 1 
+    COLORS = ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33"]
+    SHAPES = ["o", ",", "v", "^", "<", ">"]
+    MAX_DEPTH: int = 1
     LABELS: bool = True
+
+
+@dataclass
+class BarChartConditionalDepthConfiguration:
+    TITLE: str = "Random forest model summary"
+    COLOR_MAP: str = "Purples"
+    TOP_K: int = 15
+    COLOR: str = "black"
 
 
 class VisualizationConfigurationProvider:
     accepted_visualizations = {
-        InteractionMethod.H_STATISTIC: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
-                                        VisualizationType.BAR_CHART_OVA, VisualizationType.BAR_CHART_OVO,
-                                        VisualizationType.HEATMAP],
-        InteractionMethod.PERFORMANCE_BASED: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
-                                              VisualizationType.BAR_CHART_OVO, VisualizationType.HEATMAP],
-        InteractionMethod.VARIABLE_INTERACTION: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
-                                                VisualizationType.BAR_CHART_OVO, VisualizationType.HEATMAP],
-        InteractionMethod.CONDITIONAL_MINIMAL_DEPTH: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
-                                                      VisualizationType.BAR_CHART_OVO, VisualizationType.HEATMAP],
-        InteractionMethod.SPLIT_SCORE: [VisualizationType.SUMMARY, VisualizationType.INTERACTION_GRAPH,
-                                                VisualizationType.BAR_CHART_OVO, VisualizationType.HEATMAP,
-                                                VisualizationType.LOLLIPOP]
+        InteractionMethod.H_STATISTIC: [
+            VisualizationType.SUMMARY,
+            VisualizationType.INTERACTION_GRAPH,
+            VisualizationType.BAR_CHART_OVA,
+            VisualizationType.BAR_CHART_OVO,
+            VisualizationType.HEATMAP,
+        ],
+        InteractionMethod.PERFORMANCE_BASED: [
+            VisualizationType.SUMMARY,
+            VisualizationType.INTERACTION_GRAPH,
+            VisualizationType.BAR_CHART_OVO,
+            VisualizationType.HEATMAP,
+        ],
+        InteractionMethod.VARIABLE_INTERACTION: [
+            VisualizationType.SUMMARY,
+            VisualizationType.INTERACTION_GRAPH,
+            VisualizationType.BAR_CHART_OVO,
+            VisualizationType.HEATMAP,
+        ],
+        InteractionMethod.CONDITIONAL_MINIMAL_DEPTH: [
+            VisualizationType.SUMMARY,
+            VisualizationType.INTERACTION_GRAPH,
+            VisualizationType.BAR_CHART_OVO,
+            VisualizationType.HEATMAP,
+            VisualizationType.BAR_CHART_CONDITIONAL,
+        ],
+        InteractionMethod.SPLIT_SCORE: [
+            VisualizationType.SUMMARY,
+            VisualizationType.INTERACTION_GRAPH,
+            VisualizationType.BAR_CHART_OVO,
+            VisualizationType.HEATMAP,
+            VisualizationType.LOLLIPOP,
+        ],
     }
 
     @classmethod
@@ -95,12 +121,18 @@ class VisualizationConfigurationProvider:
     @classmethod
     def _h_stat_config(cls):
         return VisualizationConfiguration(
-            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.H_STATISTIC])
+            accepted_visualizations=cls.accepted_visualizations[
+                InteractionMethod.H_STATISTIC
+            ]
+        )
 
     @classmethod
     def _var_inter_config(cls):
         return VisualizationConfiguration(
-            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.VARIABLE_INTERACTION])
+            accepted_visualizations=cls.accepted_visualizations[
+                InteractionMethod.VARIABLE_INTERACTION
+            ]
+        )
 
     @classmethod
     def _perf_based_config(cls):
@@ -108,8 +140,11 @@ class VisualizationConfigurationProvider:
         graph_config.MIN_RELEVANT_INTERACTION = 0.1
 
         return VisualizationConfiguration(
-            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.PERFORMANCE_BASED],
-            interaction_graph=graph_config)
+            accepted_visualizations=cls.accepted_visualizations[
+                InteractionMethod.PERFORMANCE_BASED
+            ],
+            interaction_graph=graph_config,
+        )
 
     @classmethod
     def _split_score_config(cls):
@@ -117,8 +152,11 @@ class VisualizationConfigurationProvider:
         graph_config.MIN_RELEVANT_INTERACTION = 0.1
 
         return VisualizationConfiguration(
-            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.SPLIT_SCORE],
-            interaction_graph=graph_config)
+            accepted_visualizations=cls.accepted_visualizations[
+                InteractionMethod.SPLIT_SCORE
+            ],
+            interaction_graph=graph_config,
+        )
 
     @classmethod
     def _cond_depth_config(cls):
@@ -128,8 +166,10 @@ class VisualizationConfigurationProvider:
         graph_config.MAX_EDGE_WIDTH = 3
 
         return VisualizationConfiguration(
-            accepted_visualizations=cls.accepted_visualizations[InteractionMethod.CONDITIONAL_MINIMAL_DEPTH],
-            interaction_graph=graph_config
+            accepted_visualizations=cls.accepted_visualizations[
+                InteractionMethod.CONDITIONAL_MINIMAL_DEPTH
+            ],
+            interaction_graph=graph_config,
         )
 
 
@@ -137,7 +177,14 @@ class VisualizationConfigurationProvider:
 class VisualizationConfiguration:
     accepted_visualizations: List[str]
     interaction_graph: InteractionGraphConfiguration = InteractionGraphConfiguration()
-    interaction_matrix: InteractionMatrixConfiguration = InteractionMatrixConfiguration()
-    interaction_bar_chart_ova: InteractionVersusAllConfiguration = InteractionVersusAllConfiguration()
-    interaction_bar_chart_ovo: InteractionVersusOneConfiguration = InteractionVersusOneConfiguration()
+    interaction_matrix: InteractionMatrixConfiguration = (
+        InteractionMatrixConfiguration()
+    )
+    interaction_bar_chart_ova: InteractionVersusAllConfiguration = (
+        InteractionVersusAllConfiguration()
+    )
+    interaction_bar_chart_ovo: InteractionVersusOneConfiguration = (
+        InteractionVersusOneConfiguration()
+    )
     lollipop: LollipopSplitScoreConfiguration = LollipopSplitScoreConfiguration()
+    interaction_bar_chart_conditional: BarChartConditionalDepthConfiguration = BarChartConditionalDepthConfiguration()
