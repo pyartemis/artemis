@@ -24,7 +24,7 @@ def sample_if_not_none(X: pd.DataFrame, n: int):
 
 def sample_both_if_not_none(X: pd.DataFrame, y: np.array, n: int):
     if n is None:
-        return X
+        return X, y
     else:
         X_sampled = X.sample(n)
         return X_sampled, y[X_sampled.index]
