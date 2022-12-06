@@ -10,13 +10,18 @@ from artemis.utilities.ops import remove_element, center, partial_dependence_val
 from ._pdp import PartialDependenceBasedMethod
 
 class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
-    """Class implementing Friedman H-statistic feature interaction method.
-    Method is described in the following paper: https://arxiv.org/pdf/0811.1679.pdf.
-
+    """Class implementing H-statistic for extraction of interactions. 
     Attributes:
-        ova         [pd.DataFrame], object used for storing one vs all feature interaction profiles
-        _pdp_cache  [Dict], object used for caching partial dependence values calculations
-
+        method (str) -- name of interaction method
+        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
+        variable_importance (pd.DataFrame) -- variable importance values 
+        ovo (pd.DataFrame) -- one versus one variable interaction values 
+        ova (pd.DataFrame) -- one vs all feature interactions
+        normalized (bool) -- flag determining whether to normalize the interaction values (unnrormalized version is proposed in https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935)
+        
+    References:
+    - https://www.jstor.org/stable/pdf/30245114.pdf
+    - https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935
     """
 
     def __init__(self, random_state: Optional[int] = None, normalized: bool = True):
