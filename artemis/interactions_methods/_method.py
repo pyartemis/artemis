@@ -1,30 +1,29 @@
-from abc import abstractmethod, ABC
-from typing import Optional
+from abc import abstractmethod
 
 import pandas as pd
 import numpy as np
 
-from artemis.utilities.domain import VisualizationType
+from artemis.utilities.domain import VisualisationType
 from artemis.utilities.exceptions import MethodNotFittedException
-from artemis.visualizer._configuration import VisualizationConfigurationProvider
-from artemis.visualizer._visualizer import Visualizer
+from artemis.visualisation.configuration import VisualisationConfigurationProvider
+from artemis.visualisation.visualisator import Visualizator
 
 
-class FeatureInteractionMethod(ABC):
+class FeatureInteractionMethod:
     """Abstract base class for interaction methods. This class should not be used directly. Use derived classes instead.
 
-    Attributes:
-        method  (str) -- name of interaction method
-        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        variable_importance (pd.DataFrame) -- variable importance values 
-        ovo (pd.DataFrame) -- one versus one variable interaction values 
-        X_sampled (pd.DataFrame) -- data used to calculate interactions
-        features_included  (List[str]) -- list of features that will be used during interactions calculation, if None is passed, all features will be used
+        Attributes:
+            method              [str], name of interaction method
+            visualisation       [Visualisation], automatically created on the basis of a method and used to create visualisations
+            variable_importance [pd.DataFrame], object that stores variable importance values after fitting
+            ovo                 [pd.DataFrame], stores one versus one variable interaction values after fitting
+            X_sampled           [pd.DataFrame], data used to calculate interactions
+            features_included   [List[str]], list of features that will be used during interactions calculation, if None is passed, all features will be used
     """
 
     def __init__(self, method: str, random_state: Optional[int] = None):
         self.method = method
-        self.visualizer = Visualizer(method, VisualizationConfigurationProvider.get(method))
+        self.visualisation = Visualizator(method, VisualisationConfigurationProvider.get(method))
         self.variable_importance = None
         self.ovo = None
         self.X_sampled = None
@@ -36,6 +35,12 @@ class FeatureInteractionMethod(ABC):
     @abstractmethod
     def interactions_ascending_order(self):
         ...
+
+    @property
+    def _compare_ovo(self):
+        if self.ovo is None:
+            raise MethodNotFittedException(self.method)
+        return self.ovo.sort_values(self.method, ascending=self.interactions_ascending_order, ignore_index=True)
 
     @property
     def _compare_ovo(self):

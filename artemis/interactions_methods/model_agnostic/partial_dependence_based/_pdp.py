@@ -20,6 +20,10 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
     def interactions_ascending_order(self):
         return False
 
+    @property
+    def interactions_ascending_order(self):
+        return False
+
     def fit(self,
             model,
             X: pd.DataFrame,
