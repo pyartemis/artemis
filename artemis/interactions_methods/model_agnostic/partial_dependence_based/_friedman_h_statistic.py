@@ -23,8 +23,8 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         """Constructor for FriedmanHStatisticMethod
 
         Parameters:
-            normalized (bool, optional) -- flag determining whether to normalize the interaction values. Defaults to True.
             random_state (int, optional) -- random state for reproducibility. Defaults to None.
+            normalized (bool, optional) -- flag determining whether to normalize the interaction values. Defaults to True.
         """
         super().__init__(InteractionMethod.H_STATISTIC, random_state=random_state)
         self.ova = None
