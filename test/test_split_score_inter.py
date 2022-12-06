@@ -1,11 +1,11 @@
 import unittest
 
 from .util import california_housing_random_forest, california_housing_boosting_models, has_decreasing_order, CALIFORNIA_SUBSET
-from artemis.utilities.domain import InteractionMethod, VisualisationType
+from artemis.utilities.domain import InteractionMethod, VisualizationType
 from artemis.utilities.split_score_metrics import SplitScoreInteractionMetric, SplitScoreImportanceMetric, _LGBM_UNSUPPORTED_METRICS
 from artemis.interactions_methods.model_specific import SplitScoreMethod
-from artemis.utilities.exceptions import VisualisationNotSupportedException, MetricNotSupportedException, ModelNotSupportedException
-from artemis.visualisation.configuration import VisualisationConfigurationProvider
+from artemis.utilities.exceptions import VisualizationNotSupportedException, MetricNotSupportedException, ModelNotSupportedException
+from artemis.visualizer._configuration import VisualizationConfigurationProvider
 from dataclasses import fields
 
     
@@ -82,7 +82,7 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
         inter2 = SplitScoreMethod()
         inter2.fit(self.model_lgbm_bis)
         # allowed plots are generated without exception
-        accepted_vis = VisualisationConfigurationProvider.get(InteractionMethod.SPLIT_SCORE).accepted_visualisations
+        accepted_vis = VisualizationConfigurationProvider.get(InteractionMethod.SPLIT_SCORE).accepted_visualizations
         for vis in accepted_vis:
             inter.plot(vis, show=False)
             inter2.plot(vis, show=False)
@@ -105,7 +105,7 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
         # then
         # nothing crashes!
 
-    def test_should_raise_VisualisationNotSupportedException(self):
+    def test_should_raise_VisualizationNotSupportedException(self):
         # when
         inter = SplitScoreMethod()
         inter.fit(self.model_xgb)
@@ -113,10 +113,10 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
         inter2.fit(self.model_lgbm)
 
         # barchart (OvA) is not supported 
-        with self.assertRaises(VisualisationNotSupportedException):
-            inter.plot(VisualisationType.BAR_CHART_OVA)
-        with self.assertRaises(VisualisationNotSupportedException):
-            inter2.plot(VisualisationType.BAR_CHART_OVA)
+        with self.assertRaises(VisualizationNotSupportedException):
+            inter.plot(VisualizationType.BAR_CHART_OVA)
+        with self.assertRaises(VisualizationNotSupportedException):
+            inter2.plot(VisualizationType.BAR_CHART_OVA)
 
     def test_should_raise_ModelNotSupportedException(self):
         with self.assertRaises(ModelNotSupportedException):

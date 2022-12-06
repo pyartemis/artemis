@@ -7,7 +7,7 @@ from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.domain import CorrelationMethod
 from artemis.utilities.exceptions import MethodNotFittedException
 from artemis.utilities.ops import point_left_side_circle
-from artemis.visualisation.configuration import InteractionGraphConfiguration
+from artemis.visualizer._configuration import InteractionGraphConfiguration
 
 
 class FeatureInteractionMethodComparator:
@@ -43,11 +43,11 @@ class FeatureInteractionMethodComparator:
                         figsize: tuple = (8, 6)):
         m1_name, m2_name = method1.method, method2.method
         fig, ax = plt.subplots(figsize=figsize)
-
-        circle_r = 0.2 * min(max(method1.ovo[m1_name]), max(method2.ovo[m2_name]))
+        plt.grid(True)
+        circle_r = 0.2 * min(max(method1._compare_ovo[m1_name]), max(method2._compare_ovo[m2_name]))
 
         x, y = list(), list()
-        for index, row in method1.ovo.iterrows():
+        for index, row in method1._compare_ovo.iterrows():
 
             f1, f2 = row["Feature 1"], row["Feature 2"]
             x_curr, y_curr = row[method1.method], method2.interaction_value(f1, f2)
@@ -58,6 +58,11 @@ class FeatureInteractionMethodComparator:
                 _add_arrow(ax, circle_r, f1, f2, x_curr, y_curr)
 
         ax.scatter(x, y, color=InteractionGraphConfiguration.NODE_COLOR)
+        
+        if method1.interactions_ascending_order:
+            plt.gca().invert_xaxis()
+        if method2.interactions_ascending_order:
+            plt.gca().invert_yaxis()
 
         if add_correlation_box:
 
@@ -83,8 +88,8 @@ class FeatureInteractionMethodComparator:
 
 
 def _rank_interaction_values_encoded(method1, method2):
-    rank_features_m1 = method1.sorted_ovo().apply(lambda row: _alphabetical_order_pair(row), axis=1)
-    rank_features_m2 = method2.sorted_ovo().apply(lambda row: _alphabetical_order_pair(row), axis=1)
+    rank_features_m1 = method1._compare_ovo.apply(lambda row: _alphabetical_order_pair(row), axis=1)
+    rank_features_m2 = method2._compare_ovo.apply(lambda row: _alphabetical_order_pair(row), axis=1)
     rank_features_encoded = pd.concat(
         [rank_features_m1.astype('category').cat.codes, rank_features_m2.astype('category').cat.codes], axis=1)
 
@@ -94,9 +99,7 @@ def _rank_interaction_values_encoded(method1, method2):
 def _title_x_y(ax, m1_name, m2_name):
     ax.set_xlabel(m1_name)
     ax.set_ylabel(m2_name)
-    ax.set_title(f"{m1_name} and {m2_name} comparison")
-    ax.set_xticks([])
-    ax.set_yticks([])
+    ax.set_title(f"{m1_name}\nand\n{m2_name}\nComparison")
 
 
 def _add_correlation_box(ax, correlations):
@@ -137,7 +140,7 @@ def _assert_fitted_ovo(method1: FeatureInteractionMethod, method2: FeatureIntera
 
 
 def _suitable_for_ovo(method: FeatureInteractionMethod):
-    return method.ovo is not None
+    return method._compare_ovo is not None
 
 
 def _alphabetical_order_pair(row):

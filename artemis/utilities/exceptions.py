@@ -1,9 +1,9 @@
-class VisualisationNotSupportedException(Exception):
+class VisualizationNotSupportedException(Exception):
     def __init__(self, method: str, vis_type: str):
         self.method = method
         self.vis_type = vis_type
         super().__init__(
-            f"Visualisation type: {self.vis_type} is not supported for {self.method}"
+            f"Visualization type: {self.vis_type} is not supported for {self.method}"
         )
 
 
