@@ -1,15 +1,31 @@
 import unittest
+from parameterized import parameterized_class
 
 from artemis.comparision import FeatureInteractionMethodComparator
 from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod, GreenwellMethod
 from artemis.utilities.exceptions import MethodNotFittedException
-from test.util import california_housing_random_forest
+from test.util import california_housing_random_forest, wine_random_forest
 
 
+MODEL_REG, X_REG, _ = california_housing_random_forest()
+MODEL_CLS, X_CLS, _ = wine_random_forest()
+
+
+@parameterized_class([
+    {
+        "model": MODEL_REG,
+        "X": X_REG
+    },
+    {
+        "model": MODEL_CLS,
+        "X": X_CLS
+    },
+])
 class MethodComparatorUnitTest(unittest.TestCase):
+    model = None
+    X = None
 
     def setUp(self) -> None:
-        self.model, self.X, _ = california_housing_random_forest()
         self.method_1, self.method_2 = FriedmanHStatisticMethod(), GreenwellMethod()
 
         self.method_1_fitted, self.method_2_fitted = FriedmanHStatisticMethod(), GreenwellMethod()

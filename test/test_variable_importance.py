@@ -1,17 +1,34 @@
 import unittest
+from parameterized import parameterized_class
 
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from artemis.importance_methods.model_agnostic import PermutationImportance, PartialDependenceBasedImportance
 from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod
-from test.util import toy_input
+from test.util import toy_input_reg, toy_input_cls
 
 
+MODEL_REG, X_REG, Y_REG = toy_input_reg()
+MODEL_CLS, X_CLS, Y_CLS = toy_input_cls()
+
+
+@parameterized_class([
+    {
+        "model": MODEL_REG,
+        "X": X_REG,
+        "y": Y_REG,
+    },
+    {
+        "model": MODEL_CLS,
+        "X": X_CLS,
+        "y": Y_CLS,
+    },
+])
 class VariableImportanceUnitTest(unittest.TestCase):
-
-    def setUp(self) -> None:
-        self.model, self.X, self.y = toy_input()
+    model = None
+    X = None
+    y = None
 
     def test_calculate_permutation_variable_importance(self):
         calculator = PermutationImportance()
