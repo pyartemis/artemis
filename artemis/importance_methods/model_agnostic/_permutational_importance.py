@@ -53,6 +53,9 @@ class PermutationImportance(VariableImportanceMethod):
             model, X, y_true, self.metric, n_repeat, features, show_progress
         )
         return self.variable_importance
+    @property
+    def importance_ascending_order(self):
+        return False
 
 
 def _permutation_importance(

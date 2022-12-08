@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-
 @dataclass
 class InteractionMethod:
     H_STATISTIC: str = "Friedman H-statistic Interaction Measure"
@@ -57,3 +56,4 @@ class CorrelationMethod:
     PEARSON: str = "pearson"
     KENDALL: str = "kendall"
     SPEARMAN: str = "spearman"
+

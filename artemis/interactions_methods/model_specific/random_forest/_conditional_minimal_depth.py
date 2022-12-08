@@ -65,7 +65,8 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         column_dict = _make_column_dict(X)
         self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
         self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self.interactions_ascending_order)
-        self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
+        self._variable_importance_obj = MinimalDepthImportance()
+        self.variable_importance = self._variable_importance_obj.importance(model, X, trees)
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """Plots interactions
@@ -90,6 +91,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
+                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
                              **kwargs)
 
 
