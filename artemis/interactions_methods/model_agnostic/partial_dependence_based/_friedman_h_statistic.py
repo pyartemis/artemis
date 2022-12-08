@@ -75,6 +75,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
+                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
                              **kwargs)
 
     def _ova(self, predict_function, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:

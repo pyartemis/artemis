@@ -34,7 +34,7 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
         show_progress: bool = False,
         precalculated_pdp: dict = None,
     ):
-        """Calculate artial Dependence Based Feature Importance.
+        """Calculate Partial Dependence Based Feature Importance.
         Arguments:
             model -- model for which importance will be extracted
             X (pd.DataFrame) -- data used to calculate importance

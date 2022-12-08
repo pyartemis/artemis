@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from artemis.utilities.exceptions import MethodNotSupportedException
+
 
 @dataclass
 class InteractionMethod:
@@ -57,3 +59,21 @@ class CorrelationMethod:
     PEARSON: str = "pearson"
     KENDALL: str = "kendall"
     SPEARMAN: str = "spearman"
+
+
+class ImportanceOrderProvider:
+    STANDARD_ORDER_METHODS = [ImportanceMethod.PERMUTATION_IMPORTANCE, ImportanceMethod.PDP_BASED_IMPORTANCE]
+
+    REVERSED_ORDER_METHODS = [ImportanceMethod.MINIMAL_DEPTH_IMPORTANCE, ImportanceMethod.SPLIT_SCORE_IMPORTANCE]
+
+    @staticmethod
+    def is_ascending_order(method: str):
+
+        if method in ImportanceOrderProvider.STANDARD_ORDER_METHODS:
+            return False
+
+        if method in ImportanceOrderProvider.REVERSED_ORDER_METHODS:
+            return True
+
+        raise MethodNotSupportedException(method)
+

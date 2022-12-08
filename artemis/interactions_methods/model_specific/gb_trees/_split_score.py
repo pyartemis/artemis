@@ -3,10 +3,6 @@ from typing import Optional
 import pandas as pd
 from tqdm import tqdm
 
-from ....utilities.exceptions import MethodNotFittedException, MetricNotSupportedException
-from ....utilities.domain import InteractionMethod, VisualizationType
-from ..._method import FeatureInteractionMethod
-from ._handler import GBTreesHandler
 from artemis.importance_methods.model_specific import SplitScoreImportance
 from artemis.utilities.split_score_metrics import (
     SplitScoreImportanceMetric,
@@ -17,6 +13,8 @@ from artemis.utilities.split_score_metrics import (
 from ._handler import GBTreesHandler
 from ..._method import FeatureInteractionMethod
 from ....utilities.domain import InteractionMethod
+from ....utilities.domain import VisualizationType
+from ....utilities.exceptions import MethodNotFittedException, MetricNotSupportedException
 
 
 class SplitScoreMethod(FeatureInteractionMethod):
@@ -74,8 +72,8 @@ class SplitScoreMethod(FeatureInteractionMethod):
         self.ovo = _get_ovo(self, self.full_ovo, interaction_selected_metric)
 
         # calculate variable importance
-        split_score_importance = SplitScoreImportance()
-        self.variable_importance = split_score_importance.importance(
+        self._variable_importance_obj = SplitScoreImportance()
+        self.variable_importance = self._variable_importance_obj.importance(
             model=model,
             selected_metric=importance_selected_metric,
             trees_df=model.trees_df,
@@ -100,6 +98,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
+                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
                              _full_result=self.full_result,
                              **kwargs)
 
