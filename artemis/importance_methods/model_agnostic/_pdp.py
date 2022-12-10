@@ -14,7 +14,7 @@ from artemis.utilities.ops import (
     sample_if_not_none,
     split_features_num_cat,
 )
-from artemis.utilities.pdp_calculator import PartialDependenceCalculator
+from artemis.utilities.pd_calculator import PartialDependenceCalculator
 
 
 class PartialDependenceBasedImportance(VariableImportanceMethod):
@@ -37,7 +37,7 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
         features: Optional[List[str]] = None,
         show_progress: bool = False,
         batchsize: Optional[int] = 2000,
-        pdp_calculator: PartialDependenceCalculator = None,
+        pd_calculator: Optional[PartialDependenceCalculator] = None,
     ):
         """Calculate Partial Dependence Based Feature Importance.
         Arguments:
@@ -58,14 +58,14 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
         self.features_included = all_if_none(X.columns, features)
   
 
-        if pdp_calculator is None:
-            self.pdp_calculator = PartialDependenceCalculator(self.model, self.X_sampled, self.predict_function, self.batchsize)
+        if pd_calculator is None:
+            self.pd_calculator = PartialDependenceCalculator(self.model, self.X_sampled, self.predict_function, self.batchsize)
         else: 
-            if pdp_calculator.model != self.model:
+            if pd_calculator.model != self.model:
                 raise ValueError("Model in PDP calculator is different than the model in the method.")
-            if not pdp_calculator.X.equals(self.X_sampled):
+            if not pd_calculator.X.equals(self.X_sampled):
                 raise ValueError("Data in PDP calculator is different than the data in the method.")
-            self.pdp_calculator = pdp_calculator
+            self.pd_calculator = pd_calculator
 
         self.variable_importance = self._pdp_importance(show_progress)
         return self.variable_importance
@@ -75,13 +75,13 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
         return False
 
     def _pdp_importance(self, show_progress: bool) -> pd.DataFrame:
-        self.pdp_calculator.calculate_pd_single(show_progress=show_progress)
+        self.pd_calculator.calculate_pd_single(show_progress=show_progress)
 
         importance = []
         num_features, _ = split_features_num_cat(self.X_sampled, self.features_included)
 
         for feature in self.features_included:
-            pdp = self.pdp_calculator.get_pd_single(feature)
+            pdp = self.pd_calculator.get_pd_single(feature)
             importance.append(_calc_importance(feature, pdp, feature in num_features))
 
         return pd.DataFrame(importance, columns=["Feature", "Importance"]).sort_values(

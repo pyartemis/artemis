@@ -31,11 +31,11 @@ class GreenwellMethod(PartialDependenceBasedMethod):
             random_state (int, optional) -- random state for reproducibility. Defaults to None."""
         super().__init__(InteractionMethod.VARIABLE_INTERACTION, random_state=random_state)
 
-    def _calculate_ovo_interactions_from_pdp(self, show_progress: bool = False):
-        self.pdp_calculator.calculate_pd_pairs(self.pairs, show_progress=show_progress)
+    def _calculate_ovo_interactions_from_pd(self, show_progress: bool = False):
+        self.pd_calculator.calculate_pd_pairs(self.pairs, show_progress=show_progress)
         value_pairs = []
         for pair in self.pairs:
-            pd_values = self.pdp_calculator.get_pd_pairs(pair[0], pair[1])
+            pd_values = self.pd_calculator.get_pd_pairs(pair[0], pair[1])
             res_j = np.apply_along_axis(stdev, 0, np.apply_along_axis(stdev, 1, pd_values))
             res_i = np.apply_along_axis(stdev, 0, np.apply_along_axis(stdev, 0, pd_values))
             value_pairs.append([pair[0], pair[1], (res_j + res_i) / 2])

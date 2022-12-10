@@ -7,6 +7,7 @@ from tqdm import tqdm
 from artemis.utilities.domain import VisualizationType, InteractionMethod, ProgressInfoLog
 from artemis.utilities.exceptions import MethodNotFittedException
 from artemis.utilities.ops import remove_element, center, partial_dependence_value
+from artemis.utilities.pd_calculator import PartialDependenceCalculator
 from ._pdp import PartialDependenceBasedMethod
 
 class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
@@ -41,6 +42,8 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             n: int = None,
             features: List[str] = None,
             show_progress: bool = False,
+            batchsize: Optional[int] = 2000,
+            pd_calculator: Optional[PartialDependenceCalculator] = None,
             calculate_ova: bool = True):
         """Calculates H-statistic Interactions and Partial Dependence Based Importance for the given model. 
         Despite pair interactions, this method also calculates one vs all interactions.
@@ -52,9 +55,9 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             features (List[str], optional) -- list of features for which interactions will be calculated
             show_progress (bool) -- whether to show progress bar 
         """
-        super().fit(model, X, n, features, show_progress)
+        super().fit(model, X, n, features, show_progress, batchsize, pd_calculator)
         if calculate_ova:
-            self.ova = self._calculate_ova_interactions_from_pdp(show_progress)
+            self.ova = self._calculate_ova_interactions_from_pd(show_progress)
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """Plots interactions
@@ -79,34 +82,34 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
                              importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
                              **kwargs)
 
-    def _calculate_ova_interactions_from_pdp(self, show_progress: bool) -> pd.DataFrame:
-        self.pdp_calculator.calculate_pd_minus_single(self.features_included, show_progress=show_progress)
+    def _calculate_ova_interactions_from_pd(self, show_progress: bool) -> pd.DataFrame:
+        self.pd_calculator.calculate_pd_minus_single(self.features_included, show_progress=show_progress)
         preds = self.predict_function(self.model, self.X_sampled)
         value_minus_single = []
         for feature in self.features_included:
-            pd_f = self.pdp_calculator.get_pd_single(feature, feature_values = self.X_sampled[feature].values)
-            pd_f_minus = self.pdp_calculator.get_pd_minus_single(feature)
+            pd_f = self.pd_calculator.get_pd_single(feature, feature_values = self.X_sampled[feature].values)
+            pd_f_minus = self.pd_calculator.get_pd_minus_single(feature)
             value_minus_single.append([feature, _calculate_hstat_value(pd_f, pd_f_minus, preds, self.normalized)])
         return pd.DataFrame(value_minus_single, columns=["Feature", InteractionMethod.H_STATISTIC]).sort_values(
             by=InteractionMethod.H_STATISTIC, ascending=self.interactions_ascending_order, ignore_index=True
         ).fillna(0)
 
-    def _calculate_ovo_interactions_from_pdp(self, show_progress: bool):
-        self.pdp_calculator.calculate_pd_pairs(self.pairs, show_progress=show_progress, all_combinations=False)
-        self.pdp_calculator.calculate_pd_single(self.features_included, show_progress=False)
+    def _calculate_ovo_interactions_from_pd(self, show_progress: bool):
+        self.pd_calculator.calculate_pd_pairs(self.pairs, show_progress=show_progress, all_combinations=False)
+        self.pd_calculator.calculate_pd_single(self.features_included, show_progress=False)
         value_pairs = []
         for pair in self.pairs:
-            pd_f1 = self.pdp_calculator.get_pd_single(pair[0], feature_values = self.X_sampled[pair[0]].values)
-            pd_f2 = self.pdp_calculator.get_pd_single(pair[1], feature_values = self.X_sampled[pair[1]].values)
+            pd_f1 = self.pd_calculator.get_pd_single(pair[0], feature_values = self.X_sampled[pair[0]].values)
+            pd_f2 = self.pd_calculator.get_pd_single(pair[1], feature_values = self.X_sampled[pair[1]].values)
             pair_feature_values = list(zip(self.X_sampled[pair[0]].values, self.X_sampled[pair[1]].values))
-            pd_pair = self.pdp_calculator.get_pd_pairs(pair[0], pair[1], feature_values = pair_feature_values)
+            pd_pair = self.pd_calculator.get_pd_pairs(pair[0], pair[1], feature_values = pair_feature_values)
             value_pairs.append([pair[0], pair[1], _calculate_hstat_value(pd_f1, pd_f2, pd_pair, self.normalized)])
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
             by=self.method, ascending=self.interactions_ascending_order, ignore_index=True
         ).fillna(0)
 
-def _calculate_hstat_value(pd_f1: np.ndarray, pd_f2: np.ndarray, pd_pair: np.ndarray, normalized: bool = True):
-    nominator = (center(pd_pair) - center(pd_f1) - center(pd_f2)) ** 2
+def _calculate_hstat_value(pd_i: np.ndarray, pd_versus: np.ndarray, pd_i_versus: np.ndarray, normalized: bool = True):
+    nominator = (center(pd_i_versus) - center(pd_i) - center(pd_versus)) ** 2
     if normalized: 
-        denominator = center(pd_pair) ** 2
+        denominator = center(pd_i_versus) ** 2
     return np.sum(nominator) / np.sum(denominator) if normalized else np.sqrt(np.sum(nominator))

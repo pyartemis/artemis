@@ -4,7 +4,7 @@ import numpy as np
 from parameterized import parameterized_class
 from artemis.utilities.ops import get_predict_function
 
-from artemis.utilities.pdp_calculator import PartialDependenceCalculator
+from artemis.utilities.pd_calculator import PartialDependenceCalculator
 
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE, wine_random_forest, WINE_SUBSET
 from artemis.utilities.domain import InteractionMethod
