@@ -8,10 +8,13 @@ from tqdm import tqdm
 from artemis.importance_methods._method import VariableImportanceMethod
 from artemis.utilities.domain import ImportanceMethod, ProgressInfoLog
 from artemis.utilities.ops import (
+    all_if_none,
     get_predict_function,
     partial_dependence_value,
+    sample_if_not_none,
     split_features_num_cat,
 )
+from artemis.utilities.pdp_calculator import PartialDependenceCalculator
 
 
 class PartialDependenceBasedImportance(VariableImportanceMethod):
@@ -30,9 +33,11 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
         self,
         model,
         X: pd.DataFrame,
+        n: int = None,
         features: Optional[List[str]] = None,
         show_progress: bool = False,
-        precalculated_pdp: dict = None,
+        batchsize: Optional[int] = 2000,
+        pdp_calculator: PartialDependenceCalculator = None,
     ):
         """Calculate Partial Dependence Based Feature Importance.
         Arguments:
@@ -47,66 +52,43 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
         """
         self.predict_function = get_predict_function(model)
         self.model = model
+        self.batchsize = batchsize
 
-        # if precalculated_pdp is None:
-        self.variable_importance = _pdp_importance(
-            self.predict_function, self.model, X, features, show_progress
-        )
-        # else:
-        #    self.variable_importance = _map_to_df(X, features, precalculated_pdp)
+        self.X_sampled = sample_if_not_none(self.random_generator, X, n)
+        self.features_included = all_if_none(X.columns, features)
+  
 
+        if pdp_calculator is None:
+            self.pdp_calculator = PartialDependenceCalculator(self.model, self.X_sampled, self.predict_function, self.batchsize)
+        else: 
+            if pdp_calculator.model != self.model:
+                raise ValueError("Model in PDP calculator is different than the model in the method.")
+            if not pdp_calculator.X.equals(self.X_sampled):
+                raise ValueError("Data in PDP calculator is different than the data in the method.")
+            self.pdp_calculator = pdp_calculator
+
+        self.variable_importance = self._pdp_importance(show_progress)
         return self.variable_importance
 
     @property
     def importance_ascending_order(self):
         return False
 
+    def _pdp_importance(self, show_progress: bool) -> pd.DataFrame:
+        self.pdp_calculator.calculate_pd_single(show_progress=show_progress)
 
-def _map_to_df(X: pd.DataFrame, features: List[str], precalculated_pdp: dict):
-    importance = list()
-    num_features, cat_features = split_features_num_cat(X, features)
+        importance = []
+        num_features, _ = split_features_num_cat(self.X_sampled, self.features_included)
 
-    feature_to_pdp = defaultdict(list)
-    for feature, val in precalculated_pdp.keys():
-        feature_to_pdp[feature].append(val)
+        for feature in self.features_included:
+            pdp = self.pdp_calculator.get_pd_single(feature)
+            importance.append(_calc_importance(feature, pdp, feature in num_features))
 
-    for feature in feature_to_pdp.keys():
-        importance.append(
-            _calc_importance(feature, feature_to_pdp[feature], feature in num_features)
-        )
-
-    return pd.DataFrame.from_records(importance).sort_values(
-        by="Value", ascending=False, ignore_index=True
-    )
+        return pd.DataFrame(importance, columns=["Feature", "Importance"]).sort_values(
+            by="Importance", ascending=self.importance_ascending_order, ignore_index=True
+        ).fillna(0)
 
 
-def _pdp_importance(
-    predict_function, model, X: pd.DataFrame, features: List[str], progress: bool
-) -> pd.DataFrame:
-    importance = []
-
-    num_features, cat_features = split_features_num_cat(X, features)
-
-    for feature in tqdm(
-        features, disable=not progress, desc=ProgressInfoLog.CALC_VAR_IMP
-    ):
-        pdp = list()
-        for _, row in X.iterrows():
-            pdp.append(
-                partial_dependence_value(
-                    X, {feature: row[feature]}, predict_function, model
-                )
-            )
-
-        importance.append(_calc_importance(feature, pdp, feature in num_features))
-
-    return pd.DataFrame.from_records(importance).sort_values(
-        by="Value", ascending=False, ignore_index=True
-    )
-
-
-def _calc_importance(feature: str, pdp: List, is_numerical: bool):
-    return {
-        "Feature": feature,
-        "Value": np.std(pdp) if is_numerical else (np.max(pdp) - np.min(pdp)) / 4,
-    }
+def _calc_importance(feature: str, pdp: np.ndarray, is_numerical: bool):
+    return [feature, np.std(pdp) if is_numerical else (np.max(pdp) - np.min(pdp)) / 4]
+    
