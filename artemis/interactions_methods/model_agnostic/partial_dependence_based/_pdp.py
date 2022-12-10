@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from itertools import combinations
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
 from tqdm import tqdm
@@ -13,8 +13,8 @@ from artemis.utilities.ops import get_predict_function, sample_if_not_none, all_
 
 class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
-    def __init__(self, method: str):
-        super().__init__(method)
+    def __init__(self, method: str, random_state: Optional[int] = None):
+        super().__init__(method, random_state=random_state)
 
     @property
     def interactions_ascending_order(self):
@@ -52,8 +52,8 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
                    n: int = None,
                    features: List[str] = None,
                    show_progress: bool = False):
-        self.X_sampled = sample_if_not_none(X, n)
-        self.features_included = all_if_none(X, features)
+        self.X_sampled = sample_if_not_none(self.random_generator, X, n)
+        self.features_included = all_if_none(X.columns, features)
 
         self.ovo = self._ovo(predict_function, model, self.X_sampled, show_progress, self.features_included)
 

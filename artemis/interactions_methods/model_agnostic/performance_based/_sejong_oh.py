@@ -1,5 +1,5 @@
 from itertools import combinations
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -25,8 +25,12 @@ class SejongOhMethod(FeatureInteractionMethod):
     - https://www.mdpi.com/2076-3417/9/23/5191
     """
 
-    def __init__(self, metric: Metric = RMSE()):
-        super().__init__(InteractionMethod.PERFORMANCE_BASED)
+    def __init__(self, metric: Metric = RMSE(), random_state: Optional[int] = None):
+        """Constructor for SejongOhMethod
+        Parameters:
+            metric (Metric, optional) -- metric used to calculate interactions. Defaults to RMSE().
+            random_state (int, optional) -- random state for reproducibility. Defaults to None."""
+        super().__init__(InteractionMethod.PERFORMANCE_BASED, random_state)
         self.metric = metric
         self.y_sampled = None
     
@@ -56,8 +60,8 @@ class SejongOhMethod(FeatureInteractionMethod):
             features (List[str], optional) -- list of features for which interactions will be calculated
             show_progress (bool) -- whether to show progress bar 
         """
-        self.X_sampled, self.y_sampled = sample_both_if_not_none(X, y_true, n)
-        self.features_included = all_if_none(X, features)
+        self.X_sampled, self.y_sampled = sample_both_if_not_none(self.random_generator, X, y_true, n)
+        self.features_included = all_if_none(X.columns, features)
         self.ovo = _perf_based_ovo(self, model, self.X_sampled, self.y_sampled, n_repeat, show_progress)
 
         # calculate variable importance
@@ -80,10 +84,10 @@ def _perf_based_ovo(
         inter = [
             _inter(method_class, model, X, y_true, f1, f2, original_performance) for _ in range(n_repeat)
         ]
-        interactions.append([f1, f2, abs(sum(inter) / len(inter))])
+        interactions.append([f1, f2, np.mean(inter)])
 
     return pd.DataFrame(interactions, columns=["Feature 1", "Feature 2", method_class.method]).sort_values(
-        by=method_class.method, ascending=method_class.interactions_ascending_order, ignore_index=True
+        by=method_class.method, key=abs, ascending=method_class.interactions_ascending_order, ignore_index=True
     )
 
 
@@ -99,7 +103,7 @@ def _inter(
     """
     Calculates performance-based interaction between features `f1` and `f2`.
     Intuitively, it calculates the impact on the performance of the model, when one of [f1, f2] are permuted
-    with respect to when both are permuted.
+    with respect to when both are permuted together.
 
     Specifics can be found in: https://www.mdpi.com/2076-3417/9/23/5191.
     """
@@ -120,9 +124,10 @@ def _permute_score(
 ):
     """Permute `features` list and assess performance of the model."""
     X_copy_permuted = X.copy()
+    p = method_class.random_generator.permutation(len(X))
 
     for feature in features:
-        X_copy_permuted[feature] = np.random.permutation(X_copy_permuted[feature])
+        X_copy_permuted[feature] = X_copy_permuted[feature].values[p]
 
     return _neg_if_class(
         method_class,

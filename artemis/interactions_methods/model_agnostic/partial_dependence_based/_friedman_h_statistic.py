@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -11,7 +11,6 @@ from ._pdp import PartialDependenceBasedMethod
 
 class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
     """Class implementing H-statistic for extraction of interactions. 
-
     Attributes:
         method (str) -- name of interaction method
         visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
@@ -19,19 +18,20 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         ovo (pd.DataFrame) -- one versus one variable interaction values 
         ova (pd.DataFrame) -- one vs all feature interactions
         normalized (bool) -- flag determining whether to normalize the interaction values (unnrormalized version is proposed in https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935)
-
+        
     References:
     - https://www.jstor.org/stable/pdf/30245114.pdf
     - https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935
     """
 
-    def __init__(self, normalized: bool = True):
+    def __init__(self, random_state: Optional[int] = None, normalized: bool = True):
         """Constructor for FriedmanHStatisticMethod
 
-        Attributes:
+        Parameters:
+            random_state (int, optional) -- random state for reproducibility. Defaults to None.
             normalized (bool, optional) -- flag determining whether to normalize the interaction values. Defaults to True.
         """
-        super().__init__(InteractionMethod.H_STATISTIC)
+        super().__init__(InteractionMethod.H_STATISTIC, random_state=random_state)
         self.ova = None
         self.normalized = normalized
         self._pdp_cache = dict()

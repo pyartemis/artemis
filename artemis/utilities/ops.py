@@ -15,24 +15,24 @@ def remove_element(columns: pd.Index, column) -> List[str]:
     return columns_copy
 
 
-def sample_if_not_none(X: pd.DataFrame, n: int):
+def sample_if_not_none(random_generator, X: pd.DataFrame, n: int):
     if n is None:
         return X
     else:
-        return X.sample(n)
+        return X.sample(n, random_state=random_generator)
 
 
-def sample_both_if_not_none(X: pd.DataFrame, y: np.array, n: int):
+def sample_both_if_not_none(random_generator, X: pd.DataFrame, y: np.array, n: int):
     if n is None:
-        return X
+        return X, y
     else:
-        X_sampled = X.sample(n)
+        X_sampled = X.sample(n, random_state=random_generator)
         return X_sampled, y[X_sampled.index]
 
 
-def all_if_none(X: pd.DataFrame, columns: List[str]):
+def all_if_none(X_columns: pd.DataFrame, columns: List[str]):
     if columns is None:
-        return X.columns
+        return X_columns
     else:
         return columns
 

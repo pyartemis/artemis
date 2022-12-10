@@ -1,14 +1,28 @@
 import unittest
+from parameterized import parameterized_class
 
 from artemis.interactions_methods.model_specific import ConditionalMinimalDepthMethod
 from artemis.utilities.domain import InteractionMethod
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
-from test.util import california_housing_random_forest
+from test.util import california_housing_random_forest, wine_random_forest
+
+MODEL_REG, X_REG, _ = california_housing_random_forest()
+MODEL_CLS, X_CLS, _ = wine_random_forest()
 
 
+@parameterized_class([
+    {
+        "model": MODEL_REG,
+        "X": X_REG
+    },
+    {
+        "model": MODEL_CLS,
+        "X": X_CLS
+    },
+])
 class ConditionalMinimalDepthTestCase(unittest.TestCase):
-    def setUp(self) -> None:
-        self.model, self.X, _ = california_housing_random_forest()
+    model = None
+    X = None
 
     def test_ovo_all_features(self):
         # when
@@ -17,7 +31,8 @@ class ConditionalMinimalDepthTestCase(unittest.TestCase):
 
         # then
         self.assertSetEqual(set(cond_min.ovo.columns), {"root_variable", "variable", "n_occurences", cond_min.method})
-        self.assertEqual(len(cond_min.ovo), 8 * 8 - 8)
+        p = len(self.X.columns)
+        self.assertEqual(len(cond_min.ovo), p * p - p)
 
     def test_plot(self):
         # when

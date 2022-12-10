@@ -1,5 +1,5 @@
 from statistics import stdev
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -23,9 +23,12 @@ class GreenwellMethod(PartialDependenceBasedMethod):
     """
 
 
-    def __init__(self):
-        """Constructor for GreenwellMethod"""
-        super().__init__(InteractionMethod.VARIABLE_INTERACTION)
+    def __init__(self, random_state: Optional[int] = None):
+        """Constructor for GreenwellMethod
+        
+        Parameters:
+            random_state (int, optional) -- random state for reproducibility. Defaults to None."""
+        super().__init__(InteractionMethod.VARIABLE_INTERACTION, random_state=random_state)
 
     def _calculate_i_versus(self, predict_function, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
         """
