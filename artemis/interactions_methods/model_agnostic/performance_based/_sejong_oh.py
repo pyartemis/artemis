@@ -33,7 +33,7 @@ class SejongOhMethod(FeatureInteractionMethod):
         super().__init__(InteractionMethod.PERFORMANCE_BASED, random_state)
         self.metric = metric
         self.y_sampled = None
-    
+
     @property
     def interactions_ascending_order(self):
         return False
@@ -49,7 +49,7 @@ class SejongOhMethod(FeatureInteractionMethod):
             show_progress: bool = False,
     ):
 
-        """Calculates Performance Based Interactions and Permutationl Based Feature Importance for the given model. 
+        """Calculates Performance Based Interactions and Permutationl Based Feature Importance for the given model.
 
         Parameters:
             model -- model to be explained
@@ -65,11 +65,12 @@ class SejongOhMethod(FeatureInteractionMethod):
         self.ovo = _perf_based_ovo(self, model, self.X_sampled, self.y_sampled, n_repeat, show_progress)
 
         # calculate variable importance
-        permutation_importance = PermutationImportance(self.metric)
-        self.variable_importance = permutation_importance.importance(model, X=self.X_sampled, y_true=self.y_sampled,
-                                                                     n_repeat=n_repeat,
-                                                                     features=self.features_included,
-                                                                     show_progress=show_progress)
+        self._variable_importance_obj = PermutationImportance(self.metric)
+        self.variable_importance = self._variable_importance_obj.importance(model, X=self.X_sampled,
+                                                                            y_true=self.y_sampled,
+                                                                            n_repeat=n_repeat,
+                                                                            features=self.features_included,
+                                                                            show_progress=show_progress)
 
 
 def _perf_based_ovo(

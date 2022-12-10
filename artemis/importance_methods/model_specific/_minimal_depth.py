@@ -47,8 +47,7 @@ class MinimalDepthImportance(VariableImportanceMethod):
         for tree_id in tree_id_to_depth_split.keys():
             depth_tree, split_tree = tree_id_to_depth_split[tree_id]
             for f in split_tree.keys():
-                # until we do not handle this in visualisations, let's keep higher = bigger axiom
-                feature_to_depth[f].append(np.max(depth_tree) - depth_tree[split_tree[f][0]])
+                feature_to_depth[f].append(depth_tree[split_tree[f][0]])
 
 
         records_result = []
@@ -62,6 +61,11 @@ class MinimalDepthImportance(VariableImportanceMethod):
         ).sort_values(by="Value", ignore_index=True)
 
         return self.variable_importance
+
+    @property
+    def importance_ascending_order(self):
+        return True
+
 
 
 def _check_preconditions(method: str, tree_id_to_depth_split: dict):

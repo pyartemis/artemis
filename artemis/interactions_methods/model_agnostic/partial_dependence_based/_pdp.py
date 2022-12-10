@@ -40,10 +40,11 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         self.model = model
         self.sample_ovo(self.predict_function, self.model, X, n, features, show_progress)
 
-        self.variable_importance = PartialDependenceBasedImportance().importance(self.model, self.X_sampled,
-                                                                                 features=self.features_included,
-                                                                                 show_progress=show_progress,
-                                                                                 precalculated_pdp=pdp_cache)
+        self._variable_importance_obj = PartialDependenceBasedImportance()
+        self.variable_importance = self._variable_importance_obj.importance(self.model, self.X_sampled,
+                                                                            features=self.features_included,
+                                                                            show_progress=show_progress,
+                                                                            precalculated_pdp=pdp_cache)
 
     def sample_ovo(self,
                    predict_function,

@@ -24,6 +24,7 @@ class FeatureInteractionMethod(ABC):
         self.method = method
         self.visualizer = Visualizer(method, VisualizationConfigurationProvider.get(method))
         self.variable_importance = None
+        self._variable_importance_obj = None
         self.ovo = None
         self.X_sampled = None
         self.features_included = None
@@ -82,6 +83,7 @@ class FeatureInteractionMethod(ABC):
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
+                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
                              **kwargs)
 
 

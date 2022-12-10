@@ -24,20 +24,21 @@ class Visualizer:
         return vis_type in self.vis_config.accepted_visualizations
 
     def plot(
-            self,
-            ovo: pd.DataFrame,
-            vis_type: str,
-            ova: Optional[pd.DataFrame] = None,
-            variable_importance: Optional[pd.DataFrame] = None,
-            title: Optional[str] = "default",
-            figsize: tuple = (8, 6),
-            show: bool = True,
-            interactions_ascending_order: bool = False,
-            _full_result: Optional[pd.DataFrame] = None,
-            _feature_column_name_1: str = "Feature 1",
-            _feature_column_name_2: str = "Feature 2",
-            _directed: bool = False,
-            **kwargs,
+        self,
+        ovo: pd.DataFrame,
+        vis_type: str,
+        ova: Optional[pd.DataFrame] = None,
+        variable_importance: Optional[pd.DataFrame] = None,
+        title: Optional[str] = "default",
+        figsize: tuple = (8, 6),
+        show: bool = True,
+        interactions_ascending_order: bool = False,
+        importance_ascending_order: bool = False,
+        _full_result: Optional[pd.DataFrame] = None,
+        _feature_column_name_1: str = "Feature 1",
+        _feature_column_name_2: str = "Feature 2",
+        _directed: bool = False,
+        **kwargs,
     ):
 
         if not self.accepts(vis_type):
