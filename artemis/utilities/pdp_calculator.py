@@ -17,23 +17,23 @@ class PartialDependenceCalculator:
         self.batchsize = batchsize
         self.pd_single = {col: 
                             {   
-                                "f_values": np.sort(np.unique(X[col].values)), 
-                                "pd_values": np.full(len(np.unique(X[col].values)), np.nan) 
+                                "f_values": np.sort(np.unique(self.X[col].values)), 
+                                "pd_values": np.full(len(np.unique(self.X[col].values)), np.nan) 
                             }
-                            for col in X.columns}
+                            for col in self.X.columns}
         self.pd_pairs = {(col1, col2): 
                             {   
-                                "f1_values": np.sort(np.unique(X[col1].values)), 
-                                "f2_values": np.sort(np.unique(X[col2].values)),
-                                "pd_values": np.full((len(np.unique(X[col1].values)), len(np.unique(X[col2].values))), np.nan)
+                                "f1_values": np.sort(np.unique(self.X[col1].values)), 
+                                "f2_values": np.sort(np.unique(self.X[col2].values)),
+                                "pd_values": np.full((len(np.unique(self.X[col1].values)), len(np.unique(self.X[col2].values))), np.nan)
                             }
-                            for col1, col2 in combinations(X.columns, 2)}
+                            for col1, col2 in combinations(self.X.columns, 2)}
         self.pd_minus_single = {col:
                             {   
-                                "row_ids": np.arange(len(X)),
-                                "pd_values": np.full(len(X), np.nan) 
+                                "row_ids": np.arange(self.X_len),
+                                "pd_values": np.full(self.X_len, np.nan) 
                             }
-                            for col in X.columns}
+                            for col in self.X.columns}
 
     def get_pd_single(self, feature: str, feature_values: Optional[List[Any]] = None) -> np.ndarray:
         if feature_values is None:
@@ -90,6 +90,7 @@ class PartialDependenceCalculator:
         current_len = 0
         X_full = pd.DataFrame()
         for feature1, feature2 in tqdm(feature_pairs, desc=desc, disable=not show_progress):
+            feature1, feature2 = get_pair_key((feature1, feature2), self.pd_pairs.keys())
             if all_combinations:
                 feature_values = [(f1, f2) for f1 in self.pd_pairs[(feature1, feature2)]["f1_values"] for f2 in self.pd_pairs[(feature1, feature2)]["f2_values"]]
             else:
@@ -118,8 +119,8 @@ class PartialDependenceCalculator:
         current_len = 0
         X_full = pd.DataFrame()
         for feature in tqdm(features, desc=desc, disable=not show_progress):
-            if np.isnan(self.pd_single[feature]["pd_values"]).any(): 
-                for i, row in self.X.iterrows():
+            if np.isnan(self.pd_minus_single[feature]["pd_values"]).any(): 
+                for i, row in self.X.copy().reset_index(drop=True).iterrows():
                     change_dict = {other_feature: row[other_feature] for other_feature in self.X.columns if other_feature != feature}
                     X_changed = self.X.copy().assign(**change_dict)
                     range_dict[(feature, i)] = (current_len, current_len+self.X_len)
