@@ -18,7 +18,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         ovo (pd.DataFrame) -- one versus one variable interaction values 
         ova (pd.DataFrame) -- one vs all feature interactions
         normalized (bool) -- flag determining whether to normalize the interaction values (unnrormalized version is proposed in https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935)
-        
+
     References:
     - https://www.jstor.org/stable/pdf/30245114.pdf
     - https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935
@@ -99,6 +99,16 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         return pd.DataFrame(h_stat_one_vs_all, columns=["Feature", InteractionMethod.H_STATISTIC]).sort_values(
             by=InteractionMethod.H_STATISTIC, ascending=self.interactions_ascending_order, ignore_index=True
         )
+
+
+    def _ovo(self, predict_function, model, X_sampled: pd.DataFrame, show_progress: bool, **kwargs):
+        value_pairs = [
+            [c1, c2, self._calculate_i_versus(predict_function, model, X_sampled, c1, [c2])]
+            for c1, c2 in tqdm(self.pairs, desc=ProgressInfoLog.CALC_OVO, disable=not show_progress)
+        ]
+        return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
+            by=self.method, ascending=self.interactions_ascending_order, ignore_index=True
+        ).fillna(0)
 
     def _calculate_i_versus(self, predict_function, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
         """Friedmann H-statistic feature interaction specifics can be found in https://arxiv.org/pdf/0811.1679.pdf"""
