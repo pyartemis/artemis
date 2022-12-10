@@ -7,6 +7,7 @@ from tqdm import tqdm
 from artemis.utilities.domain import VisualizationType, InteractionMethod, ProgressInfoLog
 from artemis.utilities.exceptions import MethodNotFittedException
 from artemis.utilities.ops import remove_element, center, partial_dependence_value
+from artemis.utilities.pd_calculator import PartialDependenceCalculator
 from ._pdp import PartialDependenceBasedMethod
 
 class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
@@ -34,14 +35,16 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         super().__init__(InteractionMethod.H_STATISTIC, random_state=random_state)
         self.ova = None
         self.normalized = normalized
-        self._pdp_cache = dict()
 
     def fit(self,
             model,
             X: pd.DataFrame,
             n: int = None,
             features: List[str] = None,
-            show_progress: bool = False):
+            show_progress: bool = False,
+            batchsize: Optional[int] = 2000,
+            pd_calculator: Optional[PartialDependenceCalculator] = None,
+            calculate_ova: bool = True):
         """Calculates H-statistic Interactions and Partial Dependence Based Importance for the given model. 
         Despite pair interactions, this method also calculates one vs all interactions.
 
@@ -52,8 +55,9 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             features (List[str], optional) -- list of features for which interactions will be calculated
             show_progress (bool) -- whether to show progress bar 
         """
-        super().fit(model, X, n, features, show_progress, self._pdp_cache)
-        self.ova = self._ova(self.predict_function, self.model, self.X_sampled, show_progress, self.features_included)
+        super().fit(model, X, n, features, show_progress, batchsize, pd_calculator)
+        if calculate_ova:
+            self.ova = self._calculate_ova_interactions_from_pd(show_progress)
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """Plots interactions
@@ -78,74 +82,34 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
                              importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
                              **kwargs)
 
-    def _ova(self, predict_function, model, X: pd.DataFrame, progress: bool, features: List[str]) -> pd.DataFrame:
-        """
-        Calculate interaction values between distinguished feature and all other features.
-        Args:
-            model:      model for which interactions will be extracted, must have implemented predict method
-            X:          data used to calculate interactions
-            progress:   determine whether to show the progress bar
-            features:   list of features for which one versus all interaction will be calculated
-
-        Returns:
-            object: features and their corresponding OVA (One Vs All) feature interaction values
-
-        """
-        h_stat_one_vs_all = [
-            [column, self._calculate_i_versus(predict_function, model, X, column, remove_element(X.columns, column))]
-            for column in tqdm(features, desc=ProgressInfoLog.CALC_OVA, disable=not progress)
-        ]
-
-        return pd.DataFrame(h_stat_one_vs_all, columns=["Feature", InteractionMethod.H_STATISTIC]).sort_values(
+    def _calculate_ova_interactions_from_pd(self, show_progress: bool) -> pd.DataFrame:
+        self.pd_calculator.calculate_pd_minus_single(self.features_included, show_progress=show_progress)
+        preds = self.predict_function(self.model, self.X_sampled)
+        value_minus_single = []
+        for feature in self.features_included:
+            pd_f = self.pd_calculator.get_pd_single(feature, feature_values = self.X_sampled[feature].values)
+            pd_f_minus = self.pd_calculator.get_pd_minus_single(feature)
+            value_minus_single.append([feature, _calculate_hstat_value(pd_f, pd_f_minus, preds, self.normalized)])
+        return pd.DataFrame(value_minus_single, columns=["Feature", InteractionMethod.H_STATISTIC]).sort_values(
             by=InteractionMethod.H_STATISTIC, ascending=self.interactions_ascending_order, ignore_index=True
-        )
+        ).fillna(0)
 
-
-    def _ovo(self, predict_function, model, X_sampled: pd.DataFrame, show_progress: bool, **kwargs):
-        value_pairs = [
-            [c1, c2, self._calculate_i_versus(predict_function, model, X_sampled, c1, [c2])]
-            for c1, c2 in tqdm(self.pairs, desc=ProgressInfoLog.CALC_OVO, disable=not show_progress)
-        ]
+    def _calculate_ovo_interactions_from_pd(self, show_progress: bool):
+        self.pd_calculator.calculate_pd_pairs(self.pairs, show_progress=show_progress, all_combinations=False)
+        self.pd_calculator.calculate_pd_single(self.features_included, show_progress=False)
+        value_pairs = []
+        for pair in self.pairs:
+            pd_f1 = self.pd_calculator.get_pd_single(pair[0], feature_values = self.X_sampled[pair[0]].values)
+            pd_f2 = self.pd_calculator.get_pd_single(pair[1], feature_values = self.X_sampled[pair[1]].values)
+            pair_feature_values = list(zip(self.X_sampled[pair[0]].values, self.X_sampled[pair[1]].values))
+            pd_pair = self.pd_calculator.get_pd_pairs(pair[0], pair[1], feature_values = pair_feature_values)
+            value_pairs.append([pair[0], pair[1], _calculate_hstat_value(pd_f1, pd_f2, pd_pair, self.normalized)])
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
             by=self.method, ascending=self.interactions_ascending_order, ignore_index=True
         ).fillna(0)
 
-    def _calculate_i_versus(self, predict_function, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
-        """Friedmann H-statistic feature interaction specifics can be found in https://arxiv.org/pdf/0811.1679.pdf"""
-        pd_i_list = np.array([])
-        pd_versus_list = np.array([])
-        pd_i_versus_list = np.array([])
-
-        for _, row in X_sampled.iterrows():
-            change_i = {i: row[i]}
-            change_versus = {col: row[col] for col in versus}
-            change_i_versus = {**change_i, **change_versus}
-
-            key_i = _pdp_cache_key(i, row)
-            pd_i = _take_from_cache_or_calc(self._pdp_cache, key_i, X_sampled, change_i, predict_function, model)
-            self._pdp_cache[key_i] = pd_i
-
-            if len(versus) == 1:
-                key_versus = _pdp_cache_key(versus[0], row)
-                pd_versus = _take_from_cache_or_calc(self._pdp_cache, key_versus, X_sampled, change_versus, predict_function, model)
-                self._pdp_cache[key_versus] = pd_versus
-            else:
-                pd_versus = partial_dependence_value(X_sampled, change_versus, predict_function, model)
-
-            pd_i_versus = partial_dependence_value(X_sampled, change_i_versus, predict_function, model)
-
-            pd_i_list = np.append(pd_i_list, pd_i)
-            pd_versus_list = np.append(pd_versus_list, pd_versus)
-            pd_i_versus_list = np.append(pd_i_versus_list, pd_i_versus)
-
-        nominator = (center(pd_i_versus_list) - center(pd_i_list) - center(pd_versus_list)) ** 2
-        denominator = center(pd_i_versus_list) ** 2
-        return np.sum(nominator) / np.sum(denominator) if self.normalized else np.sqrt(np.sum(nominator))
-
-
-def _pdp_cache_key(column, row):
-    return column, row[column]
-
-
-def _take_from_cache_or_calc(pdp_cache, key, X_sampled, change_dict, predict_function, model):
-    return pdp_cache[key] if key in pdp_cache else partial_dependence_value(X_sampled, change_dict, predict_function, model)
+def _calculate_hstat_value(pd_i: np.ndarray, pd_versus: np.ndarray, pd_i_versus: np.ndarray, normalized: bool = True):
+    nominator = (center(pd_i_versus) - center(pd_i) - center(pd_versus)) ** 2
+    if normalized: 
+        denominator = center(pd_i_versus) ** 2
+    return np.sum(nominator) / np.sum(denominator) if normalized else np.sqrt(np.sum(nominator))

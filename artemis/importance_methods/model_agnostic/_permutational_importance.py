@@ -50,7 +50,7 @@ class PermutationImportance(VariableImportanceMethod):
             pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"
         """
         self.variable_importance = _permutation_importance(
-            model, X, y_true, self.metric, n_repeat, features, show_progress
+            model, X, y_true, self.metric, n_repeat, features, show_progress, self.random_generator
         )
         return self.variable_importance
     @property
@@ -66,22 +66,23 @@ def _permutation_importance(
     n_repeat: int,
     features: List[str],
     show_progress: bool,
+    random_generator: np.random._generator.Generator
 ):
     base_score = metric.calculate(y, model.predict(X))
     corrupted_scores = _corrupted_scores(
-        model, X, y, features, metric, n_repeat, show_progress
+        model, X, y, features, metric, n_repeat, show_progress, random_generator
     )
 
     feature_importance = [
         {
             "Feature": f,
-            "Value": _neg_if_class(metric, np.mean(corrupted_scores[f]) - base_score),
+            "Importance": _neg_if_class(metric, np.mean(corrupted_scores[f]) - base_score),
         }
         for f in corrupted_scores.keys()
     ]
 
     return pd.DataFrame.from_records(feature_importance).sort_values(
-        by="Value", ascending=False, ignore_index=True
+        by="Importance", ascending=False, ignore_index=True
     )
 
 
@@ -93,6 +94,7 @@ def _corrupted_scores(
     metric: Metric,
     n_repeat: int,
     show_progress: bool,
+    random_generator: np.random._generator.Generator
 ):
     X_copy_permuted = X.copy()
     corrupted_scores = {f: [] for f in features}
@@ -100,7 +102,7 @@ def _corrupted_scores(
         range(n_repeat), disable=not show_progress, desc=ProgressInfoLog.CALC_VAR_IMP
     ):
         for feature in features:
-            X_copy_permuted[feature] = np.random.permutation(X_copy_permuted[feature])
+            X_copy_permuted[feature] = random_generator.permutation(X_copy_permuted[feature])
             corrupted_scores[feature].append(
                 metric.calculate(y, model.predict(X_copy_permuted))
             )

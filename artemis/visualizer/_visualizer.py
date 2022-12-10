@@ -137,7 +137,7 @@ class Visualizer:
         df_to_plot["Interaction"] = df_to_plot["root_variable"] + ":" + df_to_plot["variable"]
         df_to_plot = df_to_plot.iloc[:top_k]
         df_to_plot = df_to_plot.join(variable_importance.set_index("Feature"), on="variable").rename(
-            columns={"Value": "unconditional_importance"})
+            columns={"Importance": "unconditional_importance"})
 
         norm = plt.Normalize(df_to_plot["n_occurences"].min(), df_to_plot["n_occurences"].max())
         cmap = plt.get_cmap(colormap)
@@ -306,8 +306,8 @@ class Visualizer:
             if variable_importance is not None
             else None,
             node_size=[
-                node_size * val / np.max(variable_importance["Value"])
-                for val in variable_importance["Value"]
+                node_size * val / np.max(variable_importance["Importance"])
+                for val in variable_importance["Importance"]
             ]
             if variable_importance is not None
             else node_size,
@@ -635,7 +635,7 @@ class Visualizer:
                     _f2_name: f,
                     self.method: variable_importance[
                         variable_importance["Feature"] == f
-                        ]["Value"].values[0],
+                        ]["Importance"].values[0],
                 }
                 for f in all_features
             ]

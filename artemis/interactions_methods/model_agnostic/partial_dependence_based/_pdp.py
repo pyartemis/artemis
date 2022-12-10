@@ -9,6 +9,7 @@ from artemis.importance_methods.model_agnostic import PartialDependenceBasedImpo
 from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.utilities.domain import ProgressInfoLog
 from artemis.utilities.ops import get_predict_function, sample_if_not_none, all_if_none
+from artemis.utilities.pd_calculator import PartialDependenceCalculator
 
 
 class PartialDependenceBasedMethod(FeatureInteractionMethod):
@@ -27,7 +28,7 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
             features: List[str] = None,
             show_progress: bool = False,
             batchsize: Optional[int] = 2000,
-            pdp_cache: dict = None):
+            pd_calculator: Optional[PartialDependenceCalculator] = None):
         """Calculates Partial Dependence Based Interactions and Importance for the given model. 
 
         Parameters:
@@ -39,27 +40,29 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         """
         self.predict_function = get_predict_function(model)
         self.model = model
-        self.sample_ovo(self.predict_function, self.model, X, n, features, show_progress, batchsize)
+        self.batchsize = batchsize
+
+        self.X_sampled = sample_if_not_none(self.random_generator, X, n)
+        self.features_included = all_if_none(X.columns, features)
+        self.pairs = list(combinations(self.features_included, 2))
+
+        if pd_calculator is None:
+            self.pd_calculator = PartialDependenceCalculator(self.model, self.X_sampled, self.predict_function, self.batchsize)
+        else: 
+            if pd_calculator.model != self.model:
+                raise ValueError("Model in PDP calculator is different than the model in the method.")
+            if not pd_calculator.X.equals(self.X_sampled):
+                raise ValueError("Data in PDP calculator is different than the data in the method.")
+            self.pd_calculator = pd_calculator
+
+        self.ovo = self._calculate_ovo_interactions_from_pd(show_progress = show_progress)
 
         self._variable_importance_obj = PartialDependenceBasedImportance()
         self.variable_importance = self._variable_importance_obj.importance(self.model, self.X_sampled,
                                                                             features=self.features_included,
                                                                             show_progress=show_progress,
-                                                                            precalculated_pdp=pdp_cache)
-
-    def sample_ovo(self,
-                   predict_function,
-                   model,
-                   X: pd.DataFrame,
-                   n: int = None,
-                   features: List[str] = None,
-                   show_progress: bool = False, 
-                   batchsize: Optional[int] = 2000):
-        self.X_sampled = sample_if_not_none(self.random_generator, X, n)
-        self.features_included = all_if_none(X.columns, features)
-        self.pairs = list(combinations(self.features_included, 2))
-        self.ovo = self._ovo(predict_function, model, self.X_sampled, show_progress, batchsize=batchsize)
+                                                                            pd_calculator=self.pd_calculator)
 
     @abstractmethod
-    def _ovo(self, predict_function, model, X_sampled: pd.DataFrame, show_progress: bool, **kwargs):
+    def _calculate_ovo_interactions_from_pd(self, show_progress: bool):
         ...
