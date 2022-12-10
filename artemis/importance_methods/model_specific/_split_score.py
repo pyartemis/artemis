@@ -128,9 +128,9 @@ def _calculate_mean_weighted_depth_metric(trees_df: pd.DataFrame):
 def _select_metric(importance_full_result: pd.DataFrame, selected_metric: str):
     variable_importance = importance_full_result[
         ["split_feature", selected_metric]
-    ].rename(columns={"split_feature": "Feature", selected_metric: "Value"})
+    ].rename(columns={"split_feature": "Feature", selected_metric: "Importance"})
     return variable_importance.sort_values(
-        by="Value", ascending=False, ignore_index=True
+        by="Importance", ascending=False, ignore_index=True
     )
 
 

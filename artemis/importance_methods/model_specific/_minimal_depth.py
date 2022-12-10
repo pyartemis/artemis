@@ -53,12 +53,12 @@ class MinimalDepthImportance(VariableImportanceMethod):
         records_result = []
         for f in feature_to_depth.keys():
             records_result.append(
-                {"Feature": columns[f], "Value": np.mean(feature_to_depth[f])}
+                {"Feature": columns[f], "Importance": np.mean(feature_to_depth[f])}
             )
 
         self.variable_importance = pd.DataFrame.from_records(
             records_result
-        ).sort_values(by="Value", ignore_index=True)
+        ).sort_values(by="Importance", ignore_index=True)
 
         return self.variable_importance
 
