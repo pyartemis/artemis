@@ -58,9 +58,6 @@ class VariableImportanceUnitTest(unittest.TestCase):
         self.assertGreater(importance[importance["Feature"] == "important_feature"]["Importance"].values[0],
                            importance[importance["Feature"] == "noise_feature"]["Importance"].values[0])
 
-    def test_ci_dev(self):
-        self.assertEqual(False, True)
-
 
 if __name__ == '__main__':
     unittest.main()
