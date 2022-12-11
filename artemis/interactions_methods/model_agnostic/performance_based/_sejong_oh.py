@@ -1,5 +1,5 @@
 from itertools import combinations
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -13,23 +13,49 @@ from artemis.utilities.ops import all_if_none, sample_both_if_not_none
 
 
 class SejongOhMethod(FeatureInteractionMethod):
-    """Class implementing Sejong Oh Performance Based feature interaction method.
-    Attributes:
-        method (str) -- name of interaction method
-        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        feature_importance (pd.DataFrame) -- variable importance values 
-        ovo (pd.DataFrame) -- one versus one variable interaction values 
-        metric (Metric) -- metric used to calculate interactions
+    """
+    Sejong Oh's Performance Based Method for Feature Interaction Extraction. 
     
+    Attributes:
+    ----------
+    method : str 
+        Method name, used also for naming column with results in `results` pd.DataFrame.
+    visualizer : Visualizer
+        Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
+    ovo : pd.DataFrame 
+        One versus one (pair) feature interaction values. 
+    feature_importance : pd.DataFrame 
+        Feature importance values.
+    metric : Metric
+        Metric used for calculating performance.
+    model : object
+        Explained model.
+    X_sampled: pd.DataFrame
+        Sampled data used for calculation.
+    y_sampled: np.array or pd.Series
+        Sampled target values used for calculation.
+    features_included: List[str]
+        List of features for which interactions are calculated.
+    pairs : List[List[str]]
+        List of pairs of features for which interactions are calculated.
+    random_state : int
+        Random state used for reproducibility.
+
     References:
+    ----------
     - https://www.mdpi.com/2076-3417/9/23/5191
     """
 
     def __init__(self, metric: Metric = RMSE(), random_state: Optional[int] = None):
         """Constructor for SejongOhMethod
+        
         Parameters:
-            metric (Metric, optional) -- metric used to calculate interactions. Defaults to RMSE().
-            random_state (int, optional) -- random state for reproducibility. Defaults to None."""
+        ----------
+        metric : Metric
+            Metric used to calculate model performance. Defaults to RMSE().
+        random_state : int, optional 
+            Random state for reproducibility. Defaults to None.
+        """
         super().__init__(InteractionMethod.PERFORMANCE_BASED, random_state)
         self.metric = metric
         self.y_sampled = None
@@ -42,23 +68,30 @@ class SejongOhMethod(FeatureInteractionMethod):
             self,
             model,
             X: pd.DataFrame,
-            y_true: np.array = None,  
+            y_true: Union[np.array, pd.Series],  
             n: int = None,
             n_repeat: int = 10,
             features: List[str] = None,
             show_progress: bool = False,
-    ):
-
-        """Calculates Performance Based Interactions and Permutationl Based Feature Importance for the given model.
+    ):  
+        """Calculates Performance Based Feature Interactions Strenght and Permutation Based Feature Importance for the given model.
 
         Parameters:
-            model -- model to be explained
-            X (pd.DataFrame, optional) -- data used to calculate interactions
-            y_true (np.array) -- target values for X data
-            n (int, optional) -- number of samples to be used for calculation of interactions
-            n_repeat (int) -- number of permutations 
-            features (List[str], optional) -- list of features for which interactions will be calculated
-            show_progress (bool) -- whether to show progress bar 
+        ----------
+        model : object
+            Model to be explained, should have predict method.
+        X : pd.DataFrame
+            Data used to calculate interactions. If n is not None, n rows from X will be sampled. 
+        y_true : np.array or pd.Series
+            Target values for X data. 
+        n : int, optional
+            Number of samples to be used for calculation of interactions. If None, all rows from X will be used. Default is None.
+        n_repeat : int, optional
+            Number of permutations. Default is 10.
+        features : List[str], optional
+            List of features for which interactions will be calculated. If None, all features from X will be used. Default is None.
+        show_progress : bool
+            If True, progress bar will be shown. Default is False.
         """
         self.X_sampled, self.y_sampled = sample_both_if_not_none(self._random_generator, X, y_true, n)
         self.features_included = all_if_none(X.columns, features)

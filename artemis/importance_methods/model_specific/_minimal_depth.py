@@ -10,12 +10,22 @@ from artemis.utilities.exceptions import FeatureImportanceWithoutInteractionExce
 
 
 class MinimalDepthImportance(FeatueImportanceMethod):
-    """Class implementing Minimal Depth Feature Importance. It applies to tree-based models like Random Forests.
+    """
+    Minimal Depth Feature Importance.
+    It applies to tree-based models like Random Forests.
     It uses data calculated in ConditionalMinimalDepth method from `interactions_methods` module and so needs to be calculated together.
 
     Importance of a feature is defined as the lowest depth of node using this feature as a split variable in a tree, averaged over all trees.
 
+    Attributes:
+    ----------
+    method : str 
+        Method name.
+    feature_importance : pd.DataFrame 
+        Feature importance values.
+        
     References:
+    ----------
     - https://modeloriented.github.io/randomForestExplainer/
     - https://doi.org/10.1198/jasa.2009.tm08622
     """
@@ -26,18 +36,22 @@ class MinimalDepthImportance(FeatueImportanceMethod):
 
     def importance(
         self,
-        model,  # to comply with the signature
-        tree_id_to_depth_split: dict = None,
+        model,  
+        tree_id_to_depth_split: dict,
     ) -> pd.DataFrame:
         """Calculates Minimal Depth Feature Importance.
 
-        Arguments:
-            model (object) -- unused, comply with signature
-            X (pd.DataFrame, optional) --  data to use for calculating importance on
-            tree_id_to_depth_split (dict) -- dictionary containing minimal depth of each node in each tree
+        Parameters:
+        ----------
+        model : object
+               Model for which importance will be calculated, should have predict method.
+        tree_id_to_depth_split : dict
+            Dictionary containing minimal depth of each node in each tree.
 
         Returns:
-            pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"
+        -------
+        pd.DataFrame
+            Result dataframe containing feature importance with columns: "Feature", "Importance"
         """
         _check_preconditions(self.method, tree_id_to_depth_split)
 

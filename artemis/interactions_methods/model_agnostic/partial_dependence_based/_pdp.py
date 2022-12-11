@@ -26,9 +26,9 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
     def fit(self,
             model,
             X: pd.DataFrame,
-            n: int = None,
+            n: Optional[int] = None,
             predict_function: Optional[Callable] = None,
-            features: List[str] = None,
+            features: Optional[List[str]] = None,
             show_progress: bool = False,
             batchsize: int = 2000,
             pd_calculator: Optional[PartialDependenceCalculator] = None):
@@ -37,13 +37,14 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         Parameters:
         ----------
         model : object
-            Model to be explained, should have predict or predict_proba method. 
-        X : pd.DataFrame, optional
+            Model to be explained, should have predict_proba or predict method, or predict_function should be provided. 
+        X : pd.DataFrame
             Data used to calculate interactions. If n is not None, n rows from X will be sampled. 
         n : int, optional
             Number of samples to be used for calculation of interactions. If None, all rows from X will be used. Default is None.
         predict_function : Callable, optional
-            Function used to predict model output. If None, `predict_proba` method will be used if it exists, otherwise `predict` method. Default is None.
+            Function used to predict model output. It should take model and dataset and outputs predictions. 
+            If None, `predict_proba` method will be used if it exists, otherwise `predict` method. Default is None.
         features : List[str], optional
             List of features for which interactions will be calculated. If None, all features from X will be used. Default is None.
         show_progress : bool

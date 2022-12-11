@@ -18,28 +18,26 @@ class GreenwellMethod(PartialDependenceBasedMethod):
 
     Attributes:
     ----------
-        method : str 
-            Method name, used also for naming column with results in `results` pd.DataFrame.
-        visualizer : Visualizer
-            Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
-        ovo : pd.DataFrame 
-            One versus one (pair) feature interaction values. 
-        feature_importance : pd.DataFrame 
-            Feature importance values.
-        model : object
-            Explained model.
-        X_sampled: pd.DataFrame
-            Sampled data used for calculation.
-        features_included: List[str]
-            List of features for which interactions are calculated.
-        pairs : List[List[str]]
-            List of pairs of features for which interactions are calculated.
-        pd_calculator : PartialDependenceCalculator
-            Object used to calculate and store partial dependence values.
-        batchsize: int
-            Batch size used for calculation.
-        random_state : int
-            Random state used for reproducibility.
+    method : str 
+        Method name, used also for naming column with results in `results` pd.DataFrame.
+    visualizer : Visualizer
+        Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
+    ovo : pd.DataFrame 
+        One versus one (pair) feature interaction values. 
+    feature_importance : pd.DataFrame 
+        Feature importance values.
+    model : object
+        Explained model.
+    X_sampled: pd.DataFrame
+        Sampled data used for calculation.
+    features_included: List[str]
+        List of features for which interactions are calculated.
+    pairs : List[List[str]]
+        List of pairs of features for which interactions are calculated.
+    pd_calculator : PartialDependenceCalculator
+        Object used to calculate and store partial dependence values.
+    batchsize: int
+        Batch size used for calculation.
 
     References:
     ----------

@@ -11,12 +11,24 @@ from artemis.utilities.split_score_metrics import SplitScoreImportanceMetric
 
 
 class SplitScoreImportance(FeatueImportanceMethod):
-    """Class implementing Split Score Feature Importance. It applies to gradient boosting tree-based models.
-    It can use data calculated in SplitScore method from `interactions_methods` module.
+    """
+    Split Score Feature Importance.
+    It applies to gradient boosting tree-based models.
+        It can use data calculated in SplitScore method from `interactions_methods` module and so needs to be calculated together.
 
     Importance of a feature is defined by the metric selected by user (default is sum of gains).
 
+    Attributes:
+    ----------
+    method : str 
+        Method name.
+    feature_importance : pd.DataFrame 
+        Feature importance values.
+    selected_metric : str
+        Metric used for calculating importance.
+        
     References:
+    ----------
     - https://modeloriented.github.io/EIX/
     """
 
@@ -28,9 +40,6 @@ class SplitScoreImportance(FeatueImportanceMethod):
     def importance(
             self,
             model,
-            X: Optional[
-                pd.DataFrame
-            ] = None,  # unused as explanations are calculated only for trained model, left for compatibility
             features: Optional[List[str]] = None,
             selected_metric: str = SplitScoreImportanceMetric.SUM_GAIN,
             show_progress: bool = False,
@@ -38,16 +47,26 @@ class SplitScoreImportance(FeatueImportanceMethod):
     ):
         """Calculates Split Score Feature Importance.
 
-        Arguments:
-            model (object) -- model to be explained
-            X (pd.DataFrame, optional) -- unused as explanations are calculated only for trained model
-            features (List[str], optional) -- list of features to be explained
-            selected_metric (str) -- metric to be used for calculating importance, one of ['sum_gain', 'sum_cover', 'mean_gain', 'mean_cover', 'mean_depth', 'mean_weighted_depth', 'root_frequency', 'weighted_root_frequency']
-            show_progress (bool) -- whether to show progress bar
-            trees_df (pd.DataFrame, optional) -- DataFrame containing trees data, can be precalculated by SplitScore method
+        Parameters:
+        ----------
+        model : object
+             Model for which importance will be calculated, should have predict_proba or predict method, or predict_function should be provided. 
+        features : List[str], optional
+            List of features for which importance will be calculated. If None, all features from X will be used. Default is None.
+        selected_metric : str
+            Metric used to calculate feature importance, 
+            one of ['sum_gain', 'sum_cover', 'mean_gain', 'mean_cover', 'mean_depth', 
+            'mean_weighted_depth', 'root_frequency', 'weighted_root_frequency'].
+            Default is 'mean_gain'.
+        show_progress : bool
+            If True, progress bar will be shown. Default is False.
+        trees_df : pd.DataFrame, optional
+            DataFrame containing unified structure of the trained trees, can be precalculated by SplitScore method. Default is None.
 
         Returns:
-            pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"
+        -------
+        pd.DataFrame
+            Result dataframe containing feature importance with columns: "Feature", "Importance"
         """
         if trees_df is None:
             if not isinstance(model, GBTreesHandler):
