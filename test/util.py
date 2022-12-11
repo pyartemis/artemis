@@ -3,6 +3,7 @@ import random
 import pandas as pd
 from sklearn.datasets import fetch_california_housing, load_wine
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from xgboost import XGBRegressor, XGBClassifier
 from lightgbm import LGBMRegressor, LGBMClassifier
 
@@ -49,6 +50,22 @@ def wine_boosting_models():
     model_xgb_bis = XGBClassifier(n_estimators=40, max_depth=8).fit(X.iloc[:, :3], y)
     model_lgbm_bis = LGBMClassifier(n_estimators=40, max_depth=8).fit(X.iloc[:, :3], y)
     return model_xgb, model_lgbm, model_xgb_bis, model_lgbm_bis, X, y
+
+
+def california_housing_linear_regression():
+    california = fetch_california_housing()
+    X = pd.DataFrame(california.data, columns=california.feature_names)
+    y = california.target
+    model = LinearRegression().fit(X, y)
+    return model, X, y
+
+
+def wine_logistic_regression():
+    wine = load_wine()
+    X = pd.DataFrame(wine.data, columns=wine.feature_names)
+    y = wine.target
+    model = LogisticRegression().fit(X, y)
+    return model, X, y
 
 
 def toy_input_reg():
