@@ -1,9 +1,9 @@
 import unittest
-
 from parameterized import parameterized_class
 
 from artemis.additivity import AdditivityMeter
 from test.util import california_housing_random_forest, california_housing_linear_regression
+
 
 MODEL_REG, X_REG, _ = california_housing_random_forest()
 LINEAR_MODEL_REG, _, _ = california_housing_linear_regression()
