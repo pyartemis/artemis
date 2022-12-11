@@ -4,13 +4,13 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.importance_methods._method import FeatueImportanceMethod
+from artemis.importance_methods._method import FeatureImportanceMethod
 from artemis.interactions_methods.model_specific.gb_trees._handler import GBTreesHandler
 from artemis.utilities.domain import ImportanceMethod
 from artemis.utilities.split_score_metrics import SplitScoreImportanceMetric
 
 
-class SplitScoreImportance(FeatueImportanceMethod):
+class SplitScoreImportance(FeatureImportanceMethod):
     """
     Split Score Feature Importance.
     It applies to gradient boosting tree-based models.

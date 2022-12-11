@@ -19,7 +19,7 @@ class GreenwellMethod(PartialDependenceBasedMethod):
     Attributes:
     ----------
     method : str 
-        Method name, used also for naming column with results in `results` pd.DataFrame.
+        Method name, used also for naming column with results in `ovo` pd.DataFrame.
     visualizer : Visualizer
         Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
     ovo : pd.DataFrame 

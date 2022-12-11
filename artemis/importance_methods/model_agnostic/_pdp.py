@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.importance_methods._method import FeatueImportanceMethod
+from artemis.importance_methods._method import FeatureImportanceMethod
 from artemis.utilities.domain import ImportanceMethod, ProgressInfoLog
 from artemis.utilities.ops import (
     all_if_none,
@@ -16,7 +16,7 @@ from artemis.utilities.ops import (
 from artemis.utilities.pd_calculator import PartialDependenceCalculator
 
 
-class PartialDependenceBasedImportance(FeatueImportanceMethod):
+class PartialDependenceBasedImportance(FeatureImportanceMethod):
     """
     Partial Dependence Based Feature Importance.
     It is used for calculating feature importance for partial dependence based feature interaction methods:
@@ -33,8 +33,6 @@ class PartialDependenceBasedImportance(FeatueImportanceMethod):
         List of features for which importance is calculated.
     X_sampled: pd.DataFrame
         Sampled data used for calculation.
-    features_included: List[str]
-        List of features for which interactions are calculated.
     pd_calculator : PartialDependenceCalculator
         Object used to calculate and store partial dependence values.
 
@@ -76,8 +74,9 @@ class PartialDependenceBasedImportance(FeatueImportanceMethod):
         show_progress : bool
             If True, progress bar will be shown. Default is False.
         batchsize : int
-            Batch size for calculating partial dependence. Prediction requests are collected until the batchsize is exceeded, 
-            then the model is queried for predictions jointly for many observations. It speeds up the operation of the method.
+            Batch size for calculating partial dependence. Data for prediction are collected until the number of rows exceeds batchsize. 
+            Then, the `predict_function` is called, jointly for the entire batch of observations. It speeds up the operation of the method
+            by reducing the number of `predict_function` calls.
             Default is 2000.
         pd_calculator : PartialDependenceCalculator, optional
             PartialDependenceCalculator object containing partial dependence values for a given model and dataset. 

@@ -17,7 +17,6 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
     def __init__(self, method: str, random_state: Optional[int] = None):
         super().__init__(method, random_state=random_state)
         self.pd_calculator = None
-        self.batchsize = None
 
     @property
     def interactions_ascending_order(self):
@@ -60,14 +59,13 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         """
         self.predict_function = get_predict_function(model, predict_function)
         self.model = model
-        self.batchsize = batchsize
 
         self.X_sampled = sample_if_not_none(self._random_generator, X, n)
         self.features_included = all_if_none(X.columns, features)
         self.pairs = list(combinations(self.features_included, 2))
 
         if pd_calculator is None:
-            self.pd_calculator = PartialDependenceCalculator(self.model, self.X_sampled, self.predict_function, self.batchsize)
+            self.pd_calculator = PartialDependenceCalculator(self.model, self.X_sampled, self.predict_function, batchsize)
         else: 
             if pd_calculator.model != self.model:
                 raise ValueError("Model in PDP calculator is different than the model in the method.")

@@ -11,7 +11,7 @@ class AdditivityMeter:
     """
     AdditivityMeter is a class that calculates the additivity index of a model.
 
-    Parameters:
+    Attributes:
     -----------
     additivity_index : float
         Additivity index of the model.
@@ -25,13 +25,18 @@ class AdditivityMeter:
     X_sampled: pd.DataFrame
         Sampled data used for calculation.
     pd_calculator : PartialDependenceCalculator
-        Object used to calculate and store partial dependence values.
-    batchsize: int
-        Batch size used for calculation.
-    
+        Object used to calculate and store partial dependence values.    
     """
     def __init__(self, random_state: Optional[int] = None):
         self._random_generator = np.random.default_rng(random_state)
+        self.additivity_index = None
+        self.full_result = None
+        self.pred = None
+        self.model = None
+        self.X_smapled = None
+        self.pd_calculator = None
+        self
+       
 
     def fit(
         self,
@@ -49,7 +54,7 @@ class AdditivityMeter:
         Parameters:
         -----------
         model : object
-            Model to be explained, should have predict_proba or predict method, or predict_function should be provided. 
+            Model to calculate additivity index for, should have predict_proba or predict method, or predict_function should be provided. 
         X : pd.DataFrame
             Data used to calculate the additivity index. If n is not None, n rows from X will be sampled. 
         n : int, optional
@@ -76,12 +81,11 @@ class AdditivityMeter:
         """
         self.predict_function = get_predict_function(model, predict_function)
         self.model = model
-        self.batchsize = batchsize
         self.X_sampled = sample_if_not_none(self._random_generator, X, n)
 
         if pd_calculator is None:
             self.pd_calculator = PartialDependenceCalculator(
-                self.model, self.X_sampled, self.predict_function, self.batchsize
+                self.model, self.X_sampled, self.predict_function, batchsize
             )
         else:
             if pd_calculator.model != self.model:

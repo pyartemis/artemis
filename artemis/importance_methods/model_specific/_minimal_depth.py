@@ -4,12 +4,12 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from artemis.importance_methods._method import FeatueImportanceMethod
+from artemis.importance_methods._method import FeatureImportanceMethod
 from artemis.utilities.domain import ImportanceMethod, InteractionMethod
 from artemis.utilities.exceptions import FeatureImportanceWithoutInteractionException
 
 
-class MinimalDepthImportance(FeatueImportanceMethod):
+class MinimalDepthImportance(FeatureImportanceMethod):
     """
     Minimal Depth Feature Importance.
     It applies to tree-based models like Random Forests.

@@ -19,7 +19,7 @@ class SejongOhMethod(FeatureInteractionMethod):
     Attributes:
     ----------
     method : str 
-        Method name, used also for naming column with results in `results` pd.DataFrame.
+        Method name, used also for naming column with results in `ovo` pd.DataFrame.
     visualizer : Visualizer
         Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
     ovo : pd.DataFrame 
@@ -74,7 +74,7 @@ class SejongOhMethod(FeatureInteractionMethod):
             features: List[str] = None,
             show_progress: bool = False,
     ):  
-        """Calculates Performance Based Feature Interactions Strenght and Permutation Based Feature Importance for the given model.
+        """Calculates Performance Based Feature Interactions Strength and Permutation Based Feature Importance for the given model.
 
         Parameters:
         ----------

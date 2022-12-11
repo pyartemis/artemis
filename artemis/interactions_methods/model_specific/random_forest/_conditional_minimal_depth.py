@@ -16,7 +16,7 @@ from artemis.utilities.exceptions import MethodNotFittedException
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     """
-    Conditional Minimal Depth Method for Feature Interaction Extraction.
+    Conditional Smallest Depth Method for Feature Interaction Extraction.
     It applies to tree-based models like Random Forests.
     Currently scikit-learn forest models are supported, i.e., RandomForestClassifier, RandomForestRegressor, 
     ExtraTreesRegressor, ExtraTreesClassifier. 
@@ -24,7 +24,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     Attributes:
     ----------
     method : str 
-        Method name, used also for naming column with results in `results` pd.DataFrame.
+        Method name, used also for naming column with results in `ovo` pd.DataFrame.
     visualizer : Visualizer
         Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
     ovo : pd.DataFrame 
@@ -59,7 +59,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         compare_ovo['id'] = compare_ovo[["Feature 1", "Feature 2"]].apply(lambda x: "".join(sorted(x)), axis=1)
         return (compare_ovo.groupby("id")
                            .agg({"Feature 1": "first", "Feature 2": "first", self.method: "mean"})
-                           .sort_values("Conditional Minimal Depth Measure",
+                           .sort_values("Conditional Smallest Depth Measure",
                                         ascending=self.interactions_ascending_order,
                                         ignore_index=True))
 
@@ -69,7 +69,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
             model: Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier],
             show_progress: bool = False,
     ):
-        """Calculates Conditional Minimal Depth Feature Interactions Strenght and Minimal Depth Feature Importance for given model.
+        """Calculates Conditional Smallest Depth Feature Interactions Strenght and Minimal Depth Feature Importance for given model.
 
         Parameters:
         ----------

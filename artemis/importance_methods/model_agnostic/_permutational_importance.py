@@ -4,12 +4,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.importance_methods._method import FeatueImportanceMethod
+from artemis.importance_methods._method import FeatureImportanceMethod
 from artemis.utilities.domain import ImportanceMethod, ProgressInfoLog, ProblemType
 from artemis.utilities.performance_metrics import Metric, RMSE
 
 
-class PermutationImportance(FeatueImportanceMethod):
+class PermutationImportance(FeatureImportanceMethod):
     """
     Permutation-Based Feature Importance.
     It is used for calculating feature importance for performance based feature interaction - Sejong Oh method.

@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 
-class FeatueImportanceMethod:
+class FeatureImportanceMethod:
     """
     Abstract base class for Feature Importance methods. 
     This class should not be used directly. Use derived classes instead.

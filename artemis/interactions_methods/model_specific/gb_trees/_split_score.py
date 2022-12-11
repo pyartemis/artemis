@@ -28,7 +28,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
     Attributes:
     ----------
     method : str 
-        Method name, used also for naming column with results in `results` pd.DataFrame.
+        Method name, used also for naming column with results in `ovo` pd.DataFrame.
     visualizer : Visualizer
         Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
     ovo : pd.DataFrame 
@@ -65,7 +65,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
         importance_selected_metric: str = SplitScoreImportanceMetric.MEAN_GAIN,
         only_def_interactions: bool = True,
     ):
-        """Calculates Split Score Feature Interactions Strenght and Split Score Feature Importance for given model.
+        """Calculates Split Score Feature Interactions Strength and Split Score Feature Importance for given model.
 
         Parameters:
         ----------
