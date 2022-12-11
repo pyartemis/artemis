@@ -11,7 +11,27 @@ from artemis.visualizer._configuration import InteractionGraphConfiguration
 
 
 class FeatureInteractionMethodComparator:
+    """
+        Feature Interaction Method Comparator.
+        It is used for statistical comparison of two different feature interaction methods.
+        Calculates pearson, kendall and spearman rank-correlation and plots one vs one profiles of two methods against
+        each other. Monotonicity of the plot suggest cohesion in results. Both provided methods must be in fitted state.
+
+
+        Attributes:
+        ----------
+        ovo_profiles_comparison_plot : Figure
+            Matplotlib figure of comparison plots.
+        correlations_df : pd.DataFrame
+            Pearson, Kendall and Spearman rank correlation values
+
+        References:
+        ----------
+        - https://en.wikipedia.org/wiki/Rank_correlation
+        """
+
     def __init__(self):
+        """Constructor for FeatureInteractionMethodComparator"""
         self.ovo_profiles_comparison_plot = None
         self.correlations_df = None
 
@@ -19,11 +39,39 @@ class FeatureInteractionMethodComparator:
                 method1: FeatureInteractionMethod,
                 method2: FeatureInteractionMethod):
         _assert_fitted_ovo(method1, method2)
+        """
+        Calculates Feature Interaction Method comparison. 
+        Used for asserting stability and cohesion of results for a pair of explanation methods. 
+
+        Parameters:
+        ----------
+        method1 : FeatureInteractionMethod
+             First method for comparison
+        method2 : FeatureInteractionMethod
+             Second method for comparison 
+             
+        Returns:
+        -------
+        None
+        """
         self.correlations_df = self.correlations(method1, method2)
         self.ovo_profiles_comparison_plot = self.comparison_plot(method1, method2, add_correlation_box=True)
 
     def correlations(self, method1: FeatureInteractionMethod, method2: FeatureInteractionMethod):
+        """
+        Calculates Pearson, Kendall and Spearman rank correlation DataFrame.
 
+        Parameters:
+        ----------
+        method1 : FeatureInteractionMethod
+             First method for comparison
+        method2 : FeatureInteractionMethod
+             Second method for comparison
+
+        Returns:
+        -------
+        None
+        """
         correlations = list()
         for correlation_method in dataclasses.fields(CorrelationMethod):
             correlation_method_name = correlation_method.default
@@ -40,9 +88,31 @@ class FeatureInteractionMethodComparator:
                         method2: FeatureInteractionMethod,
                         n_labels: int = 3,
                         add_correlation_box: bool = False,
-                        figsize: tuple = (8, 6)):
+                        fig_size: tuple = (8, 6)):
+        """
+        Creates comparison plot for comparing results of two feature interaction methods. Depending on the parameters
+        rank correlation might be included on the plot.
+
+        Parameters:
+        ----------
+        method1 : FeatureInteractionMethod
+            First method for comparison
+        method2 : FeatureInteractionMethod
+            Second method for comparison
+        n_labels: int
+            Number of pairs of features with the greatest interaction values to show labels of, default = 3
+        add_correlation_box: bool
+            Flag indicating whether to show rank correlation values on the plot, default = False
+        fig_size: tuple[int]
+            Matplotlib size of the figure, default = (8, 6)
+
+
+        Returns:
+        -------
+        Figure
+        """
         m1_name, m2_name = method1.method, method2.method
-        fig, ax = plt.subplots(figsize=figsize)
+        fig, ax = plt.subplots(figsize=fig_size)
         plt.grid(True)
         circle_r = 0.2 * min(max(method1._compare_ovo[m1_name]), max(method2._compare_ovo[m2_name]))
 
@@ -58,7 +128,7 @@ class FeatureInteractionMethodComparator:
                 _add_arrow(ax, circle_r, f1, f2, x_curr, y_curr)
 
         ax.scatter(x, y, color=InteractionGraphConfiguration.NODE_COLOR)
-        
+
         if method1.interactions_ascending_order:
             plt.gca().invert_xaxis()
         if method2.interactions_ascending_order:
@@ -81,6 +151,22 @@ class FeatureInteractionMethodComparator:
             method1: FeatureInteractionMethod,
             method2: FeatureInteractionMethod,
             correlation_method: str = CorrelationMethod.KENDALL):
+        """
+        Calculates rank correlation of one vs one profiles using a given correlation method.
+
+        Parameters:
+        ----------
+        method1 : FeatureInteractionMethod
+             First method for comparison
+        method2 : FeatureInteractionMethod
+             Second method for comparison
+        correlation_method: str
+            Correlation method to use, accepted values are ['pearson', 'kendall', 'spearman'], default = 'kendall'
+
+        Returns:
+        -------
+        value of the correlation
+        """
 
         rank = _rank_interaction_values_encoded(method1, method2)
 
