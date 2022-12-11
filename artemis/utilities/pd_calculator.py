@@ -11,7 +11,7 @@ from artemis.utilities.ops import get_predict_function
 class PartialDependenceCalculator: 
     def __init__(self, model, X: pd.DataFrame, predict_function: Optional[Callable] = None, batchsize: int = 2000):
         self.model = model
-        self.predict_function = get_predict_function(model) if predict_function is None else predict_function
+        self.predict_function = get_predict_function(model, predict_function)
         self.X = X
         self.X_len = len(self.X)
         self.batchsize = batchsize

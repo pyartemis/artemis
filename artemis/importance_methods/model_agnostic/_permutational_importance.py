@@ -4,27 +4,43 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.importance_methods._method import VariableImportanceMethod
+from artemis.importance_methods._method import FeatureImportanceMethod
 from artemis.utilities.domain import ImportanceMethod, ProgressInfoLog, ProblemType
 from artemis.utilities.performance_metrics import Metric, RMSE
 
 
-class PermutationImportance(VariableImportanceMethod):
-    """Class implementing Permutation-Based Feature Importance.
+class PermutationImportance(FeatureImportanceMethod):
+    """
+    Permutation-Based Feature Importance.
     It is used for calculating feature importance for performance based feature interaction - Sejong Oh method.
 
     Importance of a feature is defined by the metric selected by user (default is sum of gains).
 
+    Attributes:
+    ----------
+    method : str 
+        Method name.
+    metric: Metric
+        Metric used for calculating performance.
+    feature_importance : pd.DataFrame 
+        Feature importance values.
+        
     References:
+    ----------
     - https://jmlr.org/papers/v20/18-760.html
     """
 
-    def __init__(self, metric: Metric = RMSE()):
-        """Constructor for PermutationImportance
-        Arguments:
-            metric  (Metric) -- performance measure to use when assessing model performance,  one of [RMSE, MSE, Accuracy]
+    def __init__(self, metric: Metric = RMSE(), random_state: Optional[int] = None):
+        """Constructor for PermutationImportance.
+
+        Parameters:
+        ----------
+        metric : Metric
+            Metric used to calculate model performance. Defaults to RMSE().
+        random_state : int, optional 
+            Random state for reproducibility. Defaults to None.
         """
-        super().__init__(ImportanceMethod.PERMUTATION_IMPORTANCE)
+        super().__init__(ImportanceMethod.PERMUTATION_IMPORTANCE, random_state=random_state)
         self.metric = metric
 
     def importance(
@@ -36,23 +52,32 @@ class PermutationImportance(VariableImportanceMethod):
         features: Optional[List[str]] = None,
         show_progress: bool = False,
     ):
-        """Calculate Permutation-Based Feature Importance.
+        """Calculates Permutation Based Feature Importance.
 
-        Arguments:
-            model -- model for which importance will be extracted
-            X (pd.DataFrame) -- data used to calculate importance
-            y_true (np.array) -- target values for `X`
-            n_repeat (int) -- amount of permutations to generate
-            features (List[str], optional) -- list of features that will be used during importance calculation
-            show_progress (bool) -- determine whether to show the progress bar
+        Parameters:
+        ----------
+        model : object
+               Model for which importance will be calculated, should have predict method.
+        X : pd.DataFrame
+            Data used to calculate importance. 
+        y_true : np.array or pd.Series
+            Target values for X data. 
+        n_repeat : int, optional
+            Number of permutations. Default is 10.
+        features : List[str], optional
+            List of features for which importance will be calculated. If None, all features from X will be used. Default is None.
+        show_progress : bool
+            If True, progress bar will be shown. Default is False.
 
         Returns:
-            pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"
+        -------
+        pd.DataFrame
+            Result dataframe containing feature importance with columns: "Feature", "Importance"
         """
-        self.variable_importance = _permutation_importance(
-            model, X, y_true, self.metric, n_repeat, features, show_progress, self.random_generator
+        self.feature_importance = _permutation_importance(
+            model, X, y_true, self.metric, n_repeat, features, show_progress, self._random_generator
         )
-        return self.variable_importance
+        return self.feature_importance
     @property
     def importance_ascending_order(self):
         return False

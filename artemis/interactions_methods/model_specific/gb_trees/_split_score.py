@@ -18,19 +18,34 @@ from ....utilities.exceptions import MethodNotFittedException, MetricNotSupporte
 
 
 class SplitScoreMethod(FeatureInteractionMethod):
-    """Class implementing Split Score Method for extraction of interactions. It applies to gradient boosting tree-based models.
+    """
+    Split Score Method for Feature Interaction Extraction.
+    It applies to gradient boosting tree-based models.
     Currently model from LightGBM and XGBoost packages are supported. 
 
     Strength of interaction is defined by the metric selected by user (default is sum of gains).
 
     Attributes:
-        metric (str) -- metric used to calculate strength of interaction
-        method (str) -- name of interaction method
-        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        variable_importance (pd.DataFrame) -- variable importance values 
-        ovo (pd.DataFrame) -- one versus one variable interaction values 
-    
+    ----------
+    method : str 
+        Method name, used also for naming column with results in `ovo` pd.DataFrame.
+    visualizer : Visualizer
+        Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
+    ovo : pd.DataFrame 
+        One versus one (pair) feature interaction values. 
+    feature_importance : pd.DataFrame 
+        Feature importance values.
+    model : object
+        Explained model.
+    metric : str 
+        Metric used to calculate strength of interactions.
+    features_included: List[str]
+        List of features for which interactions are calculated.
+    pairs : List[List[str]]
+        List of pairs of features for which interactions are calculated.
+
     References:
+    ----------
     - https://modeloriented.github.io/EIX/
     """
     def __init__(self):
@@ -45,21 +60,30 @@ class SplitScoreMethod(FeatureInteractionMethod):
     def fit(
         self,
         model: GBTreesHandler,
-        X: Optional[pd.DataFrame] = None,  # unused as explanations are calculated only for trained model, left for compatibility
         show_progress: bool = False,
         interaction_selected_metric: str = SplitScoreInteractionMetric.MEAN_GAIN,
         importance_selected_metric: str = SplitScoreImportanceMetric.MEAN_GAIN,
         only_def_interactions: bool = True,
     ):
-        """Calculates Split Score Interactions and Feature Importance for given model.
+        """Calculates Split Score Feature Interactions Strength and Split Score Feature Importance for given model.
 
         Parameters:
-            model (GBTreesHandler) -- model to be explained, can be instance of GBTreesHandler, but if not it will be converted
-            X (pd.DataFrame, optional) -- unused as explanations are calculated only for trained model
-            show_progress (bool) -- whether to show progress bar 
-            interaction_selected_metric (str) -- metric used to calculate strength of interaction, one of ['sum_gain', 'sum_cover', 'mean_gain', 'mean_cover', 'mean_depth']
-            importance_selected_metric (str) -- metric used to calculate feature importance, one of ['sum_gain', 'sum_cover', 'mean_gain', 'mean_cover', 'mean_depth', 'mean_weighted_depth', 'root_frequency', 'weighted_root_frequency']
-            only_def_interactions (bool) -- whether to return only pair of sequential features that fulfill the definition of interaction (better split score for child feature)
+        ----------
+        model : GBTreesHandler
+            Model to be explained. Should be fitted and of type GBTreesHandler (otherwise it will be converted). 
+        show_progress : bool
+            If True, progress bar will be shown. Default is False.
+        interaction_selected_metric : str 
+            Metric used to calculate strength of interaction, 
+            one of ['sum_gain', 'sum_cover', 'mean_gain', 'mean_cover', 'mean_depth']. Default is 'mean_gain'.
+        importance_selected_metric : str 
+            Metric used to calculate feature importance, 
+            one of ['sum_gain', 'sum_cover', 'mean_gain', 'mean_cover', 'mean_depth', 
+            'mean_weighted_depth', 'root_frequency', 'weighted_root_frequency'].
+            Default is 'mean_gain'.
+        only_def_interactions : bool 
+            Whether to return only pair of sequential features that fulfill the definition of interaction 
+            (with better split score for child feature).
         """
         if not isinstance(model, GBTreesHandler):
             model = GBTreesHandler(model)
@@ -72,33 +96,47 @@ class SplitScoreMethod(FeatureInteractionMethod):
         self.ovo = _get_ovo(self, self.full_ovo, interaction_selected_metric)
 
         # calculate variable importance
-        self._variable_importance_obj = SplitScoreImportance()
-        self.variable_importance = self._variable_importance_obj.importance(
+        self._feature_importance_obj = SplitScoreImportance()
+        self.feature_importance = self._feature_importance_obj.importance(
             model=model,
             selected_metric=importance_selected_metric,
             trees_df=model.trees_df,
         )
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
-        """Plots interactions
+        """
+        Plot results of explanations.
+
+        There are five types of plots available:
+        - heatmap - heatmap of feature interactions values with feature importance values on the diagonal (default)
+        - bar_chart - bar chart of top feature interactions values
+        - graph - graph of feature interactions values
+        - summary - combination of heatmap, bar chart and graph plots
+        - lolliplot - lolliplot for first k decision trees with split scores values.
         
         Parameters:
-            vis_type (str) -- type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'summary', 'lolliplot']
-            title (str) -- title of plot, default is 'default' which means that title will be automatically generated for selected visualization type
-            figsize (tuple) -- size of figure
-            show (bool) -- whether to show plot
-            **kwargs: additional arguments for plot 
+        ----------
+        vis_type : str 
+            Type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'lolliplot', 'summary']. Default is 'heatmap'.
+        title : str 
+            Title of plot, default is 'default' which means that title will be automatically generated for selected visualization type.
+        figsize : (float, float) 
+            Size of plot. Default is (8, 6).
+        show : bool 
+            Whether to show plot. Default is True.
+        **kwargs : dict
+            Additional arguments for plot.
         """
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
         self.visualizer.plot(self.ovo,
                              vis_type,
-                             variable_importance=self.variable_importance,
+                             feature_importance=self.feature_importance,
                              title=title,
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
-                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
+                             importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              _full_result=self.full_result,
                              **kwargs)
 

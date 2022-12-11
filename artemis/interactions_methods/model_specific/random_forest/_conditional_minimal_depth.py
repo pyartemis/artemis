@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import combinations
 from typing import Union, List, Tuple
 
 import numpy as np
@@ -15,16 +16,30 @@ from artemis.utilities.exceptions import MethodNotFittedException
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     """
-    Class implementing Conditional Minimal Depth Method for extraction of interactions.  t applies to tree-based models like Random Forests.
-    Currently scikit-learn forest models are supported, i.e., RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier. 
+    Conditional Smallest Depth Method for Feature Interaction Extraction.
+    It applies to tree-based models like Random Forests.
+    Currently scikit-learn forest models are supported, i.e., RandomForestClassifier, RandomForestRegressor, 
+    ExtraTreesRegressor, ExtraTreesClassifier. 
 
     Attributes:
-        method (str) -- name of interaction method
-        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        variable_importance (pd.DataFrame) -- variable importance values 
-        ovo (pd.DataFrame) -- one versus one variable interaction values 
-    
+    ----------
+    method : str 
+        Method name, used also for naming column with results in `ovo` pd.DataFrame.
+    visualizer : Visualizer
+        Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
+    ovo : pd.DataFrame 
+        One versus one (pair) feature interaction values. 
+    feature_importance : pd.DataFrame 
+        Feature importance values.
+    model : object
+        Explained model.
+    features_included: List[str]
+        List of features for which interactions are calculated.
+    pairs : List[List[str]]
+        List of pairs of features for which interactions are calculated.
+
     References:
+    ----------
     - https://modeloriented.github.io/randomForestExplainer/
     - https://doi.org/10.1198/jasa.2009.tm08622
     """
@@ -44,7 +59,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         compare_ovo['id'] = compare_ovo[["Feature 1", "Feature 2"]].apply(lambda x: "".join(sorted(x)), axis=1)
         return (compare_ovo.groupby("id")
                            .agg({"Feature 1": "first", "Feature 2": "first", self.method: "mean"})
-                           .sort_values("Conditional Minimal Depth Measure",
+                           .sort_values("Conditional Smallest Depth Measure",
                                         ascending=self.interactions_ascending_order,
                                         ignore_index=True))
 
@@ -52,31 +67,49 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     def fit(
             self,
             model: Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier],
-            X: pd.DataFrame,
             show_progress: bool = False,
     ):
-        """Calculates Conditional Minimal Depth Interactions and Minimal Depth Feature Importance for given model.
+        """Calculates Conditional Smallest Depth Feature Interactions Strenght and Minimal Depth Feature Importance for given model.
 
         Parameters:
-            model (Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier]) -- tree-based model to be explained
-            X (pd.DataFrame, optional) -- unused as explanations are calculated only for trained model
-            show_progress (bool) -- whether to show progress bar 
+        ----------
+        model : RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, or ExtraTreesClassifier
+            Model to be explained. Should be fitted and of type RandomForestClassifier, RandomForestRegressor, 
+            ExtraTreesRegressor, or ExtraTreesClassifier.
+        show_progress : bool
+            If True, progress bar will be shown. Default is False.
         """
-        column_dict = _make_column_dict(X)
-        self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
+        self.features_included = model.feature_names_in_.tolist()
+        self.pairs = list(combinations(self.features_included, 2))
+        column_dict = _make_column_dict(model.feature_names_in_)
+        self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(model.feature_names_in_), show_progress)
         self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self.interactions_ascending_order)
-        self._variable_importance_obj = MinimalDepthImportance()
-        self.variable_importance = self._variable_importance_obj.importance(model, X, trees)
+        self._feature_importance_obj = MinimalDepthImportance()
+        self.feature_importance = self._feature_importance_obj.importance(model,trees)
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
-        """Plots interactions
+        """
+        Plot results of explanations.
+
+        There are five types of plots available:
+        - heatmap - heatmap of feature interactions values with feature importance values on the diagonal (default)
+        - bar_chart - bar chart of top feature interactions values
+        - graph - graph of feature interactions values
+        - summary - combination of heatmap, bar chart and graph plots
+        - bar_chart_conditional - bar chart of top feature interactions with additional information about feature importance
         
         Parameters:
-            vis_type (str) -- type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'summary', 'bar_chart_conditional']
-            title (str) -- title of plot, default is 'default' which means that title will be automatically generated for selected visualization type
-            figsize (tuple) -- size of figure
-            show (bool) -- whether to show plot
-            **kwargs: additional arguments for plot 
+        ----------
+        vis_type : str 
+            Type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'bar_chart_conditional', 'summary']. Default is 'heatmap'.
+        title : str 
+            Title of plot, default is 'default' which means that title will be automatically generated for selected visualization type.
+        figsize : (float, float) 
+            Size of plot. Default is (8, 6).
+        show : bool 
+            Whether to show plot. Default is True.
+        **kwargs : dict
+            Additional arguments for plot.
         """
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
@@ -86,12 +119,12 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                              _feature_column_name_1="root_variable",
                              _feature_column_name_2="variable",
                              _directed=True,
-                             variable_importance=self.variable_importance,
+                             feature_importance=self.feature_importance,
                              title = title,
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
-                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
+                             importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
 
 
@@ -200,8 +233,8 @@ def _conditional_minimal_depth(split_var_to_nodes: dict, depths: np.array, tree_
     return res
 
 
-def _make_column_dict(X: pd.DataFrame) -> dict:
-    return dict(zip(range(len(X.columns)), X.columns.to_list()))
+def _make_column_dict(columns: np.ndarray) -> dict:
+    return dict(zip(range(len(columns)), list(columns)))
 
 
 def _summarise_results(raw_result_df: pd.DataFrame, column_dict: dict, method_name: str, ascending_order: bool) -> pd.DataFrame:

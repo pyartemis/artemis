@@ -27,7 +27,7 @@ class ConditionalMinimalDepthTestCase(unittest.TestCase):
     def test_ovo_all_features(self):
         # when
         cond_min = ConditionalMinimalDepthMethod()
-        cond_min.fit(self.model, self.X)
+        cond_min.fit(self.model)
 
         # then
         self.assertSetEqual(set(cond_min.ovo.columns), {"root_variable", "variable", "n_occurences", cond_min.method})
@@ -37,7 +37,7 @@ class ConditionalMinimalDepthTestCase(unittest.TestCase):
     def test_plot(self):
         # when
         cond_min = ConditionalMinimalDepthMethod()
-        cond_min.fit(self.model, self.X)
+        cond_min.fit(self.model)
 
         # allowed plots are generated without exception
         accepted_vis = VisualizationConfigurationProvider.get(
@@ -48,13 +48,13 @@ class ConditionalMinimalDepthTestCase(unittest.TestCase):
         # then
         # nothing crashes!
 
-    def test_minimal_depth_variable_importance(self):
+    def test_minimal_depth_feature_importance(self):
         # when
         cond_min = ConditionalMinimalDepthMethod()
-        cond_min.fit(self.model, self.X)
+        cond_min.fit(self.model)
 
         # then
-        self.assertSetEqual(set(cond_min.variable_importance["Feature"]), set(self.X.columns))
+        self.assertSetEqual(set(cond_min.feature_importance["Feature"]), set(self.X.columns))
 
 
 if __name__ == '__main__':

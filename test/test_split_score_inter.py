@@ -51,9 +51,9 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
 
                 # expected columns
                 self.assertListEqual(list(inter.ovo.columns), ["Feature 1", "Feature 2", InteractionMethod.SPLIT_SCORE])
-                self.assertListEqual(list(inter.variable_importance.columns), ["Feature", "Importance"])
+                self.assertListEqual(list(inter.feature_importance.columns), ["Feature", "Importance"])
 
-                # variable importance calculated
+                # feature importance calculated
                 self.assertIsNotNone(inter.full_ovo)
                 self.assertIsNotNone(inter.full_result)
 
@@ -77,9 +77,9 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
                     # expected columns
                     self.assertListEqual(list(inter.ovo.columns),
                                          ["Feature 1", "Feature 2", InteractionMethod.SPLIT_SCORE])
-                    self.assertListEqual(list(inter.variable_importance.columns), ["Feature", "Importance"])
+                    self.assertListEqual(list(inter.feature_importance.columns), ["Feature", "Importance"])
 
-                    # variable importance calculated
+                    # feature importance calculated
                     self.assertIsNotNone(inter.full_ovo)
                     self.assertIsNotNone(inter.full_result)
 

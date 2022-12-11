@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -11,26 +11,54 @@ from artemis.utilities.pd_calculator import PartialDependenceCalculator
 from ._pdp import PartialDependenceBasedMethod
 
 class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
-    """Class implementing H-statistic for extraction of interactions. 
+    """
+    Friedman's H-statistic Method for Feature Interaction Extraction. 
+    
+    Uses partial dependence values to calculate variable interaction strengths and variable importance. 
+
     Attributes:
-        method (str) -- name of interaction method
-        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        variable_importance (pd.DataFrame) -- variable importance values 
-        ovo (pd.DataFrame) -- one versus one variable interaction values 
-        ova (pd.DataFrame) -- one vs all feature interactions
-        normalized (bool) -- flag determining whether to normalize the interaction values (unnrormalized version is proposed in https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935)
+    ----------
+    method : str 
+        Method name, used also for naming column with results in `ovo` pd.DataFrame.
+    visualizer : Visualizer
+        Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
+    ovo : pd.DataFrame 
+        One versus one (pair) feature interaction values. 
+    feature_importance : pd.DataFrame 
+        Feature importance values.
+    ova : pd.DataFrame
+        One vs all feature interaction values.
+    normalized : bool 
+        Flag determining whether interaction values are normalized.
+        Unnrormalized version is proposed in https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935
+    model : object
+        Explained model.
+    X_sampled: pd.DataFrame
+        Sampled data used for calculation.
+    features_included: List[str]
+        List of features for which interactions are calculated.
+    pairs : List[List[str]]
+        List of pairs of features for which interactions are calculated.
+    pd_calculator : PartialDependenceCalculator
+        Object used to calculate and store partial dependence values.
+    batchsize: int
+        Batch size used for calculation.
 
     References:
+    ----------
     - https://www.jstor.org/stable/pdf/30245114.pdf
     - https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935
     """
-
     def __init__(self, random_state: Optional[int] = None, normalized: bool = True):
         """Constructor for FriedmanHStatisticMethod
 
         Parameters:
-            random_state (int, optional) -- random state for reproducibility. Defaults to None.
-            normalized (bool, optional) -- flag determining whether to normalize the interaction values. Defaults to True.
+        ----------
+        random_state : int, optional
+            Random state for reproducibility. Defaults to None.
+        normalized : bool, optional 
+            Flag determining whether to normalize the interaction values. Normalized version is original H-statistic, 
+            unnrormalized version is square root of nominator of H statistic. Defaults to True which translates to original H-statistic.
         """
         super().__init__(InteractionMethod.H_STATISTIC, random_state=random_state)
         self.ova = None
@@ -39,35 +67,69 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
     def fit(self,
             model,
             X: pd.DataFrame,
-            n: int = None,
-            features: List[str] = None,
+            n: Optional[int] = None,
+            predict_function: Optional[Callable] = None,
+            features: Optional[List[str]] = None,
             show_progress: bool = False,
-            batchsize: Optional[int] = 2000,
+            batchsize: int = 2000,
             pd_calculator: Optional[PartialDependenceCalculator] = None,
             calculate_ova: bool = True):
-        """Calculates H-statistic Interactions and Partial Dependence Based Importance for the given model. 
-        Despite pair interactions, this method also calculates one vs all interactions.
+        """Calculates H-statistic Feature Interactions Strength and Feature Importance for the given model. 
+        Despite pair interactions, this method can also calculate one vs all interactions.
 
         Parameters:
-            model -- model to be explained
-            X (pd.DataFrame, optional) -- data used to calculate interactions
-            n (int, optional) -- number of samples to be used for calculation of interactions
-            features (List[str], optional) -- list of features for which interactions will be calculated
-            show_progress (bool) -- whether to show progress bar 
+        ----------
+        model : object
+            Model to be explained, should have predict_proba or predict method, or predict_function should be provided. 
+        X : pd.DataFrame
+            Data used to calculate interactions. If n is not None, n rows from X will be sampled. 
+        n : int, optional
+            Number of samples to be used for calculation of interactions. If None, all rows from X will be used. Default is None.
+        predict_function : Callable, optional
+            Function used to predict model output. It should take model and dataset and outputs predictions. 
+            If None, `predict_proba` method will be used if it exists, otherwise `predict` method. Default is None.
+        features : List[str], optional
+            List of features for which interactions will be calculated. If None, all features from X will be used. Default is None.
+        show_progress : bool
+            If True, progress bar will be shown. Default is False.
+        batchsize : int
+            Batch size for calculating partial dependence. Prediction requests are collected until the batchsize is exceeded, 
+            then the model is queried for predictions jointly for many observations. It speeds up the operation of the method.
+            Default is 2000.
+        pd_calculator : PartialDependenceCalculator, optional
+            PartialDependenceCalculator object containing partial dependence values for a given model and dataset. 
+            Providing this object speeds up the calculation as partial dependence values do not need to be recalculated.
+            If None, it will be created from scratch. Default is None.
+        calculate_ova : bool
+            If True, one vs all interactions will be calculated. Default is True.
         """
-        super().fit(model, X, n, features, show_progress, batchsize, pd_calculator)
+        super().fit(model, X, n, predict_function, features, show_progress, batchsize, pd_calculator)
         if calculate_ova:
             self.ova = self._calculate_ova_interactions_from_pd(show_progress)
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
-        """Plots interactions
+        """
+        Plot results of explanations.
+
+        There are five types of plots available:
+        - heatmap - heatmap of feature interactions values with feature importance values on the diagonal (default)
+        - bar_chart - bar chart of top feature interactions values
+        - graph - graph of feature interactions values
+        - bar_chart_ova - bar chart of top one vs all interactions values
+        - summary - combination of other plots 
         
         Parameters:
-            vis_type (str) -- type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'summary', 'bar_chart_ova']
-            title (str) -- title of plot, default is 'default' which means that title will be automatically generated for selected visualization type
-            figsize (tuple) -- size of figure
-            show (bool) -- whether to show plot
-            **kwargs: additional arguments for plot 
+        ----------
+        vis_type : str 
+            Type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'bar_chart_ova', 'summary']. Default is 'heatmap'.
+        title : str 
+            Title of plot, default is 'default' which means that title will be automatically generated for selected visualization type.
+        figsize : (float, float) 
+            Size of plot. Default is (8, 6).
+        show : bool 
+            Whether to show plot. Default is True.
+        **kwargs : dict
+            Additional arguments for plot.
         """
         if self.ova is None:
             raise MethodNotFittedException(self.method)
@@ -75,11 +137,12 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         self.visualizer.plot(self.ovo,
                              vis_type,
                              self.ova,
-                             variable_importance=self.variable_importance,
+                             feature_importance=self.feature_importance,
+                             title=title,
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
-                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
+                             importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
 
     def _calculate_ova_interactions_from_pd(self, show_progress: bool) -> pd.DataFrame:
