@@ -2,7 +2,7 @@ import unittest
 from parameterized import parameterized_class
 
 from artemis.additivity import AdditivityMeter
-from test.util import california_housing_random_forest, wine_random_forest, california_housing_linear_regression, wine_random_logistic_regression
+from test.util import california_housing_random_forest, california_housing_linear_regression
 
 
 MODEL_REG, X_REG, _ = california_housing_random_forest()
