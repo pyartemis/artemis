@@ -28,7 +28,7 @@ class Visualizer:
         ovo: pd.DataFrame,
         vis_type: str,
         ova: Optional[pd.DataFrame] = None,
-        variable_importance: Optional[pd.DataFrame] = None,
+        feature_importance: Optional[pd.DataFrame] = None,
         title: Optional[str] = "default",
         figsize: tuple = (8, 6),
         show: bool = True,
@@ -47,7 +47,7 @@ class Visualizer:
         if vis_type == VisualizationType.SUMMARY:
             self.plot_summary(
                 ovo,
-                variable_importance,
+                feature_importance,
                 ova,
                 title=title,
                 figsize=figsize,
@@ -61,7 +61,7 @@ class Visualizer:
         elif vis_type == VisualizationType.INTERACTION_GRAPH:
             self.plot_interaction_graph(
                 ovo,
-                variable_importance,
+                feature_importance,
                 title=title,
                 figsize=figsize,
                 show=show,
@@ -76,7 +76,7 @@ class Visualizer:
         elif vis_type == VisualizationType.HEATMAP:
             self.plot_heatmap(
                 ovo,
-                variable_importance,
+                feature_importance,
                 title=title,
                 figsize=figsize,
                 show=show,
@@ -103,7 +103,7 @@ class Visualizer:
         elif vis_type == VisualizationType.BAR_CHART_CONDITIONAL:
             self.plot_barchart_conditional(
                 ovo,
-                variable_importance,
+                feature_importance,
                 title=title,
                 figsize=figsize,
                 show=show,
@@ -113,7 +113,7 @@ class Visualizer:
     def plot_barchart_conditional(
             self,
             ovo: pd.DataFrame,
-            variable_importance: pd.DataFrame,
+            feature_importance: pd.DataFrame,
             title: str = "default",
             figsize: tuple = (8, 6),
             show: bool = True,
@@ -136,7 +136,7 @@ class Visualizer:
         df_to_plot = ovo.copy()
         df_to_plot["Interaction"] = df_to_plot["root_variable"] + ":" + df_to_plot["variable"]
         df_to_plot = df_to_plot.iloc[:top_k]
-        df_to_plot = df_to_plot.join(variable_importance.set_index("Feature"), on="variable").rename(
+        df_to_plot = df_to_plot.join(feature_importance.set_index("Feature"), on="variable").rename(
             columns={"Importance": "unconditional_importance"})
 
         norm = plt.Normalize(df_to_plot["n_occurences"].min(), df_to_plot["n_occurences"].max())
@@ -160,7 +160,7 @@ class Visualizer:
     def plot_heatmap(
             self,
             ovo: pd.DataFrame,
-            variable_importance: pd.DataFrame,
+            feature_importance: pd.DataFrame,
             title: str = "default",
             figsize: tuple = (8, 6),
             show: bool = True,
@@ -194,9 +194,9 @@ class Visualizer:
         else:
             ovo_all_pairs = ovo
 
-        if variable_importance is not None:
-            var_imp_diag = self._variable_importance_diag(
-                ovo, variable_importance, _f1_name=_f1_name, _f2_name=_f2_name
+        if feature_importance is not None:
+            var_imp_diag = self._feature_importance_diag(
+                ovo, feature_importance, _f1_name=_f1_name, _f2_name=_f2_name
             )
             ovo_all_pairs = pd.concat([ovo_all_pairs, var_imp_diag])
 
@@ -244,7 +244,7 @@ class Visualizer:
     def plot_interaction_graph(
             self,
             ovo: pd.DataFrame,
-            variable_importance: pd.DataFrame,
+            feature_importance: pd.DataFrame,
             title: str = "default",
             figsize: tuple = (8, 6),
             show: bool = True,
@@ -302,14 +302,14 @@ class Visualizer:
             ax=ax,
             width=[G[u][v][self.method] for u, v in G.edges()],
             with_labels=True,
-            nodelist=list(variable_importance["Feature"])
-            if variable_importance is not None
+            nodelist=list(feature_importance["Feature"])
+            if feature_importance is not None
             else None,
             node_size=[
-                node_size * val / np.max(variable_importance["Importance"])
-                for val in variable_importance["Importance"]
+                node_size * val / np.max(feature_importance["Importance"])
+                for val in feature_importance["Importance"]
             ]
-            if variable_importance is not None
+            if feature_importance is not None
             else node_size,
             font_size=font_size,
             font_weight=font_weight,
@@ -426,7 +426,7 @@ class Visualizer:
     def plot_summary(
             self,
             ovo: pd.DataFrame,
-            variable_importance: pd.DataFrame,
+            feature_importance: pd.DataFrame,
             ova: Optional[pd.DataFrame] = None,
             title: str = "default",
             figsize: tuple = (8, 6),
@@ -450,7 +450,7 @@ class Visualizer:
 
         self.plot_heatmap(
             ovo,
-            variable_importance,
+            feature_importance,
             interactions_ascending_order=interactions_ascending_order,
             ax=ax1,
             _f1_name=_f1_name,
@@ -461,7 +461,7 @@ class Visualizer:
         )
         self.plot_interaction_graph(
             ovo,
-            variable_importance,
+            feature_importance,
             ax=ax2,
             _f1_name=_f1_name,
             _f2_name=_f2_name,
@@ -620,10 +620,10 @@ class Visualizer:
 
         }
 
-    def _variable_importance_diag(
+    def _feature_importance_diag(
             self,
             ovo,
-            variable_importance: pd.DataFrame,
+            feature_importance: pd.DataFrame,
             _f1_name: str = "Feature 1",
             _f2_name: str = "Feature 2",
     ):
@@ -633,8 +633,8 @@ class Visualizer:
                 {
                     _f1_name: f,
                     _f2_name: f,
-                    self.method: variable_importance[
-                        variable_importance["Feature"] == f
+                    self.method: feature_importance[
+                        feature_importance["Feature"] == f
                         ]["Importance"].values[0],
                 }
                 for f in all_features

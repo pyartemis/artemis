@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Callable, List, Optional
 import numpy as np
 import pandas as pd
 from artemis.utilities.domain import ProgressInfoLog
@@ -10,21 +10,22 @@ from artemis.utilities.pd_calculator import PartialDependenceCalculator
 class AdditivityMeter:
     def __init__(self, random_state: Optional[int] = None):
         self.random_state = random_state
-        self.random_generator = np.random.default_rng(random_state)
+        self._random_generator = np.random.default_rng(random_state)
 
     def fit(
         self,
         model,
         X: pd.DataFrame,
         n: int = None,
+        predict_function: Optional[Callable] = None,
         show_progress: bool = False,
-        batchsize: Optional[int] = 2000,
+        batchsize: int = 2000,
         pd_calculator: Optional[PartialDependenceCalculator] = None,
     ):
-        self.predict_function = get_predict_function(model)
+        self.predict_function = get_predict_function(model, predict_function)
         self.model = model
         self.batchsize = batchsize
-        self.X_sampled = sample_if_not_none(self.random_generator, X, n)
+        self.X_sampled = sample_if_not_none(self._random_generator, X, n)
 
         if pd_calculator is None:
             self.pd_calculator = PartialDependenceCalculator(

@@ -21,7 +21,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     Attributes:
         method (str) -- name of interaction method
         visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        variable_importance (pd.DataFrame) -- variable importance values 
+        feature_importance (pd.DataFrame) -- variable importance values 
         ovo (pd.DataFrame) -- one versus one variable interaction values 
     
     References:
@@ -52,7 +52,6 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     def fit(
             self,
             model: Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier],
-            X: pd.DataFrame,
             show_progress: bool = False,
     ):
         """Calculates Conditional Minimal Depth Interactions and Minimal Depth Feature Importance for given model.
@@ -62,11 +61,11 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
             X (pd.DataFrame, optional) -- unused as explanations are calculated only for trained model
             show_progress (bool) -- whether to show progress bar 
         """
-        column_dict = _make_column_dict(X)
-        self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
+        column_dict = _make_column_dict(model.feature_names_in_)
+        self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(model.feature_names_in_), show_progress)
         self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self.interactions_ascending_order)
-        self._variable_importance_obj = MinimalDepthImportance()
-        self.variable_importance = self._variable_importance_obj.importance(model, X, trees)
+        self._feature_importance_obj = MinimalDepthImportance()
+        self.feature_importance = self._feature_importance_obj.importance(model,trees)
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
         """Plots interactions
@@ -86,12 +85,12 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                              _feature_column_name_1="root_variable",
                              _feature_column_name_2="variable",
                              _directed=True,
-                             variable_importance=self.variable_importance,
+                             feature_importance=self.feature_importance,
                              title = title,
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
-                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
+                             importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
 
 
@@ -200,8 +199,8 @@ def _conditional_minimal_depth(split_var_to_nodes: dict, depths: np.array, tree_
     return res
 
 
-def _make_column_dict(X: pd.DataFrame) -> dict:
-    return dict(zip(range(len(X.columns)), X.columns.to_list()))
+def _make_column_dict(columns: np.ndarray) -> dict:
+    return dict(zip(range(len(columns)), list(columns)))
 
 
 def _summarise_results(raw_result_df: pd.DataFrame, column_dict: dict, method_name: str, ascending_order: bool) -> pd.DataFrame:

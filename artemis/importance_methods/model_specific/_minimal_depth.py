@@ -4,12 +4,12 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from artemis.importance_methods._method import VariableImportanceMethod
+from artemis.importance_methods._method import FeatueImportanceMethod
 from artemis.utilities.domain import ImportanceMethod, InteractionMethod
 from artemis.utilities.exceptions import FeatureImportanceWithoutInteractionException
 
 
-class MinimalDepthImportance(VariableImportanceMethod):
+class MinimalDepthImportance(FeatueImportanceMethod):
     """Class implementing Minimal Depth Feature Importance. It applies to tree-based models like Random Forests.
     It uses data calculated in ConditionalMinimalDepth method from `interactions_methods` module and so needs to be calculated together.
 
@@ -27,7 +27,6 @@ class MinimalDepthImportance(VariableImportanceMethod):
     def importance(
         self,
         model,  # to comply with the signature
-        X: Optional[pd.DataFrame] = None,
         tree_id_to_depth_split: dict = None,
     ) -> pd.DataFrame:
         """Calculates Minimal Depth Feature Importance.
@@ -42,7 +41,7 @@ class MinimalDepthImportance(VariableImportanceMethod):
         """
         _check_preconditions(self.method, tree_id_to_depth_split)
 
-        columns = _make_column_dict(X)
+        columns = _make_column_dict(model.feature_names_in_)
         feature_to_depth = defaultdict(list)
         for tree_id in tree_id_to_depth_split.keys():
             depth_tree, split_tree = tree_id_to_depth_split[tree_id]
@@ -56,11 +55,11 @@ class MinimalDepthImportance(VariableImportanceMethod):
                 {"Feature": columns[f], "Importance": np.mean(feature_to_depth[f])}
             )
 
-        self.variable_importance = pd.DataFrame.from_records(
+        self.feature_importance = pd.DataFrame.from_records(
             records_result
         ).sort_values(by="Importance", ignore_index=True)
 
-        return self.variable_importance
+        return self.feature_importance
 
     @property
     def importance_ascending_order(self):
@@ -75,5 +74,5 @@ def _check_preconditions(method: str, tree_id_to_depth_split: dict):
         )
 
 
-def _make_column_dict(X: pd.DataFrame) -> dict:
-    return dict(zip(range(len(X.columns)), X.columns.to_list()))
+def _make_column_dict(columns: np.ndarray) -> dict:
+    return dict(zip(range(len(columns)), list(columns)))

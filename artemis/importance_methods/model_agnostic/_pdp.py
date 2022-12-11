@@ -1,23 +1,22 @@
 from collections import defaultdict
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.importance_methods._method import VariableImportanceMethod
+from artemis.importance_methods._method import FeatueImportanceMethod
 from artemis.utilities.domain import ImportanceMethod, ProgressInfoLog
 from artemis.utilities.ops import (
     all_if_none,
     get_predict_function,
-    partial_dependence_value,
     sample_if_not_none,
     split_features_num_cat,
 )
 from artemis.utilities.pd_calculator import PartialDependenceCalculator
 
 
-class PartialDependenceBasedImportance(VariableImportanceMethod):
+class PartialDependenceBasedImportance(FeatueImportanceMethod):
     """Class implementing Partial Dependence Based Feature Importance.
     It is used for calculating feature importance for partial dependence based feature interaction methods:
     Friedman H-statistic and Greenwell methods.
@@ -34,9 +33,10 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
         model,
         X: pd.DataFrame,
         n: int = None,
+        predict_function: Optional[Callable] = None,
         features: Optional[List[str]] = None,
         show_progress: bool = False,
-        batchsize: Optional[int] = 2000,
+        batchsize: int = 2000,
         pd_calculator: Optional[PartialDependenceCalculator] = None,
     ):
         """Calculate Partial Dependence Based Feature Importance.
@@ -50,11 +50,11 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
         Returns:
             pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"
         """
-        self.predict_function = get_predict_function(model)
+        self.predict_function = get_predict_function(model, predict_function)
         self.model = model
         self.batchsize = batchsize
 
-        self.X_sampled = sample_if_not_none(self.random_generator, X, n)
+        self.X_sampled = sample_if_not_none(self._random_generator, X, n)
         self.features_included = all_if_none(X.columns, features)
   
 
@@ -67,8 +67,8 @@ class PartialDependenceBasedImportance(VariableImportanceMethod):
                 raise ValueError("Data in PDP calculator is different than the data in the method.")
             self.pd_calculator = pd_calculator
 
-        self.variable_importance = self._pdp_importance(show_progress)
-        return self.variable_importance
+        self.feature_importance = self._pdp_importance(show_progress)
+        return self.feature_importance
 
     @property
     def importance_ascending_order(self):

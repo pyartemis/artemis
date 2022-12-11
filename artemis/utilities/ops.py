@@ -67,11 +67,10 @@ def yhat_proba_default(m, d):
     return m.predict_proba(d)[:, 1]
 
 
-def get_predict_function(model):
-    # default extraction
+def get_predict_function(model, predict_function=None):
+    if predict_function is not None:
+        return predict_function
     if hasattr(model, 'predict_proba'):
-        # check if model has predict_proba
         return yhat_proba_default
     elif hasattr(model, 'predict'):
-        # check if model has predict
         return yhat_default

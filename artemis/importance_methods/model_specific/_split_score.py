@@ -4,13 +4,13 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.importance_methods._method import VariableImportanceMethod
+from artemis.importance_methods._method import FeatueImportanceMethod
 from artemis.interactions_methods.model_specific.gb_trees._handler import GBTreesHandler
 from artemis.utilities.domain import ImportanceMethod
 from artemis.utilities.split_score_metrics import SplitScoreImportanceMetric
 
 
-class SplitScoreImportance(VariableImportanceMethod):
+class SplitScoreImportance(FeatueImportanceMethod):
     """Class implementing Split Score Feature Importance. It applies to gradient boosting tree-based models.
     It can use data calculated in SplitScore method from `interactions_methods` module.
 
@@ -56,13 +56,13 @@ class SplitScoreImportance(VariableImportanceMethod):
 
         if trees_df["depth"].isnull().values.any():
             trees_df = _calculate_depth(trees_df, show_progress)
-        self.full_result = _calculate_all_variable_importance(
+        self.full_result = _calculate_all_feature_importance(
             trees_df, features, selected_metric
         )
-        self.variable_importance = _select_metric(self.full_result, selected_metric)
+        self.feature_importance = _select_metric(self.full_result, selected_metric)
         self.selected_metric = selected_metric
 
-        return self.variable_importance
+        return self.feature_importance
 
     @property
     def importance_ascending_order(self):
@@ -70,7 +70,7 @@ class SplitScoreImportance(VariableImportanceMethod):
                                         SplitScoreImportanceMetric.MEAN_WEIGHTED_DEPTH]
 
 
-def _calculate_all_variable_importance(
+def _calculate_all_feature_importance(
         trees_df: pd.DataFrame,
         features: Optional[List[str]] = None,
         selected_metric: str = SplitScoreImportanceMetric.SUM_GAIN,
@@ -126,10 +126,10 @@ def _calculate_mean_weighted_depth_metric(trees_df: pd.DataFrame):
 
 
 def _select_metric(importance_full_result: pd.DataFrame, selected_metric: str):
-    variable_importance = importance_full_result[
+    feature_importance = importance_full_result[
         ["split_feature", selected_metric]
     ].rename(columns={"split_feature": "Feature", selected_metric: "Importance"})
-    return variable_importance.sort_values(
+    return feature_importance.sort_values(
         by="Importance", ascending=False, ignore_index=True
     )
 

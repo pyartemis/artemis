@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-from typing import Optional
+from typing import Callable, Optional
 
 import numpy as np
 import pandas as pd
@@ -15,7 +15,7 @@ class FeatureInteractionMethod(ABC):
     Attributes:
         method  (str) -- name of interaction method
         visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        variable_importance (pd.DataFrame) -- variable importance values 
+        feature_importance (pd.DataFrame) -- variable importance values 
         ovo (pd.DataFrame) -- one versus one variable interaction values 
         X_sampled (pd.DataFrame) -- data used to calculate interactions
         features_included  (List[str]) -- list of features that will be used during interactions calculation, if None is passed, all features will be used
@@ -23,13 +23,14 @@ class FeatureInteractionMethod(ABC):
     def __init__(self, method: str, random_state: Optional[int] = None):
         self.method = method
         self.visualizer = Visualizer(method, VisualizationConfigurationProvider.get(method))
-        self.variable_importance = None
-        self._variable_importance_obj = None
+        self.feature_importance = None
+        self._feature_importance_obj = None
         self.ovo = None
+        self.model = None
         self.X_sampled = None
         self.features_included = None
         self.random_state = random_state
-        self.random_generator = np.random.default_rng(random_state)
+        self._random_generator = np.random.default_rng(random_state)
 
     @property
     @abstractmethod
@@ -42,14 +43,8 @@ class FeatureInteractionMethod(ABC):
             raise MethodNotFittedException(self.method)
         return self.ovo.sort_values(self.method, ascending=self.interactions_ascending_order, ignore_index=True)
 
-    @property
-    def _compare_ovo(self):
-        if self.ovo is None:
-            raise MethodNotFittedException(self.method)
-        return self.ovo.sort_values(self.method, ascending=self.interactions_ascending_order, ignore_index=True)
-
     @abstractmethod
-    def fit(self, model, X: pd.DataFrame, **kwargs):
+    def fit(self, model, **kwargs):
         """
         Base abstract method for calculating feature interaction method values.
 
@@ -78,12 +73,12 @@ class FeatureInteractionMethod(ABC):
 
         self.visualizer.plot(self.ovo,
                              vis_type,
-                             variable_importance=self.variable_importance,
+                             feature_importance=self.feature_importance,
                              title=title,
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
-                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
+                             importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
 
 

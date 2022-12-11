@@ -1,5 +1,5 @@
 from itertools import combinations
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -17,7 +17,7 @@ class SejongOhMethod(FeatureInteractionMethod):
     Attributes:
         method (str) -- name of interaction method
         visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        variable_importance (pd.DataFrame) -- variable importance values 
+        feature_importance (pd.DataFrame) -- variable importance values 
         ovo (pd.DataFrame) -- one versus one variable interaction values 
         metric (Metric) -- metric used to calculate interactions
     
@@ -42,7 +42,7 @@ class SejongOhMethod(FeatureInteractionMethod):
             self,
             model,
             X: pd.DataFrame,
-            y_true: np.array = None,  # to comply with signature
+            y_true: np.array = None,  
             n: int = None,
             n_repeat: int = 10,
             features: List[str] = None,
@@ -60,13 +60,14 @@ class SejongOhMethod(FeatureInteractionMethod):
             features (List[str], optional) -- list of features for which interactions will be calculated
             show_progress (bool) -- whether to show progress bar 
         """
-        self.X_sampled, self.y_sampled = sample_both_if_not_none(self.random_generator, X, y_true, n)
+        self.X_sampled, self.y_sampled = sample_both_if_not_none(self._random_generator, X, y_true, n)
         self.features_included = all_if_none(X.columns, features)
+        self.pairs = list(combinations(self.features_included, 2))
         self.ovo = _perf_based_ovo(self, model, self.X_sampled, self.y_sampled, n_repeat, show_progress)
 
         # calculate variable importance
-        self._variable_importance_obj = PermutationImportance(self.metric)
-        self.variable_importance = self._variable_importance_obj.importance(model, X=self.X_sampled,
+        self._feature_importance_obj = PermutationImportance(self.metric)
+        self.feature_importance = self._feature_importance_obj.importance(model, X=self.X_sampled,
                                                                             y_true=self.y_sampled,
                                                                             n_repeat=n_repeat,
                                                                             features=self.features_included,
@@ -78,10 +79,9 @@ def _perf_based_ovo(
 ):
     """For each pair of `features_included`, calculate Sejong Oh performance based interaction value."""
     original_performance = method_class.metric.calculate(y_true, model.predict(X))
-    pairs = list(combinations(method_class.features_included, 2))
     interactions = list()
 
-    for f1, f2 in tqdm(pairs, disable=not show_progress, desc=ProgressInfoLog.CALC_OVO):
+    for f1, f2 in tqdm(method_class.pairs, disable=not show_progress, desc=ProgressInfoLog.CALC_OVO):
         inter = [
             _inter(method_class, model, X, y_true, f1, f2, original_performance) for _ in range(n_repeat)
         ]
@@ -125,7 +125,7 @@ def _permute_score(
 ):
     """Permute `features` list and assess performance of the model."""
     X_copy_permuted = X.copy()
-    p = method_class.random_generator.permutation(len(X))
+    p = method_class._random_generator.permutation(len(X))
 
     for feature in features:
         X_copy_permuted[feature] = X_copy_permuted[feature].values[p]

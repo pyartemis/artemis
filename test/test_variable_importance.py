@@ -30,24 +30,24 @@ class VariableImportanceUnitTest(unittest.TestCase):
     X = None
     y = None
 
-    def test_calculate_permutation_variable_importance(self):
+    def test_calculate_permutation_feature_importance(self):
         calculator = PermutationImportance()
         importance = calculator.importance(self.model, self.X, self.y, features=list(self.X.columns))
 
         self._assert_var_imp_calculated_correctly(importance)
 
-    def test_calculate_pdp_based_variable_importance(self):
+    def test_calculate_pdp_based_feature_importance(self):
         calculator = PartialDependenceBasedImportance()
         importance = calculator.importance(self.model, self.X, features=list(self.X.columns))
         self._assert_var_imp_calculated_correctly(importance)
 
-    def test_use_variable_importance_in_pdp_method(self):
+    def test_use_feature_importance_in_pdp_method(self):
         importance_single = PartialDependenceBasedImportance().importance(self.model, self.X,
                                                                             features=list(self.X.columns))
 
         h_stat = FriedmanHStatisticMethod()
         h_stat.fit(self.model, self.X)
-        importance_h_stat = h_stat.variable_importance
+        importance_h_stat = h_stat.feature_importance
 
         assert_frame_equal(importance_h_stat, importance_single, rtol=1e-1)  # up to first decimal point
 

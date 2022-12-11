@@ -42,8 +42,8 @@ class GreenwellMethodUnitTest(unittest.TestCase):
         # sample size taken into account
         self.assertEqual(len(greenwell_inter.X_sampled), SAMPLE_SIZE)
 
-        # variable importance calculated
-        self.assertIsNotNone(greenwell_inter.variable_importance)
+        # feature importance calculated
+        self.assertIsNotNone(greenwell_inter.feature_importance)
 
     def test_subset_of_features_sampled(self):
         # when

@@ -4,12 +4,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.importance_methods._method import VariableImportanceMethod
+from artemis.importance_methods._method import FeatueImportanceMethod
 from artemis.utilities.domain import ImportanceMethod, ProgressInfoLog, ProblemType
 from artemis.utilities.performance_metrics import Metric, RMSE
 
 
-class PermutationImportance(VariableImportanceMethod):
+class PermutationImportance(FeatueImportanceMethod):
     """Class implementing Permutation-Based Feature Importance.
     It is used for calculating feature importance for performance based feature interaction - Sejong Oh method.
 
@@ -49,10 +49,10 @@ class PermutationImportance(VariableImportanceMethod):
         Returns:
             pd.DataFrame -- DataFrame containing feature importance with columns: "Feature", "Importance"
         """
-        self.variable_importance = _permutation_importance(
-            model, X, y_true, self.metric, n_repeat, features, show_progress, self.random_generator
+        self.feature_importance = _permutation_importance(
+            model, X, y_true, self.metric, n_repeat, features, show_progress, self._random_generator
         )
-        return self.variable_importance
+        return self.feature_importance
     @property
     def importance_ascending_order(self):
         return False

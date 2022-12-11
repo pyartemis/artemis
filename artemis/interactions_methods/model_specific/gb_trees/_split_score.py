@@ -27,7 +27,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
         metric (str) -- metric used to calculate strength of interaction
         method (str) -- name of interaction method
         visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        variable_importance (pd.DataFrame) -- variable importance values 
+        feature_importance (pd.DataFrame) -- variable importance values 
         ovo (pd.DataFrame) -- one versus one variable interaction values 
     
     References:
@@ -45,7 +45,6 @@ class SplitScoreMethod(FeatureInteractionMethod):
     def fit(
         self,
         model: GBTreesHandler,
-        X: Optional[pd.DataFrame] = None,  # unused as explanations are calculated only for trained model, left for compatibility
         show_progress: bool = False,
         interaction_selected_metric: str = SplitScoreInteractionMetric.MEAN_GAIN,
         importance_selected_metric: str = SplitScoreImportanceMetric.MEAN_GAIN,
@@ -72,8 +71,8 @@ class SplitScoreMethod(FeatureInteractionMethod):
         self.ovo = _get_ovo(self, self.full_ovo, interaction_selected_metric)
 
         # calculate variable importance
-        self._variable_importance_obj = SplitScoreImportance()
-        self.variable_importance = self._variable_importance_obj.importance(
+        self._feature_importance_obj = SplitScoreImportance()
+        self.feature_importance = self._feature_importance_obj.importance(
             model=model,
             selected_metric=importance_selected_metric,
             trees_df=model.trees_df,
@@ -93,12 +92,12 @@ class SplitScoreMethod(FeatureInteractionMethod):
             raise MethodNotFittedException(self.method)
         self.visualizer.plot(self.ovo,
                              vis_type,
-                             variable_importance=self.variable_importance,
+                             feature_importance=self.feature_importance,
                              title=title,
                              figsize=figsize,
                              show=show,
                              interactions_ascending_order=self.interactions_ascending_order,
-                             importance_ascending_order=self._variable_importance_obj.importance_ascending_order,
+                             importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              _full_result=self.full_result,
                              **kwargs)
 
