@@ -60,7 +60,7 @@ def california_housing_linear_regression():
     return model, X, y
 
 
-def wine_random_logistic_regression():
+def wine_logistic_regression():
     wine = load_wine()
     X = pd.DataFrame(wine.data, columns=wine.feature_names)
     y = wine.target
