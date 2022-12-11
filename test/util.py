@@ -1,11 +1,9 @@
-import random
-
 import pandas as pd
+from lightgbm import LGBMRegressor, LGBMClassifier
 from sklearn.datasets import fetch_california_housing, load_wine
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from xgboost import XGBRegressor, XGBClassifier
-from lightgbm import LGBMRegressor, LGBMClassifier
 
 CALIFORNIA_SUBSET = ["Longitude", "Latitude", "MedInc", "AveRooms"]
 WINE_SUBSET = ["alcohol", "malic_acid", "ash", "alcalinity_of_ash"]
