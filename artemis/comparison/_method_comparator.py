@@ -14,7 +14,7 @@ class FeatureInteractionMethodComparator:
     """
         Feature Interaction Method Comparator.
         It is used for statistical comparison of two different feature interaction methods.
-        Calculates pearson, kendall and spearman rank-correlation and plots one vs one profiles of two methods against
+        Calculates Pearson, Kendall and Spearman rank-correlation and plots one vs one profiles of two methods against
         each other. Monotonicity of the plot suggest cohesion in results. Both provided methods must be in fitted state.
 
 
