@@ -49,6 +49,7 @@ class ProgressInfoLog:
         f"Calculating {InteractionCalculationStrategy.ONE_VS_ALL} interactions"
     )
     CALC_VAR_IMP: str = "Calculating variable importance"
+    CALC_ADD: str = "Calculating additivity index of the model"
 
 
 @dataclass
