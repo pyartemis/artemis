@@ -9,7 +9,6 @@ from artemis.utilities.pd_calculator import PartialDependenceCalculator
 
 class AdditivityMeter:
     def __init__(self, random_state: Optional[int] = None):
-        self.random_state = random_state
         self._random_generator = np.random.default_rng(random_state)
 
     def fit(
