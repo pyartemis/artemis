@@ -81,6 +81,7 @@ class Visualizer:
                 figsize=figsize,
                 show=show,
                 interactions_ascending_order=interactions_ascending_order,
+                importance_ascending_order=importance_ascending_order,
                 _f1_name=_feature_column_name_1,
                 _f2_name=_feature_column_name_2,
                 _directed=_directed,
@@ -165,6 +166,7 @@ class Visualizer:
             figsize: tuple = (8, 6),
             show: bool = True,
             interactions_ascending_order: bool = False,
+            importance_ascending_order: bool = False,
             ax=None,
             _f1_name: str = "Feature 1",
             _f2_name: str = "Feature 2",
@@ -176,7 +178,8 @@ class Visualizer:
             "interaction_color_map",
             config.INTERACTION_COLOR_MAP if not interactions_ascending_order else config.INTERACTION_COLOR_MAP_REVERSE)
         importance_color_map = kwargs.pop(
-            "importance_color_map", config.IMPORTANCE_COLOR_MAP
+            "importance_color_map",
+            config.IMPORTANCE_COLOR_MAP if not importance_ascending_order else config.IMPORTANCE_COLOR_MAP_REVERSE
         )
         annot_fmt = kwargs.pop("annot_fmt", config.ANNOT_FMT)
         linewidths = kwargs.pop("linewidths", config.LINEWIDTHS)
@@ -210,6 +213,9 @@ class Visualizer:
         matrix = ovo_all_pairs.pivot_table(
             self.method, _f1_name, _f2_name, aggfunc="first"
         )
+
+        matrix = self.order_heatmap(matrix, asc_order=interactions_ascending_order)
+
         off_diag_mask = np.eye(matrix.shape[0], dtype=bool)
 
         sns.heatmap(
@@ -665,3 +671,22 @@ class Visualizer:
 
     def _map_to_width(self, max_width: float, ovo_copy: pd.DataFrame):
         ovo_copy[self.method] = ovo_copy[self.method] * max_width
+
+    @staticmethod
+    def order_heatmap(matrix: pd.DataFrame, asc_order: bool) -> pd.DataFrame:
+        feature_importance = pd.Series(np.diag(matrix), index=matrix.index)
+
+        lambda_1 = feature_importance.max()
+        lambda_2 = matrix.max().max()
+        features = list(matrix.index)
+
+        scores = dict()
+        for f in features:
+            f_copy = features.copy()
+            f_copy.remove(f)
+            scores[f.lower()] = feature_importance[f] * 1 / lambda_1 + max(matrix[f][f_copy]) * 1 / lambda_2
+
+        ind = matrix.sort_index(key=lambda x: [scores[f_lower] for f_lower in x.str.lower()], ascending=asc_order).index
+        m = matrix.reindex(ind)  # re-order rows
+
+        return m[list(ind)]  # re-order columns

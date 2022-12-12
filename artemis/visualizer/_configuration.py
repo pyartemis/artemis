@@ -27,6 +27,7 @@ class InteractionMatrixConfiguration:
     INTERACTION_COLOR_MAP: str = "Purples"
     INTERACTION_COLOR_MAP_REVERSE: str = "Purples_r"
     IMPORTANCE_COLOR_MAP: str = "Greens"
+    IMPORTANCE_COLOR_MAP_REVERSE: str = "Greens_r"
     ANNOT_FMT: str = ".3f"
     LINEWIDTHS: float = 0.5
     LINECOLOR: str = "white"

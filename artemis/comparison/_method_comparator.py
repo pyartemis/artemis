@@ -190,7 +190,7 @@ def _title_x_y(ax, m1_name, m2_name):
 
 def _add_correlation_box(ax, correlations):
     lines = [
-        f"{m.default}={round(correlations[correlations['method'] == m.default]['value'].values[0], 3)}"
+        f"{m.default.capitalize()}={round(correlations[correlations['method'] == m.default]['value'].values[0], 3)}"
         for m in dataclasses.fields(CorrelationMethod)
     ]
     lines.insert(0, "Feature pairs rank correlation")

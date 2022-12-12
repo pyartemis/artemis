@@ -116,7 +116,7 @@ def _perf_based_ovo(
 
     for f1, f2 in tqdm(method_class.pairs, disable=not show_progress, desc=ProgressInfoLog.CALC_OVO):
         inter = [
-            _inter(method_class, model, X, y_true, f1, f2, original_performance) for _ in range(n_repeat)
+            np.abs(_inter(method_class, model, X, y_true, f1, f2, original_performance)) for _ in range(n_repeat)
         ]
         interactions.append([f1, f2, np.mean(inter)])
 
