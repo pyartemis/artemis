@@ -14,7 +14,7 @@ class GreenwellMethod(PartialDependenceBasedMethod):
     """
     Greenwell Method for Feature Interaction Extraction. 
     
-    Uses partial dependence values to calculate variable interaction strengths and variable importance. 
+    Uses partial dependence values to calculate feature interaction strengths and feature importance. 
 
     Attributes:
     ----------

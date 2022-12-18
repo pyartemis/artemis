@@ -98,7 +98,7 @@ class SejongOhMethod(FeatureInteractionMethod):
         self.pairs = list(combinations(self.features_included, 2))
         self.ovo = _perf_based_ovo(self, model, self.X_sampled, self.y_sampled, n_repeat, show_progress)
 
-        # calculate variable importance
+        # calculate feature importance
         self._feature_importance_obj = PermutationImportance(self.metric)
         self.feature_importance = self._feature_importance_obj.importance(model, X=self.X_sampled,
                                                                             y_true=self.y_sampled,

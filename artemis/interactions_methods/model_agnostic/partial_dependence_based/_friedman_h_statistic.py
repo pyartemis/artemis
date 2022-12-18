@@ -14,7 +14,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
     """
     Friedman's H-statistic Method for Feature Interaction Extraction. 
     
-    Uses partial dependence values to calculate variable interaction strengths and variable importance. 
+    Uses partial dependence values to calculate feature interaction strengths and feature importance. 
 
     Attributes:
     ----------
@@ -128,8 +128,49 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             Size of plot. Default is (8, 6).
         show : bool 
             Whether to show plot. Default is True.
-        **kwargs : dict
-            Additional arguments for plot.
+        **kwargs : other keyword parameters
+            Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
+            For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
+            See key parameters below. 
+
+        Other keyword parameters:
+        ------------------------
+        interaction_color_map : matplotlib colormap name or object, or list of colors
+            Used for 'heatmap' visualization. The mapping from interaction values to color space. Default is 'Purples' or 'Purpler_r',
+            depending on whether a greater value means a greater interaction strength or vice versa.
+        importance_color_map :  matplotlib colormap name or object, or list of colors
+            Used for 'heatmap' visualization. The mapping from importance values to color space. Default is 'Greens' or 'Greens_r',
+            depending on whether a greater value means a greater interaction strength or vice versa.
+        annot_fmt : str
+            Used for 'heatmap' visualization. String formatting code to use when adding annotations with values. Default is '.3f'.
+        linewidths : float
+            Used for 'heatmap' visualization. Width of the lines that will divide each cell in matrix. Default is 0.5.
+        linecolor : str
+            Used for 'heatmap' visualization. Color of the lines that will divide each cell in matrix. Default is 'white'.
+        cbar_shrink : float
+            Used for 'heatmap' visualization. Fraction by which to multiply the size of the colorbar. Default is 1. 
+    
+        top_k : int 
+            Used for 'bar_chart' and 'bar_chart_ova' visualizations. Maximum number of pairs that will be presented in plot. Default is 10.
+        color : str 
+            Used for 'bar_chart' and 'bar_chart_ova' visualizations. Color of bars. Default is 'mediumpurple'.
+
+        n_highest_with_labels : int 
+            Used for 'graph' visualization. ... Default is 5. 
+        edge_color: str 
+            Used for 'graph' visualization. ... Default is 'rebeccapurple. 
+        node_color: str
+            Used for 'graph' visualization. ... Default is 'green'. 
+        node_size: int
+            Used for 'graph' visualization. ... Default is '1800'. 
+        font_color: str
+            Used for 'graph' visualization. ... Default is '#3B1F2B'. 
+        font_weight: str 
+            Used for 'graph' visualization. ... Default is 'bold'. 
+        font_size: int 
+            Used for 'graph' visualization. ... Default is 10. 
+        threshold_relevant_interaction : float
+            Used for 'graph' visualization. ... Default depends on the interaction method. 
         """
         if self.ova is None:
             raise MethodNotFittedException(self.method)

@@ -13,12 +13,10 @@ class InteractionGraphConfiguration:
     FONT_WEIGHT: str = "bold"
     FONT_SIZE: int = 10
     EDGE_COLOR: str = "rebeccapurple"
-    EDGE_COLOR_POS: str = "#24E9D0"
-    EDGE_COLOR_NEG: str = "#DB162F"
     NODE_COLOR: str = "green"
     NODE_SIZE: int = 1800
     TITLE: str = "Interaction graph"
-    MIN_RELEVANT_INTERACTION: float = 0.05
+    THRESHOLD_RELEVANT_INTERACTION: float = 0.05
 
 
 @dataclass
@@ -139,7 +137,7 @@ class VisualizationConfigurationProvider:
     @classmethod
     def _perf_based_config(cls):
         graph_config = InteractionGraphConfiguration()
-        graph_config.MIN_RELEVANT_INTERACTION = 0.1
+        graph_config.THRESHOLD_RELEVANT_INTERACTION = 0.1
 
         return VisualizationConfiguration(
             accepted_visualizations=cls.accepted_visualizations[
@@ -151,7 +149,7 @@ class VisualizationConfigurationProvider:
     @classmethod
     def _split_score_config(cls):
         graph_config = InteractionGraphConfiguration()
-        graph_config.MIN_RELEVANT_INTERACTION = 0.1
+        graph_config.THRESHOLD_RELEVANT_INTERACTION = 0.1
 
         return VisualizationConfiguration(
             accepted_visualizations=cls.accepted_visualizations[
@@ -164,7 +162,7 @@ class VisualizationConfigurationProvider:
     def _cond_depth_config(cls):
 
         graph_config = InteractionGraphConfiguration()
-        graph_config.MIN_RELEVANT_INTERACTION = 0.6
+        graph_config.THRESHOLD_RELEVANT_INTERACTION = 0.6
         graph_config.MAX_EDGE_WIDTH = 3
 
         return VisualizationConfiguration(

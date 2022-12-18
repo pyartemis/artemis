@@ -15,7 +15,7 @@ class MinimalDepthImportance(FeatureImportanceMethod):
     It applies to tree-based models like Random Forests.
     It uses data calculated in ConditionalMinimalDepth method from `interactions_methods` module and so needs to be calculated together.
 
-    Importance of a feature is defined as the lowest depth of node using this feature as a split variable in a tree, averaged over all trees.
+    Importance of a feature is defined as the lowest depth of node using this feature as a split feature in a tree, averaged over all trees.
 
     Attributes:
     ----------
