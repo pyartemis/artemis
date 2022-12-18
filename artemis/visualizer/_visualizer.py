@@ -594,6 +594,8 @@ class Visualizer:
                     (root["tree"] + 1, root["gain"]),
                     (root["tree"] + 1, root["gain"]),
                 )
+        plt.xlabel("Tree number")
+        plt.ylabel("Gain")
         if show:
             plt.show()
         else:
