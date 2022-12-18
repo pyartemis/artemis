@@ -45,7 +45,7 @@ class PartialDependenceCalculator:
         return selected_values
 
     def get_pd_pairs(self, feature1: str, feature2: str, feature_values: Optional[List[Tuple[Any, Any]]] = None) -> np.ndarray:
-        pair_key = get_pair_key((feature1, feature2), self.pd_pairs.keys())
+        pair_key = self.get_pair_key((feature1, feature2))
         all_matrix = self.pd_pairs[pair_key]["pd_values"]
         if feature_values is None:
             return all_matrix
@@ -90,7 +90,7 @@ class PartialDependenceCalculator:
         current_len = 0
         X_full = pd.DataFrame()
         for feature1, feature2 in tqdm(feature_pairs, desc=desc, disable=not show_progress):
-            feature1, feature2 = get_pair_key((feature1, feature2), self.pd_pairs.keys())
+            feature1, feature2 = self.get_pair_key((feature1, feature2))
             if all_combinations:
                 feature_values = [(f1, f2) for f1 in self.pd_pairs[(feature1, feature2)]["f1_values"] for f2 in self.pd_pairs[(feature1, feature2)]["f2_values"]]
             else:
@@ -155,15 +155,17 @@ class PartialDependenceCalculator:
             start, end = range_dict[(var_name, row_id)]
             self.pd_minus_single[var_name]["pd_values"][row_id] = np.mean(y[start:end])
 
+    def get_pair_key(self, pair: Tuple[str, str]) -> Tuple[str, str]:
+        if pair in self.pd_pairs.keys():
+            return pair
+        else:
+            return (pair[1], pair[0])
+
+
 def get_index(array, value) -> int:
     return np.where(array == value)[0][0]
 
 def reorder_pair_values(pair_values: List[Tuple[Any, Any]]) -> List[Tuple[Any, Any]]:
     return [(pair[1], pair[0]) for pair in pair_values]
 
-def get_pair_key(pair: Tuple[str, str], keys: List[Tuple[str, str]]) -> Tuple[str, str]:
-    if pair in keys:
-        return pair
-    else:
-        return (pair[1], pair[0])
 
