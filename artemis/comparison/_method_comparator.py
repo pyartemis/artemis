@@ -113,6 +113,7 @@ class FeatureInteractionMethodComparator:
         """
         m1_name, m2_name = method1.method, method2.method
         fig, ax = plt.subplots(figsize=fig_size)
+        ax.set_axisbelow(True)
         plt.grid(True)
         circle_r = 0.2 * min(max(method1._compare_ovo[m1_name]), max(method2._compare_ovo[m2_name]))
 

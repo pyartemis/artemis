@@ -95,7 +95,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
         self.full_ovo = _get_summary(self.full_result, only_def_interactions)
         self.ovo = _get_ovo(self, self.full_ovo, interaction_selected_metric)
 
-        # calculate variable importance
+        # calculate feature importance
         self._feature_importance_obj = SplitScoreImportance()
         self.feature_importance = self._feature_importance_obj.importance(
             model=model,
@@ -124,8 +124,66 @@ class SplitScoreMethod(FeatureInteractionMethod):
             Size of plot. Default is (8, 6).
         show : bool 
             Whether to show plot. Default is True.
-        **kwargs : dict
-            Additional arguments for plot.
+        **kwargs : other keyword parameters
+            Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
+            For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
+            See key parameters below. 
+        
+        Other keyword parameters:
+        ------------------------
+        interaction_color_map : matplotlib colormap name or object, or list of colors
+            Used for 'heatmap' visualization. The mapping from interaction values to color space. Default is 'Purples' or 'Purpler_r',
+            depending on whether a greater value means a greater interaction strength or vice versa.
+        importance_color_map :  matplotlib colormap name or object, or list of colors
+            Used for 'heatmap' visualization. The mapping from importance values to color space. Default is 'Greens' or 'Greens_r',
+            depending on whether a greater value means a greater interaction strength or vice versa.
+        annot_fmt : str
+            Used for 'heatmap' visualization. String formatting code to use when adding annotations with values. Default is '.3f'.
+        linewidths : float
+            Used for 'heatmap' visualization. Width of the lines that will divide each cell in matrix. Default is 0.5.
+        linecolor : str
+            Used for 'heatmap' visualization. Color of the lines that will divide each cell in matrix. Default is 'white'.
+        cbar_shrink : float
+            Used for 'heatmap' visualization. Fraction by which to multiply the size of the colorbar. Default is 1. 
+    
+        top_k : int 
+            Used for 'bar_chart' visualization. Maximum number of pairs that will be presented in plot. Default is 10.
+        color : str 
+            Used for 'bar_chart' visualization. Color of bars. Default is 'mediumpurple'.
+
+        n_highest_with_labels : int 
+            Used for 'graph' visualization. ... Default is 5. 
+        edge_color: str 
+            Used for 'graph' visualization. ... Default is 'rebeccapurple. 
+        node_color: str
+            Used for 'graph' visualization. ... Default is 'green'. 
+        node_size: int
+            Used for 'graph' visualization. ... Default is '1800'. 
+        font_color: str
+            Used for 'graph' visualization. ... Default is '#3B1F2B'. 
+        font_weight: str 
+            Used for 'graph' visualization. ... Default is 'bold'. 
+        font_size: int 
+            Used for 'graph' visualization. ... Default is 10. 
+        threshold_relevant_interaction : float
+            Used for 'graph' visualization. ... Default depends on the interaction method. 
+
+        max_trees : float
+            Used for 'lolliplot' visualization. Fraction of trees that will be presented in plot. Default is 0.2. 
+        colors : List[str]
+            Used for 'lolliplot' visualization. List of colors for nodes with successive depths. 
+            Default is ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33"]. 
+        shapes : List[str]
+            Used for 'lolliplot' visualization. List of shapes for nodes with successive depths. 
+            Default is ["o", ",", "v", "^", "<", ">"]. 
+        max_depth : int
+            Used for 'lolliplot' visualization. Threshold for depth of nodes that will be presented in plot. Default is 1. 
+        label_threshold : float
+            Used for 'lolliplot' visualization. Threshold for fraction of score of nodes that will be labeled in plot. Default is 0.1. 
+        labels : bool
+            Used for 'lolliplot' visualization. Whether to add labels to plot. Default is True. 
+        scale : str
+            Used for 'lolliplot' visualization. Scale for x axis (trees). Default is 'linear'. 
         """
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
@@ -205,8 +263,8 @@ def _get_summary(full_result: pd.DataFrame, only_def_interactions: bool = True):
         )
         .rename(
             columns={
-                "parent_name": "parent_variable",
-                "split_feature": "child_variable",
+                "parent_name": "parent_feature",
+                "split_feature": "child_feature",
             }
         )
         .reset_index(drop=True)
@@ -220,11 +278,11 @@ def _get_ovo(
     selected_metric: SplitScoreInteractionMetric,
 ):
     return (
-        full_ovo[["parent_variable", "child_variable", selected_metric]]
+        full_ovo[["parent_feature", "child_feature", selected_metric]]
         .rename(
             columns={
-                "parent_variable": "Feature 1",
-                "child_variable": "Feature 2",
+                "parent_feature": "Feature 1",
+                "child_feature": "Feature 2",
                 selected_metric: method_class.method,
             }
         )

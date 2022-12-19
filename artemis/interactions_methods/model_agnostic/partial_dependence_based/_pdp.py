@@ -3,7 +3,7 @@ from itertools import combinations
 from typing import Callable, List, Optional
 
 import pandas as pd
-from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 from artemis.importance_methods.model_agnostic import PartialDependenceBasedImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
@@ -81,6 +81,21 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
                                                                             show_progress=show_progress,
                                                                             pd_calculator=self.pd_calculator)
 
+    def plot_profile(self, feature1: str, feature2: Optional[str] = None):
+        if feature2 is not None:
+            pair = self.pd_calculator.pd_pairs[self.pd_calculator._get_pair_key((feature1, feature2))]
+            cs = plt.contour(pair["f2_values"], pair["f1_values"], pair["pd_values"], colors="black", linewidths=0.5)
+            cs2 = plt.contourf(pair["f2_values"], pair["f1_values"], pair["pd_values"])
+            plt.clabel(cs, colors="black")
+            plt.colorbar(cs2)
+            plt.xlabel(feature2)
+            plt.ylabel(feature1)
+        else:
+            single = self.pd_calculator.pd_single[feature1]
+            plt.plot(single["f_values"], single["pd_values"])
+            plt.xlabel(feature1)
+            plt.ylabel("PD value")
+    
     @abstractmethod
     def _calculate_ovo_interactions_from_pd(self, show_progress: bool):
         ...

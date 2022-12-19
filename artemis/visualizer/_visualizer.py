@@ -273,8 +273,8 @@ class Visualizer:
         font_color = kwargs.pop("font_color", config.FONT_COLOR)
         font_weight = kwargs.pop("font_weight", config.FONT_WEIGHT)
         font_size = kwargs.pop("font_size", config.FONT_SIZE)
-        min_relevant_interaction = kwargs.pop(
-            "min_relevant_interaction", config.MIN_RELEVANT_INTERACTION
+        threshold_relevant_interaction = kwargs.pop(
+            "threshold_relevant_interaction", config.THRESHOLD_RELEVANT_INTERACTION
         )
 
         fig = None
@@ -288,7 +288,7 @@ class Visualizer:
 
         # filter out non-significant interactions according to the order
         ovo_no_sig_inter = self._filter_insignificant_interactions(interactions_ascending_order,
-                                                                   min_relevant_interaction, ovo_copy)
+                                                                   threshold_relevant_interaction, ovo_copy)
 
         self._interactions_to_edge_widths(interactions_ascending_order, ovo_copy, max_edge_width)
 
@@ -321,7 +321,7 @@ class Visualizer:
             font_weight=font_weight,
             font_color=font_color,
             node_color=node_color,
-            edge_color=edge_color,  # self._edge_colors(G, edge_color_pos, edge_color_neg),
+            edge_color=edge_color, 
             connectionstyle="arc3,rad=0.3",
         )
 
@@ -594,6 +594,8 @@ class Visualizer:
                     (root["tree"] + 1, root["gain"]),
                     (root["tree"] + 1, root["gain"]),
                 )
+        plt.xlabel("Tree number")
+        plt.ylabel("Gain")
         if show:
             plt.show()
         else:
@@ -603,12 +605,6 @@ class Visualizer:
     def _edge_widths(self, G):
         return [
             abs(elem) * self.vis_config.interaction_graph.MAX_EDGE_WIDTH
-            for elem in nx.get_edge_attributes(G, self.method).values()
-        ]
-
-    def _edge_colors(self, G, edge_color_pos, edge_color_neg):
-        return [
-            edge_color_pos if elem > 0 else edge_color_neg
             for elem in nx.get_edge_attributes(G, self.method).values()
         ]
 
@@ -650,12 +646,12 @@ class Visualizer:
 
     def _filter_insignificant_interactions(self,
                                            interactions_ascending_order: bool,
-                                           min_relevant_interaction: float,
+                                           threshold_relevant_interaction: float,
                                            ovo_copy: pd.DataFrame):
         if interactions_ascending_order:
-            ovo_copy.loc[ovo_copy[self.method] > min_relevant_interaction, self.method] = 0
+            ovo_copy.loc[ovo_copy[self.method] > threshold_relevant_interaction, self.method] = 0
         else:
-            ovo_copy.loc[ovo_copy[self.method] < min_relevant_interaction, self.method] = 0
+            ovo_copy.loc[ovo_copy[self.method] < threshold_relevant_interaction, self.method] = 0
 
         return ovo_copy.copy()
 
