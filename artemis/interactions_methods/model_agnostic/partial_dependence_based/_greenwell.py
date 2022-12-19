@@ -70,5 +70,5 @@ class GreenwellMethod(PartialDependenceBasedMethod):
         ).fillna(0)
 
 def _calc_conditional_imp(pd_values: np.ndarray, is_numerical: bool):
-    return np.std(pd_values) if is_numerical else (np.max(pd_values) - np.min(pd_values)) / 4
+    return stdev(pd_values) if is_numerical else (np.max(pd_values) - np.min(pd_values)) / 4
 
