@@ -83,7 +83,7 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
     def plot_profile(self, feature1: str, feature2: Optional[str] = None):
         if feature2 is not None:
-            pair = self.pd_calculator.pd_pairs[self.pd_calculator.get_pair_key((feature1, feature2))]
+            pair = self.pd_calculator.pd_pairs[self.pd_calculator._get_pair_key((feature1, feature2))]
             cs = plt.contour(pair["f2_values"], pair["f1_values"], pair["pd_values"], colors="black", linewidths=0.5)
             cs2 = plt.contourf(pair["f2_values"], pair["f1_values"], pair["pd_values"])
             plt.clabel(cs, colors="black")

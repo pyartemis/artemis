@@ -6,7 +6,7 @@ import pandas as pd
 
 from tqdm import tqdm
 from artemis.utilities.domain import InteractionMethod, ProgressInfoLog
-from artemis.utilities.ops import partial_dependence_value
+from artemis.utilities.ops import partial_dependence_value, split_features_num_cat
 from ._pdp import PartialDependenceBasedMethod
 
 
@@ -58,12 +58,17 @@ class GreenwellMethod(PartialDependenceBasedMethod):
     def _calculate_ovo_interactions_from_pd(self, show_progress: bool = False):
         self.pd_calculator.calculate_pd_pairs(self.pairs, show_progress=show_progress)
         value_pairs = []
+        num_features, _ = split_features_num_cat(self.X_sampled, self.features_included)
         for pair in self.pairs:
+            pair = self.pd_calculator._get_pair_key((pair[0], pair[1]))
             pd_values = self.pd_calculator.get_pd_pairs(pair[0], pair[1])
-            res_j = np.apply_along_axis(stdev, 0, np.apply_along_axis(stdev, 1, pd_values))
-            res_i = np.apply_along_axis(stdev, 0, np.apply_along_axis(stdev, 0, pd_values))
+            res_j = np.apply_along_axis(stdev, 0, np.apply_along_axis(_calc_conditional_imp, 1, pd_values, is_numerical = pair[1] in num_features))
+            res_i = np.apply_along_axis(stdev, 0, np.apply_along_axis(_calc_conditional_imp, 0, pd_values, is_numerical = pair[0] in num_features))
             value_pairs.append([pair[0], pair[1], (res_j + res_i) / 2])
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
             by=self.method, ascending=self.interactions_ascending_order, ignore_index=True
         ).fillna(0)
+
+def _calc_conditional_imp(pd_values: np.ndarray, is_numerical: bool):
+    return np.std(pd_values) if is_numerical else (np.max(pd_values) - np.min(pd_values)) / 4
 
