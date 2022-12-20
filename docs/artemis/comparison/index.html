@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>artemis.comparison API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>artemis.comparison</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from ._method_comparator import FeatureInteractionMethodComparator
+
+__all__ = [&#34;FeatureInteractionMethodComparator&#34;]</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="artemis.comparison.FeatureInteractionMethodComparator"><code class="flex name class">
+<span>class <span class="ident">FeatureInteractionMethodComparator</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Feature Interaction Method Comparator.
+It is used for statistical comparison of two different feature interaction methods.
+Calculates Pearson, Kendall and Spearman rank-correlation and plots one vs one profiles of two methods against
+each other. Monotonicity of the plot suggest cohesion in results. Both provided methods must be in fitted state.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>ovo_profiles_comparison_plot</code></strong> :&ensp;<code>Figure</code></dt>
+<dd>Matplotlib figure of comparison plots.</dd>
+<dt><strong><code>correlations_df</code></strong> :&ensp;<code>pd.DataFrame</code></dt>
+<dd>Pearson, Kendall and Spearman rank correlation values</dd>
+</dl>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Rank_correlation">https://en.wikipedia.org/wiki/Rank_correlation</a></li>
+</ul>
+<p>Constructor for FeatureInteractionMethodComparator</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FeatureInteractionMethodComparator:
+    &#34;&#34;&#34;
+        Feature Interaction Method Comparator.
+        It is used for statistical comparison of two different feature interaction methods.
+        Calculates Pearson, Kendall and Spearman rank-correlation and plots one vs one profiles of two methods against
+        each other. Monotonicity of the plot suggest cohesion in results. Both provided methods must be in fitted state.
+
+
+        Attributes
+        ----------
+        ovo_profiles_comparison_plot : Figure
+            Matplotlib figure of comparison plots.
+        correlations_df : pd.DataFrame
+            Pearson, Kendall and Spearman rank correlation values
+
+        References
+        ----------
+        - https://en.wikipedia.org/wiki/Rank_correlation
+        &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;Constructor for FeatureInteractionMethodComparator&#34;&#34;&#34;
+        self.ovo_profiles_comparison_plot = None
+        self.correlations_df = None
+
+    def summary(self,
+                method1: FeatureInteractionMethod,
+                method2: FeatureInteractionMethod):
+        _assert_fitted_ovo(method1, method2)
+        &#34;&#34;&#34;
+        Calculates Feature Interaction Method comparison. 
+        Used for asserting stability and cohesion of results for a pair of explanation methods. 
+
+        Parameters
+        ----------
+        method1 : FeatureInteractionMethod
+             First method for comparison
+        method2 : FeatureInteractionMethod
+             Second method for comparison 
+             
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        self.correlations_df = self.correlations(method1, method2)
+        self.ovo_profiles_comparison_plot = self.comparison_plot(method1, method2, add_correlation_box=True)
+
+    def correlations(self, method1: FeatureInteractionMethod, method2: FeatureInteractionMethod):
+        &#34;&#34;&#34;
+        Calculates Pearson, Kendall and Spearman rank correlation DataFrame.
+
+        Parameters
+        ----------
+        method1 : FeatureInteractionMethod
+             First method for comparison
+        method2 : FeatureInteractionMethod
+             Second method for comparison
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        correlations = list()
+        for correlation_method in dataclasses.fields(CorrelationMethod):
+            correlation_method_name = correlation_method.default
+            correlations.append(
+                {
+                    &#34;method&#34;: correlation_method_name,
+                    &#34;value&#34;: self.correlation(method1, method2, correlation_method_name)
+                })
+
+        return pd.DataFrame.from_records(correlations)
+
+    def comparison_plot(self,
+                        method1: FeatureInteractionMethod,
+                        method2: FeatureInteractionMethod,
+                        n_labels: int = 3,
+                        add_correlation_box: bool = False,
+                        fig_size: tuple = (8, 6)):
+        &#34;&#34;&#34;
+        Creates comparison plot for comparing results of two feature interaction methods. Depending on the parameters
+        rank correlation might be included on the plot.
+
+        Parameters
+        ----------
+        method1 : FeatureInteractionMethod
+            First method for comparison
+        method2 : FeatureInteractionMethod
+            Second method for comparison
+        n_labels: int
+            Number of pairs of features with the greatest interaction values to show labels of, default = 3
+        add_correlation_box: bool
+            Flag indicating whether to show rank correlation values on the plot, default = False
+        fig_size: tuple[int]
+            Matplotlib size of the figure, default = (8, 6)
+
+
+        Returns
+        -------
+        Figure
+        &#34;&#34;&#34;
+        m1_name, m2_name = method1.method, method2.method
+        fig, ax = plt.subplots(figsize=fig_size)
+        ax.set_axisbelow(True)
+        plt.grid(True)
+        circle_r = 0.2 * min(max(method1._compare_ovo[m1_name]), max(method2._compare_ovo[m2_name]))
+
+        x, y = list(), list()
+        for index, row in method1._compare_ovo.iterrows():
+
+            f1, f2 = row[&#34;Feature 1&#34;], row[&#34;Feature 2&#34;]
+            x_curr, y_curr = row[method1.method], method2.interaction_value(f1, f2)
+            x.append(x_curr)
+            y.append(y_curr)
+
+            if index &lt; n_labels:
+                _add_arrow(ax, circle_r, f1, f2, x_curr, y_curr)
+
+        ax.scatter(x, y, color=InteractionGraphConfiguration.NODE_COLOR)
+
+        if method1.interactions_ascending_order:
+            plt.gca().invert_xaxis()
+        if method2.interactions_ascending_order:
+            plt.gca().invert_yaxis()
+
+        if add_correlation_box:
+
+            corr = self.correlations_df
+            if self.correlations_df is None:
+                corr = self.correlations(method1, method2)
+
+            _add_correlation_box(ax, corr)
+
+        _title_x_y(ax, m1_name, m2_name)
+
+        return fig, ax
+
+    @staticmethod
+    def correlation(
+            method1: FeatureInteractionMethod,
+            method2: FeatureInteractionMethod,
+            correlation_method: str = CorrelationMethod.KENDALL):
+        &#34;&#34;&#34;
+        Calculates rank correlation of one vs one profiles using a given correlation method.
+
+        Parameters
+        ----------
+        method1 : FeatureInteractionMethod
+             First method for comparison
+        method2 : FeatureInteractionMethod
+             Second method for comparison
+        correlation_method: str
+            Correlation method to use, accepted values are [&#39;pearson&#39;, &#39;kendall&#39;, &#39;spearman&#39;], default = &#39;kendall&#39;
+
+        Returns
+        -------
+        value of the correlation
+        &#34;&#34;&#34;
+
+        rank = _rank_interaction_values_encoded(method1, method2)
+
+        return rank.corr(method=correlation_method).iloc[0, 1]</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="artemis.comparison.FeatureInteractionMethodComparator.correlation"><code class="name flex">
+<span>def <span class="ident">correlation</span></span>(<span>method1: artemis.interactions_methods._method.FeatureInteractionMethod, method2: artemis.interactions_methods._method.FeatureInteractionMethod, correlation_method: str = 'kendall')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculates rank correlation of one vs one profiles using a given correlation method.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>method1</code></strong> :&ensp;<code>FeatureInteractionMethod</code></dt>
+<dd>First method for comparison</dd>
+<dt><strong><code>method2</code></strong> :&ensp;<code>FeatureInteractionMethod</code></dt>
+<dd>Second method for comparison</dd>
+<dt><strong><code>correlation_method</code></strong> :&ensp;<code>str</code></dt>
+<dd>Correlation method to use, accepted values are ['pearson', 'kendall', 'spearman'], default = 'kendall'</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>value</code> of <code>the correlation</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def correlation(
+        method1: FeatureInteractionMethod,
+        method2: FeatureInteractionMethod,
+        correlation_method: str = CorrelationMethod.KENDALL):
+    &#34;&#34;&#34;
+    Calculates rank correlation of one vs one profiles using a given correlation method.
+
+    Parameters
+    ----------
+    method1 : FeatureInteractionMethod
+         First method for comparison
+    method2 : FeatureInteractionMethod
+         Second method for comparison
+    correlation_method: str
+        Correlation method to use, accepted values are [&#39;pearson&#39;, &#39;kendall&#39;, &#39;spearman&#39;], default = &#39;kendall&#39;
+
+    Returns
+    -------
+    value of the correlation
+    &#34;&#34;&#34;
+
+    rank = _rank_interaction_values_encoded(method1, method2)
+
+    return rank.corr(method=correlation_method).iloc[0, 1]</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="artemis.comparison.FeatureInteractionMethodComparator.comparison_plot"><code class="name flex">
+<span>def <span class="ident">comparison_plot</span></span>(<span>self, method1: artemis.interactions_methods._method.FeatureInteractionMethod, method2: artemis.interactions_methods._method.FeatureInteractionMethod, n_labels: int = 3, add_correlation_box: bool = False, fig_size: tuple = (8, 6))</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates comparison plot for comparing results of two feature interaction methods. Depending on the parameters
+rank correlation might be included on the plot.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>method1</code></strong> :&ensp;<code>FeatureInteractionMethod</code></dt>
+<dd>First method for comparison</dd>
+<dt><strong><code>method2</code></strong> :&ensp;<code>FeatureInteractionMethod</code></dt>
+<dd>Second method for comparison</dd>
+<dt><strong><code>n_labels</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of pairs of features with the greatest interaction values to show labels of, default = 3</dd>
+<dt><strong><code>add_correlation_box</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Flag indicating whether to show rank correlation values on the plot, default = False</dd>
+<dt><strong><code>fig_size</code></strong> :&ensp;<code>tuple[int]</code></dt>
+<dd>Matplotlib size of the figure, default = (8, 6)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Figure</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def comparison_plot(self,
+                    method1: FeatureInteractionMethod,
+                    method2: FeatureInteractionMethod,
+                    n_labels: int = 3,
+                    add_correlation_box: bool = False,
+                    fig_size: tuple = (8, 6)):
+    &#34;&#34;&#34;
+    Creates comparison plot for comparing results of two feature interaction methods. Depending on the parameters
+    rank correlation might be included on the plot.
+
+    Parameters
+    ----------
+    method1 : FeatureInteractionMethod
+        First method for comparison
+    method2 : FeatureInteractionMethod
+        Second method for comparison
+    n_labels: int
+        Number of pairs of features with the greatest interaction values to show labels of, default = 3
+    add_correlation_box: bool
+        Flag indicating whether to show rank correlation values on the plot, default = False
+    fig_size: tuple[int]
+        Matplotlib size of the figure, default = (8, 6)
+
+
+    Returns
+    -------
+    Figure
+    &#34;&#34;&#34;
+    m1_name, m2_name = method1.method, method2.method
+    fig, ax = plt.subplots(figsize=fig_size)
+    ax.set_axisbelow(True)
+    plt.grid(True)
+    circle_r = 0.2 * min(max(method1._compare_ovo[m1_name]), max(method2._compare_ovo[m2_name]))
+
+    x, y = list(), list()
+    for index, row in method1._compare_ovo.iterrows():
+
+        f1, f2 = row[&#34;Feature 1&#34;], row[&#34;Feature 2&#34;]
+        x_curr, y_curr = row[method1.method], method2.interaction_value(f1, f2)
+        x.append(x_curr)
+        y.append(y_curr)
+
+        if index &lt; n_labels:
+            _add_arrow(ax, circle_r, f1, f2, x_curr, y_curr)
+
+    ax.scatter(x, y, color=InteractionGraphConfiguration.NODE_COLOR)
+
+    if method1.interactions_ascending_order:
+        plt.gca().invert_xaxis()
+    if method2.interactions_ascending_order:
+        plt.gca().invert_yaxis()
+
+    if add_correlation_box:
+
+        corr = self.correlations_df
+        if self.correlations_df is None:
+            corr = self.correlations(method1, method2)
+
+        _add_correlation_box(ax, corr)
+
+    _title_x_y(ax, m1_name, m2_name)
+
+    return fig, ax</code></pre>
+</details>
+</dd>
+<dt id="artemis.comparison.FeatureInteractionMethodComparator.correlations"><code class="name flex">
+<span>def <span class="ident">correlations</span></span>(<span>self, method1: artemis.interactions_methods._method.FeatureInteractionMethod, method2: artemis.interactions_methods._method.FeatureInteractionMethod)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculates Pearson, Kendall and Spearman rank correlation DataFrame.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>method1</code></strong> :&ensp;<code>FeatureInteractionMethod</code></dt>
+<dd>First method for comparison</dd>
+<dt><strong><code>method2</code></strong> :&ensp;<code>FeatureInteractionMethod</code></dt>
+<dd>Second method for comparison</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def correlations(self, method1: FeatureInteractionMethod, method2: FeatureInteractionMethod):
+    &#34;&#34;&#34;
+    Calculates Pearson, Kendall and Spearman rank correlation DataFrame.
+
+    Parameters
+    ----------
+    method1 : FeatureInteractionMethod
+         First method for comparison
+    method2 : FeatureInteractionMethod
+         Second method for comparison
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    correlations = list()
+    for correlation_method in dataclasses.fields(CorrelationMethod):
+        correlation_method_name = correlation_method.default
+        correlations.append(
+            {
+                &#34;method&#34;: correlation_method_name,
+                &#34;value&#34;: self.correlation(method1, method2, correlation_method_name)
+            })
+
+    return pd.DataFrame.from_records(correlations)</code></pre>
+</details>
+</dd>
+<dt id="artemis.comparison.FeatureInteractionMethodComparator.summary"><code class="name flex">
+<span>def <span class="ident">summary</span></span>(<span>self, method1: artemis.interactions_methods._method.FeatureInteractionMethod, method2: artemis.interactions_methods._method.FeatureInteractionMethod)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def summary(self,
+            method1: FeatureInteractionMethod,
+            method2: FeatureInteractionMethod):
+    _assert_fitted_ovo(method1, method2)
+    &#34;&#34;&#34;
+    Calculates Feature Interaction Method comparison. 
+    Used for asserting stability and cohesion of results for a pair of explanation methods. 
+
+    Parameters
+    ----------
+    method1 : FeatureInteractionMethod
+         First method for comparison
+    method2 : FeatureInteractionMethod
+         Second method for comparison 
+         
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    self.correlations_df = self.correlations(method1, method2)
+    self.ovo_profiles_comparison_plot = self.comparison_plot(method1, method2, add_correlation_box=True)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="artemis" href="../index.html">artemis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="artemis.comparison.FeatureInteractionMethodComparator" href="#artemis.comparison.FeatureInteractionMethodComparator">FeatureInteractionMethodComparator</a></code></h4>
+<ul class="">
+<li><code><a title="artemis.comparison.FeatureInteractionMethodComparator.comparison_plot" href="#artemis.comparison.FeatureInteractionMethodComparator.comparison_plot">comparison_plot</a></code></li>
+<li><code><a title="artemis.comparison.FeatureInteractionMethodComparator.correlation" href="#artemis.comparison.FeatureInteractionMethodComparator.correlation">correlation</a></code></li>
+<li><code><a title="artemis.comparison.FeatureInteractionMethodComparator.correlations" href="#artemis.comparison.FeatureInteractionMethodComparator.correlations">correlations</a></code></li>
+<li><code><a title="artemis.comparison.FeatureInteractionMethodComparator.summary" href="#artemis.comparison.FeatureInteractionMethodComparator.summary">summary</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
