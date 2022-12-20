@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pandas as pd
 from tqdm import tqdm
 
@@ -10,7 +8,7 @@ from artemis._utilities.split_score_metrics import (
     _LGBM_UNSUPPORTED_METRICS,
     _ASCENDING_ORDER_METRICS
 )
-from ._handler import GBTreesHandler
+from artemis._utilities._handler import GBTreesHandler
 from ..._method import FeatureInteractionMethod
 from ...._utilities.domain import InteractionMethod
 from ...._utilities.domain import VisualizationType
@@ -54,7 +52,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
         self.metric = None
 
     @property
-    def interactions_ascending_order(self):
+    def _interactions_ascending_order(self):
         return self.metric in _ASCENDING_ORDER_METRICS
 
     def fit(
@@ -194,7 +192,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
                              title=title,
                              figsize=figsize,
                              show=show,
-                             interactions_ascending_order=self.interactions_ascending_order,
+                             interactions_ascending_order=self._interactions_ascending_order,
                              importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              _full_result=self.full_result,
                              **kwargs)
@@ -287,7 +285,7 @@ def _get_ovo(
                 selected_metric: method_class.method,
             }
         )
-        .sort_values(by=method_class.method, ascending=method_class.interactions_ascending_order, ignore_index=True)
+        .sort_values(by=method_class.method, ascending=method_class._interactions_ascending_order, ignore_index=True)
     )
 
 def _check_metrics_with_available_info(package, interaction_selected_metric, importance_selected_metric):

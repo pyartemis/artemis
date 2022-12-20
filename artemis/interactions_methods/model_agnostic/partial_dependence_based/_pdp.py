@@ -1,13 +1,13 @@
 from abc import abstractmethod
 from itertools import combinations
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Tuple
 
 import pandas as pd
 import matplotlib.pyplot as plt
 
 from artemis.importance_methods.model_agnostic import PartialDependenceBasedImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis._utilities.domain import ProgressInfoLog
+from artemis._utilities.domain import ProgressInfoLog, VisualizationType
 from artemis._utilities.ops import get_predict_function, sample_if_not_none, all_if_none
 from artemis._utilities.pd_calculator import PartialDependenceCalculator
 
@@ -19,8 +19,12 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         self.pd_calculator = None
 
     @property
-    def interactions_ascending_order(self):
+    def _interactions_ascending_order(self):
         return False
+
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default",
+             figsize: Tuple[float, float] = (8, 6), show: bool = True, **kwargs):
+        super().plot(vis_type, title, figsize, show)
 
     def fit(self,
             model,

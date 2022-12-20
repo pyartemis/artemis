@@ -48,14 +48,14 @@ class FeatureInteractionMethod(ABC):
 
     @property
     @abstractmethod
-    def interactions_ascending_order(self):
+    def _interactions_ascending_order(self):
         ...
 
     @property
     def _compare_ovo(self):
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
-        return self.ovo.sort_values(self.method, ascending=self.interactions_ascending_order, ignore_index=True)
+        return self.ovo.sort_values(self.method, ascending=self._interactions_ascending_order, ignore_index=True)
 
     @abstractmethod
     def fit(self, model, **kwargs):
@@ -145,7 +145,7 @@ class FeatureInteractionMethod(ABC):
                              title=title,
                              figsize=figsize,
                              show=show,
-                             interactions_ascending_order=self.interactions_ascending_order,
+                             interactions_ascending_order=self._interactions_ascending_order,
                              importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
 

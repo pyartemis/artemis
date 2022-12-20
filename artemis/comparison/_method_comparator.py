@@ -130,9 +130,9 @@ class FeatureInteractionMethodComparator:
 
         ax.scatter(x, y, color=InteractionGraphConfiguration.NODE_COLOR)
 
-        if method1.interactions_ascending_order:
+        if method1._interactions_ascending_order:
             plt.gca().invert_xaxis()
-        if method2.interactions_ascending_order:
+        if method2._interactions_ascending_order:
             plt.gca().invert_yaxis()
 
         if add_correlation_box:

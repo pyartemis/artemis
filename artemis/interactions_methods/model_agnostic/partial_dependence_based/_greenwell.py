@@ -1,12 +1,13 @@
 from statistics import stdev
-from typing import List, Optional
+from typing import List, Optional, Tuple, Callable
 
 import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
-from artemis._utilities.domain import InteractionMethod, ProgressInfoLog
+from artemis._utilities.domain import InteractionMethod, ProgressInfoLog, VisualizationType
 from artemis._utilities.ops import partial_dependence_value, split_features_num_cat
+from artemis._utilities.pd_calculator import PartialDependenceCalculator
 from ._pdp import PartialDependenceBasedMethod
 
 
@@ -44,7 +45,6 @@ class GreenwellMethod(PartialDependenceBasedMethod):
     - https://arxiv.org/pdf/1805.04755.pdf
     """
 
-
     def __init__(self, random_state: Optional[int] = None):
         """Constructor for GreenwellMethod
         
@@ -55,6 +55,21 @@ class GreenwellMethod(PartialDependenceBasedMethod):
         """
         super().__init__(InteractionMethod.VARIABLE_INTERACTION, random_state=random_state)
 
+    def fit(self,
+            model,
+            X: pd.DataFrame,
+            n: Optional[int] = None,
+            predict_function: Optional[Callable] = None,
+            features: Optional[List[str]] = None,
+            show_progress: bool = False,
+            batchsize: int = 2000,
+            pd_calculator: Optional[PartialDependenceCalculator] = None):
+        super().fit(model, X, n, predict_function, features, show_progress, batchsize, pd_calculator)
+
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default",
+             figsize: Tuple[float, float] = (8, 6), show: bool = True, **kwargs):
+        super().plot(vis_type, title, figsize, show)
+
     def _calculate_ovo_interactions_from_pd(self, show_progress: bool = False):
         self.pd_calculator.calculate_pd_pairs(self.pairs, show_progress=show_progress)
         value_pairs = []
@@ -62,13 +77,15 @@ class GreenwellMethod(PartialDependenceBasedMethod):
         for pair in self.pairs:
             pair = self.pd_calculator._get_pair_key((pair[0], pair[1]))
             pd_values = self.pd_calculator.get_pd_pairs(pair[0], pair[1])
-            res_j = np.apply_along_axis(stdev, 0, np.apply_along_axis(_calc_conditional_imp, 1, pd_values, is_numerical = pair[1] in num_features))
-            res_i = np.apply_along_axis(stdev, 0, np.apply_along_axis(_calc_conditional_imp, 0, pd_values, is_numerical = pair[0] in num_features))
+            res_j = np.apply_along_axis(stdev, 0, np.apply_along_axis(_calc_conditional_imp, 1, pd_values,
+                                                                      is_numerical=pair[1] in num_features))
+            res_i = np.apply_along_axis(stdev, 0, np.apply_along_axis(_calc_conditional_imp, 0, pd_values,
+                                                                      is_numerical=pair[0] in num_features))
             value_pairs.append([pair[0], pair[1], (res_j + res_i) / 2])
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
-            by=self.method, ascending=self.interactions_ascending_order, ignore_index=True
+            by=self.method, ascending=self._interactions_ascending_order, ignore_index=True
         ).fillna(0)
+
 
 def _calc_conditional_imp(pd_values: np.ndarray, is_numerical: bool):
     return stdev(pd_values) if is_numerical else (np.max(pd_values) - np.min(pd_values)) / 4
-

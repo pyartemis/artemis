@@ -183,7 +183,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
                              title=title,
                              figsize=figsize,
                              show=show,
-                             interactions_ascending_order=self.interactions_ascending_order,
+                             interactions_ascending_order=self._interactions_ascending_order,
                              importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
 
@@ -196,7 +196,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             pd_f_minus = self.pd_calculator.get_pd_minus_single(feature)
             value_minus_single.append([feature, _calculate_hstat_value(pd_f, pd_f_minus, preds, self.normalized)])
         return pd.DataFrame(value_minus_single, columns=["Feature", InteractionMethod.H_STATISTIC]).sort_values(
-            by=InteractionMethod.H_STATISTIC, ascending=self.interactions_ascending_order, ignore_index=True
+            by=InteractionMethod.H_STATISTIC, ascending=self._interactions_ascending_order, ignore_index=True
         ).fillna(0)
 
     def _calculate_ovo_interactions_from_pd(self, show_progress: bool):
@@ -210,7 +210,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             pd_pair = self.pd_calculator.get_pd_pairs(pair[0], pair[1], feature_values = pair_feature_values)
             value_pairs.append([pair[0], pair[1], _calculate_hstat_value(pd_f1, pd_f2, pd_pair, self.normalized)])
         return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
-            by=self.method, ascending=self.interactions_ascending_order, ignore_index=True
+            by=self.method, ascending=self._interactions_ascending_order, ignore_index=True
         ).fillna(0)
 
 def _calculate_hstat_value(pd_i: np.ndarray, pd_versus: np.ndarray, pd_i_versus: np.ndarray, normalized: bool = True):
