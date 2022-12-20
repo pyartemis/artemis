@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from artemis.utilities.domain import VisualizationType, InteractionMethod, ProgressInfoLog
-from artemis.utilities.exceptions import MethodNotFittedException
-from artemis.utilities.ops import remove_element, center, partial_dependence_value
-from artemis.utilities.pd_calculator import PartialDependenceCalculator
+from artemis._utilities.domain import VisualizationType, InteractionMethod, ProgressInfoLog
+from artemis._utilities.exceptions import MethodNotFittedException
+from artemis._utilities.ops import remove_element, center, partial_dependence_value
+from artemis._utilities.pd_calculator import PartialDependenceCalculator
 from ._pdp import PartialDependenceBasedMethod
 
 class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
@@ -16,7 +16,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
     
     Uses partial dependence values to calculate feature interaction strengths and feature importance. 
 
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name, used also for naming column with results in `ovo` pd.DataFrame.
@@ -41,10 +41,10 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         List of pairs of features for which interactions are calculated.
     pd_calculator : PartialDependenceCalculator
         Object used to calculate and store partial dependence values.
-    batchsize: int
+    batchsize : int
         Batch size used for calculation.
 
-    References:
+    References
     ----------
     - https://www.jstor.org/stable/pdf/30245114.pdf
     - https://www.tandfonline.com/doi/full/10.1080/10618600.2021.2007935
@@ -52,7 +52,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
     def __init__(self, random_state: Optional[int] = None, normalized: bool = True):
         """Constructor for FriedmanHStatisticMethod
 
-        Parameters:
+        Parameters
         ----------
         random_state : int, optional
             Random state for reproducibility. Defaults to None.
@@ -77,7 +77,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         """Calculates H-statistic Feature Interactions Strength and Feature Importance for the given model. 
         Despite pair interactions, this method can also calculate one vs all interactions.
 
-        Parameters:
+        Parameters
         ----------
         model : object
             Model to be explained, should have predict_proba or predict method, or predict_function should be provided. 
@@ -118,7 +118,7 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
         - bar_chart_ova - bar chart of top one vs all interactions values
         - summary - combination of other plots 
         
-        Parameters:
+        Parameters
         ----------
         vis_type : str 
             Type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'bar_chart_ova', 'summary']. Default is 'heatmap'.
@@ -128,12 +128,12 @@ class FriedmanHStatisticMethod(PartialDependenceBasedMethod):
             Size of plot. Default is (8, 6).
         show : bool 
             Whether to show plot. Default is True.
-        **kwargs : other keyword parameters
+        **kwargs : Other Parameters
             Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
             For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
             See key parameters below. 
 
-        Other keyword parameters:
+        Other Parameters
         ------------------------
         interaction_color_map : matplotlib colormap name or object, or list of colors
             Used for 'heatmap' visualization. The mapping from interaction values to color space. Default is 'Purples' or 'Purpler_r',

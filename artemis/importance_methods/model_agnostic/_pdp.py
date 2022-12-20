@@ -6,14 +6,14 @@ import pandas as pd
 from tqdm import tqdm
 
 from artemis.importance_methods._method import FeatureImportanceMethod
-from artemis.utilities.domain import ImportanceMethod, ProgressInfoLog
-from artemis.utilities.ops import (
+from artemis._utilities.domain import ImportanceMethod, ProgressInfoLog
+from artemis._utilities.ops import (
     all_if_none,
     get_predict_function,
     sample_if_not_none,
     split_features_num_cat,
 )
-from artemis.utilities.pd_calculator import PartialDependenceCalculator
+from artemis._utilities.pd_calculator import PartialDependenceCalculator
 
 
 class PartialDependenceBasedImportance(FeatureImportanceMethod):
@@ -23,7 +23,7 @@ class PartialDependenceBasedImportance(FeatureImportanceMethod):
     Friedman's H-statistic and Greenwell methods.
 
 
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name.
@@ -36,7 +36,7 @@ class PartialDependenceBasedImportance(FeatureImportanceMethod):
     pd_calculator : PartialDependenceCalculator
         Object used to calculate and store partial dependence values.
 
-    References:
+    References
     ----------
     - https://arxiv.org/abs/1805.04755
     """
@@ -58,7 +58,7 @@ class PartialDependenceBasedImportance(FeatureImportanceMethod):
     ):
         """Calculates Partial Dependence Based Feature Importance.
         
-        Parameters:
+        Parameters
         ----------
         model : object
              Model for which importance will be calculated, should have predict_proba or predict method, or predict_function should be provided. 
@@ -83,7 +83,7 @@ class PartialDependenceBasedImportance(FeatureImportanceMethod):
             Providing this object speeds up the calculation as partial dependence values do not need to be recalculated.
             If None, it will be created from scratch. Default is None.
 
-        Returns:
+        Returns
         -------
         pd.DataFrame
             Result dataframe containing feature importance with columns: "Feature", "Importance"

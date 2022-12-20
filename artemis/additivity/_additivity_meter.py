@@ -1,17 +1,17 @@
 from typing import Callable, List, Optional
 import numpy as np
 import pandas as pd
-from artemis.utilities.domain import ProgressInfoLog
-from artemis.utilities.ops import get_predict_function, sample_if_not_none
+from artemis._utilities.domain import ProgressInfoLog
+from artemis._utilities.ops import get_predict_function, sample_if_not_none
 
-from artemis.utilities.pd_calculator import PartialDependenceCalculator
+from artemis._utilities.pd_calculator import PartialDependenceCalculator
 
 
 class AdditivityMeter:
     """
     AdditivityMeter is a class that calculates the additivity index of a model.
 
-    Attributes:
+    Attributes
     -----------
     additivity_index : float
         Additivity index of the model.
@@ -51,7 +51,7 @@ class AdditivityMeter:
         """ 
         Calculates the additivity index of the given model.
 
-        Parameters:
+        Parameters
         -----------
         model : object
             Model to calculate additivity index for, should have predict_proba or predict method, or predict_function should be provided. 
@@ -73,7 +73,7 @@ class AdditivityMeter:
             Providing this object speeds up the calculation as partial dependence values do not need to be recalculated.
             If None, it will be created from scratch. Default is None.
 
-        Returns:
+        Returns
         --------
         additivity_index : float
             Additivity index of the model. Value from [0, 1] interval where 1 means that the model is additive, 

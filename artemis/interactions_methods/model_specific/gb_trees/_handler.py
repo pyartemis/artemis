@@ -1,13 +1,13 @@
 from re import search
 import pandas as pd
 
-from artemis.utilities.exceptions import ModelNotSupportedException
+from artemis._utilities.exceptions import ModelNotSupportedException
 
 
 class GBTreesHandler:
     """Class to unify the structure of the gradient boosing decision trees models.
 
-    Attributes:
+    Attributes
     ----------
     package : str
         Name of the package used to train the model.
@@ -17,7 +17,7 @@ class GBTreesHandler:
     def __init__(self, model=None) -> None:
         """Constructor for GBTreesHandler.
         
-        Parameters:
+        Parameters
         ----------
         model : object, optional
             Trained model which structure will be unified."""

@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 
 from artemis.importance_methods._method import FeatureImportanceMethod
-from artemis.utilities.domain import ImportanceMethod, InteractionMethod
-from artemis.utilities.exceptions import FeatureImportanceWithoutInteractionException
+from artemis._utilities.domain import ImportanceMethod, InteractionMethod
+from artemis._utilities.exceptions import FeatureImportanceWithoutInteractionException
 
 
 class MinimalDepthImportance(FeatureImportanceMethod):
@@ -17,14 +17,14 @@ class MinimalDepthImportance(FeatureImportanceMethod):
 
     Importance of a feature is defined as the lowest depth of node using this feature as a split feature in a tree, averaged over all trees.
 
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name.
     feature_importance : pd.DataFrame 
         Feature importance values.
         
-    References:
+    References
     ----------
     - https://modeloriented.github.io/randomForestExplainer/
     - https://doi.org/10.1198/jasa.2009.tm08622
@@ -41,14 +41,14 @@ class MinimalDepthImportance(FeatureImportanceMethod):
     ) -> pd.DataFrame:
         """Calculates Minimal Depth Feature Importance.
 
-        Parameters:
+        Parameters
         ----------
         model : object
                Model for which importance will be calculated, should have predict method.
         tree_id_to_depth_split : dict
             Dictionary containing minimal depth of each node in each tree.
 
-        Returns:
+        Returns
         -------
         pd.DataFrame
             Result dataframe containing feature importance with columns: "Feature", "Importance"

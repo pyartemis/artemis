@@ -4,7 +4,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from artemis.importance_methods.model_specific import SplitScoreImportance
-from artemis.utilities.split_score_metrics import (
+from artemis._utilities.split_score_metrics import (
     SplitScoreImportanceMetric,
     SplitScoreInteractionMetric,
     _LGBM_UNSUPPORTED_METRICS,
@@ -12,9 +12,9 @@ from artemis.utilities.split_score_metrics import (
 )
 from ._handler import GBTreesHandler
 from ..._method import FeatureInteractionMethod
-from ....utilities.domain import InteractionMethod
-from ....utilities.domain import VisualizationType
-from ....utilities.exceptions import MethodNotFittedException, MetricNotSupportedException
+from ...._utilities.domain import InteractionMethod
+from ...._utilities.domain import VisualizationType
+from ...._utilities.exceptions import MethodNotFittedException, MetricNotSupportedException
 
 
 class SplitScoreMethod(FeatureInteractionMethod):
@@ -25,7 +25,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
 
     Strength of interaction is defined by the metric selected by user (default is sum of gains).
 
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name, used also for naming column with results in `ovo` pd.DataFrame.
@@ -44,7 +44,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
     pairs : List[List[str]]
         List of pairs of features for which interactions are calculated.
 
-    References:
+    References
     ----------
     - https://modeloriented.github.io/EIX/
     """
@@ -67,7 +67,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
     ):
         """Calculates Split Score Feature Interactions Strength and Split Score Feature Importance for given model.
 
-        Parameters:
+        Parameters
         ----------
         model : GBTreesHandler
             Model to be explained. Should be fitted and of type GBTreesHandler (otherwise it will be converted). 
@@ -114,7 +114,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
         - summary - combination of heatmap, bar chart and graph plots
         - lolliplot - lolliplot for first k decision trees with split scores values.
         
-        Parameters:
+        Parameters
         ----------
         vis_type : str 
             Type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'lolliplot', 'summary']. Default is 'heatmap'.
@@ -124,12 +124,12 @@ class SplitScoreMethod(FeatureInteractionMethod):
             Size of plot. Default is (8, 6).
         show : bool 
             Whether to show plot. Default is True.
-        **kwargs : other keyword parameters
+        **kwargs : Other Parameters
             Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
             For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
             See key parameters below. 
         
-        Other keyword parameters:
+        Other Parameters
         ------------------------
         interaction_color_map : matplotlib colormap name or object, or list of colors
             Used for 'heatmap' visualization. The mapping from interaction values to color space. Default is 'Purples' or 'Purpler_r',

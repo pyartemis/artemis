@@ -5,8 +5,8 @@ import pandas as pd
 from tqdm import tqdm
 
 from artemis.importance_methods._method import FeatureImportanceMethod
-from artemis.utilities.domain import ImportanceMethod, ProgressInfoLog, ProblemType
-from artemis.utilities.performance_metrics import Metric, RMSE
+from artemis._utilities.domain import ImportanceMethod, ProgressInfoLog, ProblemType
+from artemis._utilities.performance_metrics import Metric, RMSE
 
 
 class PermutationImportance(FeatureImportanceMethod):
@@ -16,7 +16,7 @@ class PermutationImportance(FeatureImportanceMethod):
 
     Importance of a feature is defined by the metric selected by user (default is sum of gains).
 
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name.
@@ -25,7 +25,7 @@ class PermutationImportance(FeatureImportanceMethod):
     feature_importance : pd.DataFrame 
         Feature importance values.
         
-    References:
+    References
     ----------
     - https://jmlr.org/papers/v20/18-760.html
     """
@@ -33,7 +33,7 @@ class PermutationImportance(FeatureImportanceMethod):
     def __init__(self, metric: Metric = RMSE(), random_state: Optional[int] = None):
         """Constructor for PermutationImportance.
 
-        Parameters:
+        Parameters
         ----------
         metric : Metric
             Metric used to calculate model performance. Defaults to RMSE().
@@ -54,7 +54,7 @@ class PermutationImportance(FeatureImportanceMethod):
     ):
         """Calculates Permutation Based Feature Importance.
 
-        Parameters:
+        Parameters
         ----------
         model : object
                Model for which importance will be calculated, should have predict method.
@@ -69,7 +69,7 @@ class PermutationImportance(FeatureImportanceMethod):
         show_progress : bool
             If True, progress bar will be shown. Default is False.
 
-        Returns:
+        Returns
         -------
         pd.DataFrame
             Result dataframe containing feature importance with columns: "Feature", "Importance"

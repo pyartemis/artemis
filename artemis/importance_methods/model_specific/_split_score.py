@@ -5,9 +5,8 @@ import pandas as pd
 from tqdm import tqdm
 
 from artemis.importance_methods._method import FeatureImportanceMethod
-from artemis.interactions_methods.model_specific.gb_trees._handler import GBTreesHandler
-from artemis.utilities.domain import ImportanceMethod
-from artemis.utilities.split_score_metrics import SplitScoreImportanceMetric
+from artemis._utilities.domain import ImportanceMethod
+from artemis._utilities.split_score_metrics import SplitScoreImportanceMetric
 
 
 class SplitScoreImportance(FeatureImportanceMethod):
@@ -18,7 +17,7 @@ class SplitScoreImportance(FeatureImportanceMethod):
 
     Importance of a feature is defined by the metric selected by user (default is sum of gains).
 
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name.
@@ -27,7 +26,7 @@ class SplitScoreImportance(FeatureImportanceMethod):
     selected_metric : str
         Metric used for calculating importance.
         
-    References:
+    References
     ----------
     - https://modeloriented.github.io/EIX/
     """
@@ -47,7 +46,7 @@ class SplitScoreImportance(FeatureImportanceMethod):
     ):
         """Calculates Split Score Feature Importance.
 
-        Parameters:
+        Parameters
         ----------
         model : object
              Model for which importance will be calculated, should have predict_proba or predict method, or predict_function should be provided. 
@@ -63,14 +62,12 @@ class SplitScoreImportance(FeatureImportanceMethod):
         trees_df : pd.DataFrame, optional
             DataFrame containing unified structure of the trained trees, can be precalculated by SplitScore method. Default is None.
 
-        Returns:
+        Returns
         -------
         pd.DataFrame
             Result dataframe containing feature importance with columns: "Feature", "Importance"
         """
         if trees_df is None:
-            if not isinstance(model, GBTreesHandler):
-                model = GBTreesHandler(model)
             trees_df = model.trees_df
 
         if trees_df["depth"].isnull().values.any():

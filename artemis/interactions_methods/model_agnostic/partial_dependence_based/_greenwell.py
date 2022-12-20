@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
-from artemis.utilities.domain import InteractionMethod, ProgressInfoLog
-from artemis.utilities.ops import partial_dependence_value, split_features_num_cat
+from artemis._utilities.domain import InteractionMethod, ProgressInfoLog
+from artemis._utilities.ops import partial_dependence_value, split_features_num_cat
 from ._pdp import PartialDependenceBasedMethod
 
 
@@ -16,7 +16,7 @@ class GreenwellMethod(PartialDependenceBasedMethod):
     
     Uses partial dependence values to calculate feature interaction strengths and feature importance. 
 
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name, used also for naming column with results in `ovo` pd.DataFrame.
@@ -36,10 +36,10 @@ class GreenwellMethod(PartialDependenceBasedMethod):
         List of pairs of features for which interactions are calculated.
     pd_calculator : PartialDependenceCalculator
         Object used to calculate and store partial dependence values.
-    batchsize: int
+    batchsize : int
         Batch size used for calculation.
 
-    References:
+    References
     ----------
     - https://arxiv.org/pdf/1805.04755.pdf
     """
@@ -48,7 +48,7 @@ class GreenwellMethod(PartialDependenceBasedMethod):
     def __init__(self, random_state: Optional[int] = None):
         """Constructor for GreenwellMethod
         
-        Parameters:
+        Parameters
         ----------
         random_state : int, optional 
             Random state for reproducibility. Defaults to None.

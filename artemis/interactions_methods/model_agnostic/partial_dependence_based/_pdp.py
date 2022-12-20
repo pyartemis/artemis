@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 
 from artemis.importance_methods.model_agnostic import PartialDependenceBasedImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import ProgressInfoLog
-from artemis.utilities.ops import get_predict_function, sample_if_not_none, all_if_none
-from artemis.utilities.pd_calculator import PartialDependenceCalculator
+from artemis._utilities.domain import ProgressInfoLog
+from artemis._utilities.ops import get_predict_function, sample_if_not_none, all_if_none
+from artemis._utilities.pd_calculator import PartialDependenceCalculator
 
 
 class PartialDependenceBasedMethod(FeatureInteractionMethod):
@@ -33,7 +33,7 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
             pd_calculator: Optional[PartialDependenceCalculator] = None):
         """Calculates Partial Dependence Based Feature Interactions Strength and Feature Importance for the given model. 
 
-        Parameters:
+        Parameters
         ----------
         model : object
             Model to be explained, should have predict_proba or predict method, or predict_function should be provided. 

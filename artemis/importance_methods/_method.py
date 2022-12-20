@@ -10,12 +10,12 @@ class FeatureImportanceMethod:
     Abstract base class for Feature Importance methods. 
     This class should not be used directly. Use derived classes instead.
     
-    Attributes:
+    Attributes
     ----------
-        method : str 
-            Method name.
-        feature_importance : pd.DataFrame 
-            Feature importance values.
+    method : str 
+        Method name.
+    feature_importance : pd.DataFrame 
+        Feature importance values.
     """
 
     def __init__(self, method: str, random_state: Optional[int] = None):

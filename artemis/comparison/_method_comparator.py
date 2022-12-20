@@ -4,9 +4,9 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import CorrelationMethod
-from artemis.utilities.exceptions import MethodNotFittedException
-from artemis.utilities.ops import point_left_side_circle
+from artemis._utilities.domain import CorrelationMethod
+from artemis._utilities.exceptions import MethodNotFittedException
+from artemis._utilities.ops import point_left_side_circle
 from artemis.visualizer._configuration import InteractionGraphConfiguration
 
 
@@ -18,14 +18,14 @@ class FeatureInteractionMethodComparator:
         each other. Monotonicity of the plot suggest cohesion in results. Both provided methods must be in fitted state.
 
 
-        Attributes:
+        Attributes
         ----------
         ovo_profiles_comparison_plot : Figure
             Matplotlib figure of comparison plots.
         correlations_df : pd.DataFrame
             Pearson, Kendall and Spearman rank correlation values
 
-        References:
+        References
         ----------
         - https://en.wikipedia.org/wiki/Rank_correlation
         """
@@ -43,14 +43,14 @@ class FeatureInteractionMethodComparator:
         Calculates Feature Interaction Method comparison. 
         Used for asserting stability and cohesion of results for a pair of explanation methods. 
 
-        Parameters:
+        Parameters
         ----------
         method1 : FeatureInteractionMethod
              First method for comparison
         method2 : FeatureInteractionMethod
              Second method for comparison 
              
-        Returns:
+        Returns
         -------
         None
         """
@@ -61,14 +61,14 @@ class FeatureInteractionMethodComparator:
         """
         Calculates Pearson, Kendall and Spearman rank correlation DataFrame.
 
-        Parameters:
+        Parameters
         ----------
         method1 : FeatureInteractionMethod
              First method for comparison
         method2 : FeatureInteractionMethod
              Second method for comparison
 
-        Returns:
+        Returns
         -------
         None
         """
@@ -93,7 +93,7 @@ class FeatureInteractionMethodComparator:
         Creates comparison plot for comparing results of two feature interaction methods. Depending on the parameters
         rank correlation might be included on the plot.
 
-        Parameters:
+        Parameters
         ----------
         method1 : FeatureInteractionMethod
             First method for comparison
@@ -107,7 +107,7 @@ class FeatureInteractionMethodComparator:
             Matplotlib size of the figure, default = (8, 6)
 
 
-        Returns:
+        Returns
         -------
         Figure
         """
@@ -155,7 +155,7 @@ class FeatureInteractionMethodComparator:
         """
         Calculates rank correlation of one vs one profiles using a given correlation method.
 
-        Parameters:
+        Parameters
         ----------
         method1 : FeatureInteractionMethod
              First method for comparison
@@ -164,7 +164,7 @@ class FeatureInteractionMethodComparator:
         correlation_method: str
             Correlation method to use, accepted values are ['pearson', 'kendall', 'spearman'], default = 'kendall'
 
-        Returns:
+        Returns
         -------
         value of the correlation
         """

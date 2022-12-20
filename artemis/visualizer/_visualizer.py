@@ -8,8 +8,8 @@ from matplotlib import colors
 from matplotlib import gridspec
 from matplotlib import pyplot as plt
 
-from artemis.utilities.domain import VisualizationType
-from artemis.utilities.exceptions import VisualizationNotSupportedException
+from artemis._utilities.domain import VisualizationType
+from artemis._utilities.exceptions import VisualizationNotSupportedException
 from artemis.visualizer._configuration import (
     VisualizationConfiguration,
 )

@@ -4,8 +4,8 @@ from typing import Callable, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from artemis.utilities.domain import VisualizationType
-from artemis.utilities.exceptions import MethodNotFittedException
+from artemis._utilities.domain import VisualizationType
+from artemis._utilities.exceptions import MethodNotFittedException
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
 from artemis.visualizer._visualizer import Visualizer
 
@@ -15,7 +15,7 @@ class FeatureInteractionMethod(ABC):
     Abstract base class for Feature Interaction Extraction methods. 
     This class should not be used directly. Use derived classes instead.
     
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name, used also for naming column with results in `results` pd.DataFrame.
@@ -62,7 +62,7 @@ class FeatureInteractionMethod(ABC):
         """
         Base abstract method for calculating feature interaction values.
 
-        Parameters:
+        Parameters
         ----------
         model : object
             Model for which interactions will be extracted. 
@@ -81,7 +81,7 @@ class FeatureInteractionMethod(ABC):
         - graph - graph of feature interactions values
         - summary - combination of other plots 
         
-        Parameters:
+        Parameters
         ----------
         vis_type : str 
             Type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'summary']. Default is 'heatmap'.
@@ -91,12 +91,12 @@ class FeatureInteractionMethod(ABC):
             Size of plot. Default is (8, 6).
         show : bool 
             Whether to show plot. Default is True.
-        **kwargs : other keyword parameters
+        **kwargs : Other Parameters
             Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
             For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
             See key parameters below. 
 
-        Other keyword parameters:
+        Other Parameters
         ------------------------
         interaction_color_map : matplotlib colormap name or object, or list of colors
             Used for 'heatmap' visualization. The mapping from interaction values to color space. Default is 'Purples' or 'Purpler_r',

@@ -7,16 +7,16 @@ from tqdm import tqdm
 
 from artemis.importance_methods.model_agnostic import PermutationImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import InteractionMethod, ProblemType, ProgressInfoLog
-from artemis.utilities.performance_metrics import Metric, RMSE
-from artemis.utilities.ops import all_if_none, sample_both_if_not_none
+from artemis._utilities.domain import InteractionMethod, ProblemType, ProgressInfoLog
+from artemis._utilities.performance_metrics import Metric, RMSE
+from artemis._utilities.ops import all_if_none, sample_both_if_not_none
 
 
 class SejongOhMethod(FeatureInteractionMethod):
     """
     Sejong Oh's Performance Based Method for Feature Interaction Extraction. 
     
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name, used also for naming column with results in `ovo` pd.DataFrame.
@@ -41,7 +41,7 @@ class SejongOhMethod(FeatureInteractionMethod):
     random_state : int
         Random state used for reproducibility.
 
-    References:
+    References
     ----------
     - https://www.mdpi.com/2076-3417/9/23/5191
     """
@@ -49,7 +49,7 @@ class SejongOhMethod(FeatureInteractionMethod):
     def __init__(self, metric: Metric = RMSE(), random_state: Optional[int] = None):
         """Constructor for SejongOhMethod
         
-        Parameters:
+        Parameters
         ----------
         metric : Metric
             Metric used to calculate model performance. Defaults to RMSE().
@@ -76,7 +76,7 @@ class SejongOhMethod(FeatureInteractionMethod):
     ):  
         """Calculates Performance Based Feature Interactions Strength and Permutation Based Feature Importance for the given model.
 
-        Parameters:
+        Parameters
         ----------
         model : object
             Model to be explained, should have predict method.

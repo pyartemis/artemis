@@ -10,8 +10,8 @@ from tqdm import tqdm
 
 from artemis.importance_methods.model_specific import MinimalDepthImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import InteractionMethod, VisualizationType
-from artemis.utilities.exceptions import MethodNotFittedException
+from artemis._utilities.domain import InteractionMethod, VisualizationType
+from artemis._utilities.exceptions import MethodNotFittedException
 
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
@@ -21,7 +21,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     Currently scikit-learn forest models are supported, i.e., RandomForestClassifier, RandomForestRegressor, 
     ExtraTreesRegressor, ExtraTreesClassifier. 
 
-    Attributes:
+    Attributes
     ----------
     method : str 
         Method name, used also for naming column with results in `ovo` pd.DataFrame.
@@ -38,7 +38,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     pairs : List[List[str]]
         List of pairs of features for which interactions are calculated.
 
-    References:
+    References
     ----------
     - https://modeloriented.github.io/randomForestExplainer/
     - https://doi.org/10.1198/jasa.2009.tm08622
@@ -71,7 +71,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     ):
         """Calculates Conditional Smallest Depth Feature Interactions Strenght and Minimal Depth Feature Importance for given model.
 
-        Parameters:
+        Parameters
         ----------
         model : RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, or ExtraTreesClassifier
             Model to be explained. Should be fitted and of type RandomForestClassifier, RandomForestRegressor, 
@@ -98,7 +98,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         - summary - combination of heatmap, bar chart and graph plots
         - bar_chart_conditional - bar chart of top feature interactions with additional information about feature importance
         
-        Parameters:
+        Parameters
         ----------
         vis_type : str 
             Type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'bar_chart_conditional', 'summary']. Default is 'heatmap'.
@@ -108,12 +108,12 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
             Size of plot. Default is (8, 6).
         show : bool 
             Whether to show plot. Default is True.
-        **kwargs : other keyword parameters
+        **kwargs : Other Parameters
             Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
             For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
             See key parameters below. 
 
-        Other keyword parameters:
+        Other Parameters
         ------------------------
         interaction_color_map : matplotlib colormap name or object, or list of colors
             Used for 'heatmap' visualization. The mapping from interaction values to color space. Default is 'Purples' or 'Purpler_r',
@@ -189,7 +189,7 @@ def _calculate_conditional_minimal_depths(
         column_size:    number of features in the data
         show_progress:  determine whether to show the progress bar
 
-    Returns:
+    Returns
         Conditional minimal depths, depths and split variables of all trees
 
     """
@@ -213,7 +213,7 @@ def _bfs(tree: pd.DataFrame):
 
     Args:
         tree: tree representation
-    Returns:
+    Returns
         depth of each node, nodes grouped by split_variable
     """
     current_lvl_ids = [0]
