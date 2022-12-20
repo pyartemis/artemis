@@ -2,7 +2,7 @@ import unittest
 from parameterized import parameterized_class
 
 from artemis.interactions_methods.model_specific import ConditionalMinimalDepthMethod
-from artemis.utilities.domain import InteractionMethod
+from artemis._utilities.domain import InteractionMethod
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
 from test.util import california_housing_random_forest, wine_random_forest
 

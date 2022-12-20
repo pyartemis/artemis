@@ -2,7 +2,7 @@ import unittest
 from parameterized import parameterized_class
 
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE, wine_random_forest, WINE_SUBSET
-from artemis.utilities.domain import InteractionMethod
+from artemis._utilities.domain import InteractionMethod
 from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
 

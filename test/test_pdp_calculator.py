@@ -2,12 +2,12 @@ from itertools import combinations
 import unittest
 import numpy as np
 from parameterized import parameterized_class
-from artemis.utilities.ops import get_predict_function
+from artemis._utilities.ops import get_predict_function
 
-from artemis.utilities.pd_calculator import PartialDependenceCalculator
+from artemis._utilities.pd_calculator import PartialDependenceCalculator
 
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE, wine_random_forest, WINE_SUBSET
-from artemis.utilities.domain import InteractionMethod
+from artemis._utilities.domain import InteractionMethod
 from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
 

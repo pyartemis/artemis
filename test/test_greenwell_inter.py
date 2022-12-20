@@ -2,9 +2,9 @@ import unittest
 from parameterized import parameterized_class
 
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE, wine_random_forest, WINE_SUBSET
-from artemis.utilities.domain import InteractionMethod, VisualizationType
+from artemis._utilities.domain import InteractionMethod, VisualizationType
 from artemis.interactions_methods.model_agnostic import GreenwellMethod
-from artemis.utilities.exceptions import VisualizationNotSupportedException
+from artemis._utilities.exceptions import VisualizationNotSupportedException
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
 
 MODEL_REG, X_REG, _ = california_housing_random_forest()

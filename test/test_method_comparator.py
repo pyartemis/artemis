@@ -3,7 +3,7 @@ from parameterized import parameterized_class
 
 from artemis.comparison import FeatureInteractionMethodComparator
 from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod, GreenwellMethod
-from artemis.utilities.exceptions import MethodNotFittedException
+from artemis._utilities.exceptions import MethodNotFittedException
 from test.util import california_housing_random_forest, wine_random_forest
 
 

@@ -1,7 +1,7 @@
 import unittest
 from parameterized import parameterized_class
 
-from artemis.utilities.domain import InteractionMethod
+from artemis._utilities.domain import InteractionMethod
 from artemis.interactions_methods.model_agnostic import SejongOhMethod
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
 from .util import california_housing_random_forest, SAMPLE_SIZE, N_REPEAT, CALIFORNIA_SUBSET, has_decreasing_order, wine_random_forest, WINE_SUBSET
