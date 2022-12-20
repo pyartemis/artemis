@@ -151,22 +151,23 @@ class SplitScoreMethod(FeatureInteractionMethod):
         color : str 
             Used for 'bar_chart' visualization. Color of bars. Default is 'mediumpurple'.
 
-        n_highest_with_labels : int 
-            Used for 'graph' visualization. ... Default is 5. 
-        edge_color: str 
-            Used for 'graph' visualization. ... Default is 'rebeccapurple. 
+        n_highest_with_labels : int
+            Used for 'graph' visualization. Top most important interactions to show as labels on edges.  Default is 5.
+        edge_color: str
+            Used for 'graph' visualization. Color of the edges. Default is 'rebeccapurple.
         node_color: str
-            Used for 'graph' visualization. ... Default is 'green'. 
+            Used for 'graph' visualization. Color of nodes. Default is 'green'.
         node_size: int
-            Used for 'graph' visualization. ... Default is '1800'. 
+            Used for 'graph' visualization. Size of the nodes (networkX scale).  Default is '1800'.
         font_color: str
-            Used for 'graph' visualization. ... Default is '#3B1F2B'. 
-        font_weight: str 
-            Used for 'graph' visualization. ... Default is 'bold'. 
-        font_size: int 
-            Used for 'graph' visualization. ... Default is 10. 
+            Used for 'graph' visualization. Font color. Default is '#3B1F2B'.
+        font_weight: str
+            Used for 'graph' visualization. Font weight. Default is 'bold'.
+        font_size: int
+            Used for 'graph' visualization. Font size (networkX scale). Default is 10.
         threshold_relevant_interaction : float
-            Used for 'graph' visualization. ... Default depends on the interaction method. 
+            Used for 'graph' visualization. Minimum (or maximum, depends on method) value of interaction to display
+            corresponding edge on visualization. Default depends on the interaction method.
 
         max_trees : float
             Used for 'lolliplot' visualization. Fraction of trees that will be presented in plot. Default is 0.2. 
