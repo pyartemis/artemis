@@ -3,9 +3,9 @@ from typing import Dict, Callable, List, Optional, Tuple, Any
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from artemis.utilities.domain import ProgressInfoLog
+from artemis._utilities.domain import ProgressInfoLog
 
-from artemis.utilities.ops import get_predict_function
+from artemis._utilities.ops import get_predict_function
 
 
 class PartialDependenceCalculator: 
