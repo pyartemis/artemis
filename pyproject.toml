@@ -20,6 +20,7 @@ xgboost = "^1.7.1"
 lightgbm = "^3.2.0"
 parameterized = "^0.8.1"
 pytest = "^7.2.0"
+pdoc3 = "^0.10.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -1,5 +1,5 @@
 from itertools import combinations
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Union, Tuple
 
 import numpy as np
 import pandas as pd
@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from artemis.importance_methods.model_agnostic import PermutationImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis._utilities.domain import InteractionMethod, ProblemType, ProgressInfoLog
+from artemis._utilities.domain import InteractionMethod, ProblemType, ProgressInfoLog, VisualizationType
 from artemis._utilities.performance_metrics import Metric, RMSE
 from artemis._utilities.ops import all_if_none, sample_both_if_not_none
 
@@ -61,8 +61,12 @@ class SejongOhMethod(FeatureInteractionMethod):
         self.y_sampled = None
 
     @property
-    def interactions_ascending_order(self):
+    def _interactions_ascending_order(self):
         return False
+
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default",
+             figsize: Tuple[float, float] = (8, 6), show: bool = True, **kwargs):
+        super().plot(vis_type, title, figsize, show)
 
     def fit(
             self,
@@ -121,7 +125,7 @@ def _perf_based_ovo(
         interactions.append([f1, f2, np.mean(inter)])
 
     return pd.DataFrame(interactions, columns=["Feature 1", "Feature 2", method_class.method]).sort_values(
-        by=method_class.method, key=abs, ascending=method_class.interactions_ascending_order, ignore_index=True
+        by=method_class.method, key=abs, ascending=method_class._interactions_ascending_order, ignore_index=True
     )
 
 

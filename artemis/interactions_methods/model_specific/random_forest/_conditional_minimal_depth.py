@@ -48,7 +48,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         super().__init__(InteractionMethod.CONDITIONAL_MINIMAL_DEPTH)
 
     @property
-    def interactions_ascending_order(self):
+    def _interactions_ascending_order(self):
         return True
 
     @property
@@ -60,7 +60,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         return (compare_ovo.groupby("id")
                            .agg({"Feature 1": "first", "Feature 2": "first", self.method: "mean"})
                            .sort_values("Conditional Smallest Depth Measure",
-                                        ascending=self.interactions_ascending_order,
+                                        ascending=self._interactions_ascending_order,
                                         ignore_index=True))
 
 
@@ -83,7 +83,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         self.pairs = list(combinations(self.features_included, 2))
         column_dict = _make_column_dict(model.feature_names_in_)
         self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(model.feature_names_in_), show_progress)
-        self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self.interactions_ascending_order)
+        self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self._interactions_ascending_order)
         self._feature_importance_obj = MinimalDepthImportance()
         self.feature_importance = self._feature_importance_obj.importance(model,trees)
 
@@ -172,7 +172,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                              title = title,
                              figsize=figsize,
                              show=show,
-                             interactions_ascending_order=self.interactions_ascending_order,
+                             interactions_ascending_order=self._interactions_ascending_order,
                              importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
 
