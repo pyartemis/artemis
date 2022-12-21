@@ -1,86 +1,105 @@
 from abc import abstractmethod
 from itertools import combinations
-from typing import List, Optional
+from typing import Callable, List, Optional, Tuple
 
 import pandas as pd
-from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 from artemis.importance_methods.model_agnostic import PartialDependenceBasedImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import ProgressInfoLog
-from artemis.utilities.ops import get_predict_function, sample_if_not_none, all_if_none
+from artemis._utilities.domain import ProgressInfoLog, VisualizationType
+from artemis._utilities.ops import get_predict_function, sample_if_not_none, all_if_none
+from artemis._utilities.pd_calculator import PartialDependenceCalculator
 
 
 class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
     def __init__(self, method: str, random_state: Optional[int] = None):
         super().__init__(method, random_state=random_state)
+        self.pd_calculator = None
 
     @property
-    def interactions_ascending_order(self):
+    def _interactions_ascending_order(self):
         return False
+
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default",
+             figsize: Tuple[float, float] = (8, 6), show: bool = True, **kwargs):
+        super().plot(vis_type, title, figsize, show)
 
     def fit(self,
             model,
             X: pd.DataFrame,
-            n: int = None,
-            features: List[str] = None,
+            n: Optional[int] = None,
+            predict_function: Optional[Callable] = None,
+            features: Optional[List[str]] = None,
             show_progress: bool = False,
-            pdp_cache: dict = None):
-        """Calculates Partial Dependence Based Interactions and Importance for the given model. 
+            batchsize: int = 2000,
+            pd_calculator: Optional[PartialDependenceCalculator] = None):
+        """Calculates Partial Dependence Based Feature Interactions Strength and Feature Importance for the given model. 
 
-        Parameters:
-            model -- model to be explained
-            X (pd.DataFrame, optional) -- data used to calculate interactions
-            n (int, optional) -- number of samples to be used for calculation of interactions
-            features (List[str], optional) -- list of features for which interactions will be calculated
-            show_progress (bool) -- whether to show progress bar 
+        Parameters
+        ----------
+        model : object
+            Model to be explained, should have predict_proba or predict method, or predict_function should be provided. 
+        X : pd.DataFrame
+            Data used to calculate interactions. If n is not None, n rows from X will be sampled. 
+        n : int, optional
+            Number of samples to be used for calculation of interactions. If None, all rows from X will be used. Default is None.
+        predict_function : Callable, optional
+            Function used to predict model output. It should take model and dataset and outputs predictions. 
+            If None, `predict_proba` method will be used if it exists, otherwise `predict` method. Default is None.
+        features : List[str], optional
+            List of features for which interactions will be calculated. If None, all features from X will be used. Default is None.
+        show_progress : bool
+            If True, progress bar will be shown. Default is False.
+        batchsize : int
+            Batch size for calculating partial dependence. Prediction requests are collected until the batchsize is exceeded, 
+            then the model is queried for predictions jointly for many observations. It speeds up the operation of the method.
+            Default is 2000.
+        pd_calculator : PartialDependenceCalculator, optional
+            PartialDependenceCalculator object containing partial dependence values for a given model and dataset. 
+            Providing this object speeds up the calculation as partial dependence values do not need to be recalculated.
+            If None, it will be created from scratch. Default is None.
         """
-        self.predict_function = get_predict_function(model)
+        self.predict_function = get_predict_function(model, predict_function)
         self.model = model
-        self.sample_ovo(self.predict_function, self.model, X, n, features, show_progress)
 
-        self.variable_importance = PartialDependenceBasedImportance().importance(self.model, self.X_sampled,
-                                                                                 features=self.features_included,
-                                                                                 show_progress=show_progress,
-                                                                                 precalculated_pdp=pdp_cache)
-
-    def sample_ovo(self,
-                   predict_function,
-                   model,
-                   X: pd.DataFrame,
-                   n: int = None,
-                   features: List[str] = None,
-                   show_progress: bool = False):
-        self.X_sampled = sample_if_not_none(self.random_generator, X, n)
+        self.X_sampled = sample_if_not_none(self._random_generator, X, n)
         self.features_included = all_if_none(X.columns, features)
+        self.pairs = list(combinations(self.features_included, 2))
 
-        self.ovo = self._ovo(predict_function, model, self.X_sampled, show_progress, self.features_included)
+        if pd_calculator is None:
+            self.pd_calculator = PartialDependenceCalculator(self.model, self.X_sampled, self.predict_function, batchsize)
+        else: 
+            if pd_calculator.model != self.model:
+                raise ValueError("Model in PDP calculator is different than the model in the method.")
+            if not pd_calculator.X.equals(self.X_sampled):
+                raise ValueError("Data in PDP calculator is different than the data in the method.")
+            self.pd_calculator = pd_calculator
 
-    def _ovo(self, predict_function, model, X_sampled: pd.DataFrame, show_progress: bool, features: List[str]):
-        pairs = list(combinations(features, 2))
-        value_pairs = [
-            [c1, c2, self._calculate_i_versus(predict_function, model, X_sampled, c1, [c2])]
-            for c1, c2 in tqdm(pairs, desc=ProgressInfoLog.CALC_OVO, disable=not show_progress)
-        ]
+        self.ovo = self._calculate_ovo_interactions_from_pd(show_progress = show_progress)
 
-        return pd.DataFrame(value_pairs, columns=["Feature 1", "Feature 2", self.method]).sort_values(
-            by=self.method, ascending=self.interactions_ascending_order, ignore_index=True
-        ).fillna(0)
+        self._feature_importance_obj = PartialDependenceBasedImportance()
+        self.feature_importance = self._feature_importance_obj.importance(self.model, self.X_sampled,
+                                                                            features=self.features_included,
+                                                                            show_progress=show_progress,
+                                                                            pd_calculator=self.pd_calculator)
 
+    def plot_profile(self, feature1: str, feature2: Optional[str] = None):
+        if feature2 is not None:
+            pair = self.pd_calculator.pd_pairs[self.pd_calculator._get_pair_key((feature1, feature2))]
+            cs = plt.contour(pair["f2_values"], pair["f1_values"], pair["pd_values"], colors="black", linewidths=0.5)
+            cs2 = plt.contourf(pair["f2_values"], pair["f1_values"], pair["pd_values"])
+            plt.clabel(cs, colors="black")
+            plt.colorbar(cs2)
+            plt.xlabel(feature2)
+            plt.ylabel(feature1)
+        else:
+            single = self.pd_calculator.pd_single[feature1]
+            plt.plot(single["f_values"], single["pd_values"])
+            plt.xlabel(feature1)
+            plt.ylabel("PD value")
+    
     @abstractmethod
-    def _calculate_i_versus(self, predict_function, model, X_sampled: pd.DataFrame, i: str, versus: List[str]) -> float:
-        """
-        Abstract interaction value calculation between feature (i) and a list of features (versus).
-        Derived classes need to implement this method to provide its interaction values.
-
-        Parameters:
-            model: model for which interactions will be extracted, must have implemented predict method
-            X_sampled: data used to calculate interactions
-            i: distinguished feature for which interactions with versus will be calculated
-            versus: list of features for which interactions with feature `i` will be calculated
-
-        Returns:
-            value of the interaction
-        """
+    def _calculate_ovo_interactions_from_pd(self, show_progress: bool):
         ...

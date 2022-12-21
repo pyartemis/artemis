@@ -4,12 +4,12 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib import gridspec
 from matplotlib import colors
+from matplotlib import gridspec
 from matplotlib import pyplot as plt
 
-from artemis.utilities.domain import VisualizationType
-from artemis.utilities.exceptions import VisualizationNotSupportedException
+from artemis._utilities.domain import VisualizationType
+from artemis._utilities.exceptions import VisualizationNotSupportedException
 from artemis.visualizer._configuration import (
     VisualizationConfiguration,
 )
@@ -28,11 +28,12 @@ class Visualizer:
         ovo: pd.DataFrame,
         vis_type: str,
         ova: Optional[pd.DataFrame] = None,
-        variable_importance: Optional[pd.DataFrame] = None,
+        feature_importance: Optional[pd.DataFrame] = None,
         title: Optional[str] = "default",
         figsize: tuple = (8, 6),
         show: bool = True,
         interactions_ascending_order: bool = False,
+        importance_ascending_order: bool = False,
         _full_result: Optional[pd.DataFrame] = None,
         _feature_column_name_1: str = "Feature 1",
         _feature_column_name_2: str = "Feature 2",
@@ -46,7 +47,7 @@ class Visualizer:
         if vis_type == VisualizationType.SUMMARY:
             self.plot_summary(
                 ovo,
-                variable_importance,
+                feature_importance,
                 ova,
                 title=title,
                 figsize=figsize,
@@ -60,12 +61,13 @@ class Visualizer:
         elif vis_type == VisualizationType.INTERACTION_GRAPH:
             self.plot_interaction_graph(
                 ovo,
-                variable_importance,
+                feature_importance,
                 title=title,
                 figsize=figsize,
                 show=show,
                 _f1_name=_feature_column_name_1,
                 _f2_name=_feature_column_name_2,
+                interactions_ascending_order=interactions_ascending_order,
                 _directed=_directed,
                 **kwargs,
             )
@@ -74,11 +76,12 @@ class Visualizer:
         elif vis_type == VisualizationType.HEATMAP:
             self.plot_heatmap(
                 ovo,
-                variable_importance,
+                feature_importance,
                 title=title,
                 figsize=figsize,
                 show=show,
                 interactions_ascending_order=interactions_ascending_order,
+                importance_ascending_order=importance_ascending_order,
                 _f1_name=_feature_column_name_1,
                 _f2_name=_feature_column_name_2,
                 _directed=_directed,
@@ -101,7 +104,7 @@ class Visualizer:
         elif vis_type == VisualizationType.BAR_CHART_CONDITIONAL:
             self.plot_barchart_conditional(
                 ovo,
-                variable_importance,
+                feature_importance,
                 title=title,
                 figsize=figsize,
                 show=show,
@@ -109,14 +112,14 @@ class Visualizer:
             )
 
     def plot_barchart_conditional(
-        self,
-        ovo: pd.DataFrame,
-        variable_importance: pd.DataFrame,
-        title: str = "default",
-        figsize: tuple = (8, 6),
-        show: bool = True,
-        ax=None,
-        **kwargs,
+            self,
+            ovo: pd.DataFrame,
+            feature_importance: pd.DataFrame,
+            title: str = "default",
+            figsize: tuple = (8, 6),
+            show: bool = True,
+            ax=None,
+            **kwargs,
     ):
         config = self.vis_config.interaction_bar_chart_conditional
         top_k = kwargs.pop("top_k", config.TOP_K)
@@ -134,14 +137,17 @@ class Visualizer:
         df_to_plot = ovo.copy()
         df_to_plot["Interaction"] = df_to_plot["root_variable"] + ":" + df_to_plot["variable"]
         df_to_plot = df_to_plot.iloc[:top_k]
-        df_to_plot = df_to_plot.join(variable_importance.set_index("Feature"), on="variable").rename(columns={"Value": "unconditional_importance"})
-        
+        df_to_plot = df_to_plot.join(feature_importance.set_index("Feature"), on="variable").rename(
+            columns={"Importance": "unconditional_importance"})
+
         norm = plt.Normalize(df_to_plot["n_occurences"].min(), df_to_plot["n_occurences"].max())
         cmap = plt.get_cmap(colormap)
         new_cmap = colors.LinearSegmentedColormap.from_list("new_cmap", cmap(np.linspace(0.5, 1, 100)))
         sm = plt.cm.ScalarMappable(cmap=new_cmap, norm=norm)
-        ax = sns.barplot(df_to_plot, x="Interaction", y=self.method, hue="n_occurences", palette=sm.to_rgba(np.flip(df_to_plot["n_occurences"])), dodge=False)
-        plt.vlines(x=df_to_plot["Interaction"], ymin=df_to_plot[self.method], ymax=df_to_plot["unconditional_importance"], color=color, alpha=0.5)
+        ax = sns.barplot(df_to_plot, x="Interaction", y=self.method, hue="n_occurences",
+                         palette=sm.to_rgba(np.flip(df_to_plot["n_occurences"])), dodge=False)
+        plt.vlines(x=df_to_plot["Interaction"], ymin=df_to_plot[self.method],
+                   ymax=df_to_plot["unconditional_importance"], color=color, alpha=0.5)
         plt.scatter(df_to_plot["Interaction"], y=df_to_plot["unconditional_importance"], color=color, marker="o")
         ax.get_legend().remove()
         plt.colorbar(sm, label="Occurences", ax=ax)
@@ -153,25 +159,27 @@ class Visualizer:
             return fig
 
     def plot_heatmap(
-        self,
-        ovo: pd.DataFrame,
-        variable_importance: pd.DataFrame,
-        title: str = "default",
-        figsize: tuple = (8, 6),
-        show: bool = True,
-        interactions_ascending_order: bool = False,
-        ax=None,
-        _f1_name: str = "Feature 1",
-        _f2_name: str = "Feature 2",
-        _directed: bool = False,
-        **kwargs,
+            self,
+            ovo: pd.DataFrame,
+            feature_importance: pd.DataFrame,
+            title: str = "default",
+            figsize: tuple = (8, 6),
+            show: bool = True,
+            interactions_ascending_order: bool = False,
+            importance_ascending_order: bool = False,
+            ax=None,
+            _f1_name: str = "Feature 1",
+            _f2_name: str = "Feature 2",
+            _directed: bool = False,
+            **kwargs,
     ):
         config = self.vis_config.interaction_matrix
         interaction_color_map = kwargs.pop(
             "interaction_color_map",
             config.INTERACTION_COLOR_MAP if not interactions_ascending_order else config.INTERACTION_COLOR_MAP_REVERSE)
         importance_color_map = kwargs.pop(
-            "importance_color_map", config.IMPORTANCE_COLOR_MAP
+            "importance_color_map",
+            config.IMPORTANCE_COLOR_MAP if not importance_ascending_order else config.IMPORTANCE_COLOR_MAP_REVERSE
         )
         annot_fmt = kwargs.pop("annot_fmt", config.ANNOT_FMT)
         linewidths = kwargs.pop("linewidths", config.LINEWIDTHS)
@@ -189,9 +197,9 @@ class Visualizer:
         else:
             ovo_all_pairs = ovo
 
-        if variable_importance is not None:
-            var_imp_diag = self._variable_importance_diag(
-                ovo, variable_importance, _f1_name=_f1_name, _f2_name=_f2_name
+        if feature_importance is not None:
+            var_imp_diag = self._feature_importance_diag(
+                ovo, feature_importance, _f1_name=_f1_name, _f2_name=_f2_name
             )
             ovo_all_pairs = pd.concat([ovo_all_pairs, var_imp_diag])
 
@@ -205,6 +213,9 @@ class Visualizer:
         matrix = ovo_all_pairs.pivot_table(
             self.method, _f1_name, _f2_name, aggfunc="first"
         )
+
+        matrix = self.order_heatmap(matrix, asc_order=interactions_ascending_order)
+
         off_diag_mask = np.eye(matrix.shape[0], dtype=bool)
 
         sns.heatmap(
@@ -237,17 +248,18 @@ class Visualizer:
             return fig
 
     def plot_interaction_graph(
-        self,
-        ovo: pd.DataFrame,
-        variable_importance: pd.DataFrame,
-        title: str = "default",
-        figsize: tuple = (8, 6),
-        show: bool = True,
-        ax=None,
-        _f1_name: str = "Feature 1",
-        _f2_name: str = "Feature 2",
-        _directed: bool = False,
-        **kwargs,
+            self,
+            ovo: pd.DataFrame,
+            feature_importance: pd.DataFrame,
+            title: str = "default",
+            figsize: tuple = (8, 6),
+            show: bool = True,
+            ax=None,
+            interactions_ascending_order: bool = False,
+            _f1_name: str = "Feature 1",
+            _f2_name: str = "Feature 2",
+            _directed: bool = False,
+            **kwargs,
     ):
         config = self.vis_config.interaction_graph
         title = config.TITLE if title == "default" else title
@@ -256,15 +268,13 @@ class Visualizer:
             "n_highest_with_labels", config.N_HIGHEST_WITH_LABELS
         )
         edge_color = kwargs.pop("edge_color", config.EDGE_COLOR)
-        edge_color_pos = kwargs.pop("edge_color_pos", config.EDGE_COLOR_POS)
-        edge_color_neg = kwargs.pop("edge_color_neg", config.EDGE_COLOR_NEG)
         node_color = kwargs.pop("node_color", config.NODE_COLOR)
         node_size = kwargs.pop("node_size", config.NODE_SIZE)
         font_color = kwargs.pop("font_color", config.FONT_COLOR)
         font_weight = kwargs.pop("font_weight", config.FONT_WEIGHT)
         font_size = kwargs.pop("font_size", config.FONT_SIZE)
-        min_relevant_interaction = kwargs.pop(
-            "min_relevant_interaction", config.MIN_RELEVANT_INTERACTION
+        threshold_relevant_interaction = kwargs.pop(
+            "threshold_relevant_interaction", config.THRESHOLD_RELEVANT_INTERACTION
         )
 
         fig = None
@@ -275,7 +285,14 @@ class Visualizer:
             plt.title(title)
 
         ovo_copy = ovo.copy()
-        ovo_copy.loc[ovo_copy[self.method] < min_relevant_interaction, self.method] = 0
+
+        # filter out non-significant interactions according to the order
+        ovo_no_sig_inter = self._filter_insignificant_interactions(interactions_ascending_order,
+                                                                   threshold_relevant_interaction, ovo_copy)
+
+        self._interactions_to_edge_widths(interactions_ascending_order, ovo_copy, max_edge_width)
+
+        # return ovo_processed, ovo_no_sig_inter
         G = nx.from_pandas_edgelist(
             ovo_copy,
             source=_f1_name,
@@ -283,58 +300,69 @@ class Visualizer:
             edge_attr=self.method,
             create_using=nx.DiGraph if _directed else nx.Graph,
         )
-        pos = nx.spring_layout(G, k=4, weight=self.method, iterations=300)
+        pos = nx.circular_layout(G)
+
         nx.draw(
             G,
             pos,
             ax=ax,
-            width=[
-                max_edge_width * val / np.max(ovo_copy[self.method])
-                for val in ovo_copy[self.method]
-            ],
+            width=[G[u][v][self.method] for u, v in G.edges()],
             with_labels=True,
-            nodelist=list(variable_importance["Feature"])
-            if variable_importance is not None
+            nodelist=list(feature_importance["Feature"])
+            if feature_importance is not None
             else None,
             node_size=[
-                node_size * val / np.max(variable_importance["Value"])
-                for val in variable_importance["Value"]
+                node_size * val / np.max(feature_importance["Importance"])
+                for val in feature_importance["Importance"]
             ]
-            if variable_importance is not None
+            if feature_importance is not None
             else node_size,
             font_size=font_size,
             font_weight=font_weight,
             font_color=font_color,
             node_color=node_color,
-            edge_color=edge_color,  # self._edge_colors(G, edge_color_pos, edge_color_neg),
+            edge_color=edge_color, 
             connectionstyle="arc3,rad=0.3",
         )
 
-        nx.draw_networkx_edge_labels(
-            G,
-            pos,
-            ax=ax,
-            edge_labels=self._edge_labels(
-                ovo_copy, _f1_name, _f2_name, n_highest_with_labels
-            ),
-            font_color=font_color,
-            font_weight=font_weight,
-        )
+        if not interactions_ascending_order:  # no labels for cond, curvy edges do not support it :)
+            nx.draw_networkx_edge_labels(
+                G,
+                pos,
+                ax=ax,
+                edge_labels=self._edge_labels(
+                    ovo_no_sig_inter, _f1_name, _f2_name, n_highest_with_labels
+                ),
+                font_color=font_color,
+                font_weight=font_weight,
+            )
         if show:
             plt.show()
         else:
             return fig
 
+    def _interactions_to_edge_widths(self, interactions_ascending_order: bool, ovo_copy: pd.DataFrame,
+                                     max_width: float):
+
+        # standardize edge widths by scaling interactions to [0,1] interval
+        self._scale_to_unit_interval(ovo_copy)
+
+        # a => (1 - a) for ascending order
+        self._reverse_scale_for_ascending(interactions_ascending_order, ovo_copy)
+
+        # map to width
+        self._map_to_width(max_width, ovo_copy)
+
     def plot_barchart_ovo(
-        self,
-        ovo: pd.DataFrame,
-        title: str = "default",
-        figsize: tuple = (8, 6),
-        show: bool = True,
-        ax=None,
-        _f1_name: str = "Feature 1",
-        _f2_name: str = "Feature 2",
-        **kwargs,
+            self,
+            ovo: pd.DataFrame,
+            title: str = "default",
+            figsize: tuple = (8, 6),
+            show: bool = True,
+            ax=None,
+            _f1_name: str = "Feature 1",
+            _f2_name: str = "Feature 2",
+            **kwargs,
     ):
         config = self.vis_config.interaction_bar_chart_ovo
         top_k = kwargs.pop("top_k", config.TOP_K)
@@ -366,13 +394,13 @@ class Visualizer:
             return fig
 
     def plot_barchart_ova(
-        self,
-        ova: pd.DataFrame,
-        title: str = "default",
-        figsize: tuple = (8, 6),
-        show: bool = True,
-        ax=None,
-        **kwargs,
+            self,
+            ova: pd.DataFrame,
+            title: str = "default",
+            figsize: tuple = (8, 6),
+            show: bool = True,
+            ax=None,
+            **kwargs,
     ):
         config = self.vis_config.interaction_bar_chart_ova
         top_k = kwargs.pop("top_k", config.TOP_K)
@@ -402,18 +430,18 @@ class Visualizer:
             return fig
 
     def plot_summary(
-        self,
-        ovo: pd.DataFrame,
-        variable_importance: pd.DataFrame,
-        ova: Optional[pd.DataFrame] = None,
-        title: str = "default",
-        figsize: tuple = (8, 6),
-        show: bool = True,
-        interactions_ascending_order: bool = False,
-        _f1_name: str = "Feature 1",
-        _f2_name: str = "Feature 2",
-        _directed: bool = False,
-        **kwargs,
+            self,
+            ovo: pd.DataFrame,
+            feature_importance: pd.DataFrame,
+            ova: Optional[pd.DataFrame] = None,
+            title: str = "default",
+            figsize: tuple = (8, 6),
+            show: bool = True,
+            interactions_ascending_order: bool = False,
+            _f1_name: str = "Feature 1",
+            _f2_name: str = "Feature 2",
+            _directed: bool = False,
+            **kwargs,
     ):
         fig = plt.figure(figsize=tuple(5 * elem for elem in figsize))
         gs = gridspec.GridSpec(2, 4, hspace=0.4, wspace=0.1)
@@ -428,7 +456,7 @@ class Visualizer:
 
         self.plot_heatmap(
             ovo,
-            variable_importance,
+            feature_importance,
             interactions_ascending_order=interactions_ascending_order,
             ax=ax1,
             _f1_name=_f1_name,
@@ -439,7 +467,7 @@ class Visualizer:
         )
         self.plot_interaction_graph(
             ovo,
-            variable_importance,
+            feature_importance,
             ax=ax2,
             _f1_name=_f1_name,
             _f2_name=_f2_name,
@@ -483,13 +511,13 @@ class Visualizer:
             return fig
 
     def plot_lollipop(
-        self,
-        full_result: pd.DataFrame,
-        title: str = "default",
-        figsize: tuple = (8, 6),
-        show: bool = True,
-        ax=None,
-        **kwargs,
+            self,
+            full_result: pd.DataFrame,
+            title: str = "default",
+            figsize: tuple = (8, 6),
+            show: bool = True,
+            ax=None,
+            **kwargs,
     ):
         config = self.vis_config.lollipop
         max_trees = kwargs.pop("max_trees", config.MAX_TREES)
@@ -509,7 +537,7 @@ class Visualizer:
 
         full_result_copy = full_result.copy()
         full_result_copy["pair_name"] = (
-            full_result_copy["parent_name"] + ":" + full_result_copy["split_feature"]
+                full_result_copy["parent_name"] + ":" + full_result_copy["split_feature"]
         )
         roots = full_result_copy.loc[full_result_copy["depth"] == 0].copy()
         roots = roots[roots["tree"] < max_trees * roots["tree"].max()]
@@ -517,7 +545,7 @@ class Visualizer:
             (full_result_copy["leaf"] == False)
             & (full_result_copy["depth"] > 0)
             & (full_result_copy["depth"] <= max_depth)
-        ].copy()
+            ].copy()
         nodes.loc[full_result_copy["interaction"] == True, "split_feature"] = nodes.loc[
             full_result_copy["interaction"] == True, "pair_name"
         ]
@@ -542,7 +570,7 @@ class Visualizer:
             if labels:
                 nodes_to_annotate = nodes_to_plot.loc[
                     nodes_to_plot["interaction"] == True
-                ]
+                    ]
                 for j, node in nodes_to_annotate.iterrows():
                     plt.annotate(
                         node["pair_name"],
@@ -566,6 +594,8 @@ class Visualizer:
                     (root["tree"] + 1, root["gain"]),
                     (root["tree"] + 1, root["gain"]),
                 )
+        plt.xlabel("Tree number")
+        plt.ylabel("Gain")
         if show:
             plt.show()
         else:
@@ -578,33 +608,26 @@ class Visualizer:
             for elem in nx.get_edge_attributes(G, self.method).values()
         ]
 
-    def _edge_colors(self, G, edge_color_pos, edge_color_neg):
-        return [
-            edge_color_pos if elem > 0 else edge_color_neg
-            for elem in nx.get_edge_attributes(G, self.method).values()
-        ]
-
     def _edge_labels(
-        self,
-        ovo: pd.DataFrame,
-        _f1_name: str,
-        _f2_name: str,
-        n_highest_with_labels: int,
+            self,
+            ovo: pd.DataFrame,
+            _f1_name: str,
+            _f2_name: str,
+            n_highest_with_labels: int,
     ):
+        ovo_sorted = ovo.sort_values(by=self.method, ascending=False)
         return {
             (row[_f1_name], row[_f2_name]): round(row[self.method], 2)
-            for index, row in filter(
-                lambda x: x[1][self.method] > 0,
-                ovo.head(n_highest_with_labels).iterrows(),
-            )
+            for _, row in ovo_sorted[ovo_sorted[self.method] > 0].head(n_highest_with_labels).iterrows()
+
         }
 
-    def _variable_importance_diag(
-        self,
-        ovo,
-        variable_importance: pd.DataFrame,
-        _f1_name: str = "Feature 1",
-        _f2_name: str = "Feature 2",
+    def _feature_importance_diag(
+            self,
+            ovo,
+            feature_importance: pd.DataFrame,
+            _f1_name: str = "Feature 1",
+            _f2_name: str = "Feature 2",
     ):
         all_features = set(list(ovo[_f1_name]) + list(ovo[_f2_name]))
         var_imp_diag = pd.DataFrame.from_records(
@@ -612,11 +635,54 @@ class Visualizer:
                 {
                     _f1_name: f,
                     _f2_name: f,
-                    self.method: variable_importance[
-                        variable_importance["Feature"] == f
-                    ]["Value"].values[0],
+                    self.method: feature_importance[
+                        feature_importance["Feature"] == f
+                        ]["Importance"].values[0],
                 }
                 for f in all_features
             ]
         )
         return var_imp_diag
+
+    def _filter_insignificant_interactions(self,
+                                           interactions_ascending_order: bool,
+                                           threshold_relevant_interaction: float,
+                                           ovo_copy: pd.DataFrame):
+        if interactions_ascending_order:
+            ovo_copy.loc[ovo_copy[self.method] > threshold_relevant_interaction, self.method] = 0
+        else:
+            ovo_copy.loc[ovo_copy[self.method] < threshold_relevant_interaction, self.method] = 0
+
+        return ovo_copy.copy()
+
+    def _scale_to_unit_interval(self, ovo_copy: pd.DataFrame):
+        vals = ovo_copy[self.method]
+        m, M = np.min(vals), np.max(vals)
+        ovo_copy.loc[:, self.method] = (vals - m) / (M - m)
+
+    def _reverse_scale_for_ascending(self, interactions_ascending_order: bool, ovo_copy: pd.DataFrame):
+        if interactions_ascending_order:
+            ovo_copy.loc[ovo_copy[self.method] > 0, self.method] = 1 - ovo_copy.loc[
+                ovo_copy[self.method] > 0, self.method]
+
+    def _map_to_width(self, max_width: float, ovo_copy: pd.DataFrame):
+        ovo_copy[self.method] = ovo_copy[self.method] * max_width
+
+    @staticmethod
+    def order_heatmap(matrix: pd.DataFrame, asc_order: bool) -> pd.DataFrame:
+        feature_importance = pd.Series(np.diag(matrix), index=matrix.index)
+
+        lambda_1 = feature_importance.max()
+        lambda_2 = matrix.max().max()
+        features = list(matrix.index)
+
+        scores = dict()
+        for f in features:
+            f_copy = features.copy()
+            f_copy.remove(f)
+            scores[f.lower()] = feature_importance[f] * 1 / lambda_1 + max(matrix[f][f_copy]) * 1 / lambda_2
+
+        ind = matrix.sort_index(key=lambda x: [scores[f_lower] for f_lower in x.str.lower()], ascending=asc_order).index
+        m = matrix.reindex(ind)  # re-order rows
+
+        return m[list(ind)]  # re-order columns

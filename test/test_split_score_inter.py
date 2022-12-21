@@ -2,10 +2,10 @@ import unittest
 from parameterized import parameterized_class
 
 from .util import california_housing_random_forest, california_housing_boosting_models, has_decreasing_order, wine_random_forest, wine_boosting_models
-from artemis.utilities.domain import InteractionMethod, VisualizationType
-from artemis.utilities.split_score_metrics import SplitScoreInteractionMetric, SplitScoreImportanceMetric, _LGBM_UNSUPPORTED_METRICS
+from artemis._utilities.domain import InteractionMethod, VisualizationType
+from artemis._utilities.split_score_metrics import SplitScoreInteractionMetric, SplitScoreImportanceMetric, _LGBM_UNSUPPORTED_METRICS
 from artemis.interactions_methods.model_specific import SplitScoreMethod
-from artemis.utilities.exceptions import VisualizationNotSupportedException, MetricNotSupportedException, ModelNotSupportedException
+from artemis._utilities.exceptions import VisualizationNotSupportedException, MetricNotSupportedException, ModelNotSupportedException
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
 from dataclasses import fields
 
@@ -51,9 +51,9 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
 
                 # expected columns
                 self.assertListEqual(list(inter.ovo.columns), ["Feature 1", "Feature 2", InteractionMethod.SPLIT_SCORE])
-                self.assertListEqual(list(inter.variable_importance.columns), ["Feature", "Value"])
+                self.assertListEqual(list(inter.feature_importance.columns), ["Feature", "Importance"])
 
-                # variable importance calculated
+                # feature importance calculated
                 self.assertIsNotNone(inter.full_ovo)
                 self.assertIsNotNone(inter.full_result)
 
@@ -77,9 +77,9 @@ class SplitScoreMethodUnitTest(unittest.TestCase):
                     # expected columns
                     self.assertListEqual(list(inter.ovo.columns),
                                          ["Feature 1", "Feature 2", InteractionMethod.SPLIT_SCORE])
-                    self.assertListEqual(list(inter.variable_importance.columns), ["Feature", "Value"])
+                    self.assertListEqual(list(inter.feature_importance.columns), ["Feature", "Importance"])
 
-                    # variable importance calculated
+                    # feature importance calculated
                     self.assertIsNotNone(inter.full_ovo)
                     self.assertIsNotNone(inter.full_result)
 

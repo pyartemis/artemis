@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-
 @dataclass
 class InteractionMethod:
     H_STATISTIC: str = "Friedman H-statistic Interaction Measure"
@@ -49,7 +48,8 @@ class ProgressInfoLog:
     CALC_OVA: str = (
         f"Calculating {InteractionCalculationStrategy.ONE_VS_ALL} interactions"
     )
-    CALC_VAR_IMP: str = "Calculating variable importance"
+    CALC_VAR_IMP: str = "Calculating feature importance"
+    CALC_ADD: str = "Calculating additivity index of the model"
 
 
 @dataclass
@@ -57,3 +57,4 @@ class CorrelationMethod:
     PEARSON: str = "pearson"
     KENDALL: str = "kendall"
     SPEARMAN: str = "spearman"
+

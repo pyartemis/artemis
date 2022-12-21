@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import combinations
 from typing import Union, List, Tuple
 
 import numpy as np
@@ -9,22 +10,36 @@ from tqdm import tqdm
 
 from artemis.importance_methods.model_specific import MinimalDepthImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
-from artemis.utilities.domain import InteractionMethod, VisualizationType
-from artemis.utilities.exceptions import MethodNotFittedException
+from artemis._utilities.domain import InteractionMethod, VisualizationType
+from artemis._utilities.exceptions import MethodNotFittedException
 
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     """
-    Class implementing Conditional Minimal Depth Method for extraction of interactions.  t applies to tree-based models like Random Forests.
-    Currently scikit-learn forest models are supported, i.e., RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier. 
+    Conditional Smallest Depth Method for Feature Interaction Extraction.
+    It applies to tree-based models like Random Forests.
+    Currently scikit-learn forest models are supported, i.e., RandomForestClassifier, RandomForestRegressor, 
+    ExtraTreesRegressor, ExtraTreesClassifier. 
 
-    Attributes:
-        method (str) -- name of interaction method
-        visualizer (Visualizer) -- automatically created on the basis of a method and used to create visualizations
-        variable_importance (pd.DataFrame) -- variable importance values 
-        ovo (pd.DataFrame) -- one versus one variable interaction values 
-    
-    References:
+    Attributes
+    ----------
+    method : str 
+        Method name, used also for naming column with results in `ovo` pd.DataFrame.
+    visualizer : Visualizer
+        Object providing visualization. Automatically created on the basis of a method and used to create visualizations.
+    ovo : pd.DataFrame 
+        One versus one (pair) feature interaction values. 
+    feature_importance : pd.DataFrame 
+        Feature importance values.
+    model : object
+        Explained model.
+    features_included: List[str]
+        List of features for which interactions are calculated.
+    pairs : List[List[str]]
+        List of pairs of features for which interactions are calculated.
+
+    References
+    ----------
     - https://modeloriented.github.io/randomForestExplainer/
     - https://doi.org/10.1198/jasa.2009.tm08622
     """
@@ -33,7 +48,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         super().__init__(InteractionMethod.CONDITIONAL_MINIMAL_DEPTH)
 
     @property
-    def interactions_ascending_order(self):
+    def _interactions_ascending_order(self):
         return True
 
     @property
@@ -44,38 +59,106 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         compare_ovo['id'] = compare_ovo[["Feature 1", "Feature 2"]].apply(lambda x: "".join(sorted(x)), axis=1)
         return (compare_ovo.groupby("id")
                            .agg({"Feature 1": "first", "Feature 2": "first", self.method: "mean"})
-                           .sort_values("Conditional Minimal Depth Measure",
-                                        ascending=self.interactions_ascending_order,
+                           .sort_values("Conditional Smallest Depth Measure",
+                                        ascending=self._interactions_ascending_order,
                                         ignore_index=True))
 
 
     def fit(
             self,
             model: Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier],
-            X: pd.DataFrame,
             show_progress: bool = False,
     ):
-        """Calculates Conditional Minimal Depth Interactions and Minimal Depth Feature Importance for given model.
+        """Calculates Conditional Smallest Depth Feature Interactions Strenght and Minimal Depth Feature Importance for given model.
 
-        Parameters:
-            model (Union[RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, ExtraTreesClassifier]) -- tree-based model to be explained
-            X (pd.DataFrame, optional) -- unused as explanations are calculated only for trained model
-            show_progress (bool) -- whether to show progress bar 
+        Parameters
+        ----------
+        model : RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor, or ExtraTreesClassifier
+            Model to be explained. Should be fitted and of type RandomForestClassifier, RandomForestRegressor, 
+            ExtraTreesRegressor, or ExtraTreesClassifier.
+        show_progress : bool
+            If True, progress bar will be shown. Default is False.
         """
-        column_dict = _make_column_dict(X)
-        self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(X.columns), show_progress)
-        self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self.interactions_ascending_order)
-        self.variable_importance = MinimalDepthImportance().importance(model, X, trees)
+        self.features_included = model.feature_names_in_.tolist()
+        self.pairs = list(combinations(self.features_included, 2))
+        column_dict = _make_column_dict(model.feature_names_in_)
+        self.raw_result_df, trees = _calculate_conditional_minimal_depths(model.estimators_, len(model.feature_names_in_), show_progress)
+        self.ovo = _summarise_results(self.raw_result_df, column_dict, self.method, self._interactions_ascending_order)
+        self._feature_importance_obj = MinimalDepthImportance()
+        self.feature_importance = self._feature_importance_obj.importance(model,trees)
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
-        """Plots interactions
+        """
+        Plot results of explanations.
+
+        There are five types of plots available:
+        - heatmap - heatmap of feature interactions values with feature importance values on the diagonal (default)
+        - bar_chart - bar chart of top feature interactions values
+        - graph - graph of feature interactions values
+        - summary - combination of heatmap, bar chart and graph plots
+        - bar_chart_conditional - bar chart of top feature interactions with additional information about feature importance
         
-        Parameters:
-            vis_type (str) -- type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'summary', 'bar_chart_conditional']
-            title (str) -- title of plot, default is 'default' which means that title will be automatically generated for selected visualization type
-            figsize (tuple) -- size of figure
-            show (bool) -- whether to show plot
-            **kwargs: additional arguments for plot 
+        Parameters
+        ----------
+        vis_type : str 
+            Type of visualization, one of ['heatmap', 'bar_chart', 'graph', 'bar_chart_conditional', 'summary']. Default is 'heatmap'.
+        title : str 
+            Title of plot, default is 'default' which means that title will be automatically generated for selected visualization type.
+        figsize : (float, float) 
+            Size of plot. Default is (8, 6).
+        show : bool 
+            Whether to show plot. Default is True.
+        **kwargs : Other Parameters
+            Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
+            For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
+            See key parameters below. 
+
+        Other Parameters
+        ------------------------
+        interaction_color_map : matplotlib colormap name or object, or list of colors
+            Used for 'heatmap' visualization. The mapping from interaction values to color space. Default is 'Purples' or 'Purpler_r',
+            depending on whether a greater value means a greater interaction strength or vice versa.
+        importance_color_map :  matplotlib colormap name or object, or list of colors
+            Used for 'heatmap' visualization. The mapping from importance values to color space. Default is 'Greens' or 'Greens_r',
+            depending on whether a greater value means a greater interaction strength or vice versa.
+        annot_fmt : str
+            Used for 'heatmap' visualization. String formatting code to use when adding annotations with values. Default is '.3f'.
+        linewidths : float
+            Used for 'heatmap' visualization. Width of the lines that will divide each cell in matrix. Default is 0.5.
+        linecolor : str
+            Used for 'heatmap' visualization. Color of the lines that will divide each cell in matrix. Default is 'white'.
+        cbar_shrink : float
+            Used for 'heatmap' visualization. Fraction by which to multiply the size of the colorbar. Default is 1. 
+    
+        top_k : int 
+            Used for 'bar_chart' visualization. Maximum number of pairs that will be presented in plot. Default is 10.
+        color : str 
+            Used for 'bar_chart' visualization. Color of bars. Default is 'mediumpurple'.
+
+        n_highest_with_labels : int
+            Used for 'graph' visualization. Top most important interactions to show as labels on edges.  Default is 5.
+        edge_color: str
+            Used for 'graph' visualization. Color of the edges. Default is 'rebeccapurple.
+        node_color: str
+            Used for 'graph' visualization. Color of nodes. Default is 'green'.
+        node_size: int
+            Used for 'graph' visualization. Size of the nodes (networkX scale).  Default is '1800'.
+        font_color: str
+            Used for 'graph' visualization. Font color. Default is '#3B1F2B'.
+        font_weight: str
+            Used for 'graph' visualization. Font weight. Default is 'bold'.
+        font_size: int
+            Used for 'graph' visualization. Font size (networkX scale). Default is 10.
+        threshold_relevant_interaction : float
+            Used for 'graph' visualization. Minimum (or maximum, depends on method) value of interaction to display
+            corresponding edge on visualization. Default depends on the interaction method.
+        
+        top_k : int 
+            Used for 'bar_chart_conditional' visualization. Maximum number of pairs that will be presented in plot. Default is 15. 
+        cmap : matplotlib colormap name or object.
+            Used for 'bar_chart_conditional' visualization. The mapping from number of pair occurences to color space. Default is 'Purples'. 
+        color : str
+            Used for 'bar_chart_conditional' visualization. Color of lollipops for parent features. Default is 'black'. 
         """
         if self.ovo is None:
             raise MethodNotFittedException(self.method)
@@ -85,11 +168,12 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                              _feature_column_name_1="root_variable",
                              _feature_column_name_2="variable",
                              _directed=True,
-                             variable_importance=self.variable_importance,
+                             feature_importance=self.feature_importance,
                              title = title,
                              figsize=figsize,
                              show=show,
-                             interactions_ascending_order=self.interactions_ascending_order,
+                             interactions_ascending_order=self._interactions_ascending_order,
+                             importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
 
 
@@ -106,7 +190,7 @@ def _calculate_conditional_minimal_depths(
         column_size:    number of features in the data
         show_progress:  determine whether to show the progress bar
 
-    Returns:
+    Returns
         Conditional minimal depths, depths and split variables of all trees
 
     """
@@ -130,7 +214,7 @@ def _bfs(tree: pd.DataFrame):
 
     Args:
         tree: tree representation
-    Returns:
+    Returns
         depth of each node, nodes grouped by split_variable
     """
     current_lvl_ids = [0]
@@ -198,8 +282,8 @@ def _conditional_minimal_depth(split_var_to_nodes: dict, depths: np.array, tree_
     return res
 
 
-def _make_column_dict(X: pd.DataFrame) -> dict:
-    return dict(zip(range(len(X.columns)), X.columns.to_list()))
+def _make_column_dict(columns: np.ndarray) -> dict:
+    return dict(zip(range(len(columns)), list(columns)))
 
 
 def _summarise_results(raw_result_df: pd.DataFrame, column_dict: dict, method_name: str, ascending_order: bool) -> pd.DataFrame:

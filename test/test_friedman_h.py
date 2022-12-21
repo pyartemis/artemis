@@ -2,7 +2,7 @@ import unittest
 from parameterized import parameterized_class
 
 from .util import california_housing_random_forest, has_decreasing_order, CALIFORNIA_SUBSET, SAMPLE_SIZE, wine_random_forest, WINE_SUBSET
-from artemis.utilities.domain import InteractionMethod
+from artemis._utilities.domain import InteractionMethod
 from artemis.interactions_methods.model_agnostic import FriedmanHStatisticMethod
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
 
@@ -86,16 +86,6 @@ class FriedmanHStatisticMethodTestCase(unittest.TestCase):
 
         # then
         # nothing crashes!
-
-    def test_cache_pdp_for_var_imp(self):
-        # when
-        h_stat = FriedmanHStatisticMethod()
-        h_stat.fit(self.model, self.X, SAMPLE_SIZE, features=self.SUBSET)
-
-        # then
-        self.assertIsNotNone(h_stat._pdp_cache)
-        self.assertIsNotNone(h_stat.variable_importance)
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,7 @@
 import unittest
 from parameterized import parameterized_class
 
-from artemis.utilities.domain import InteractionMethod
+from artemis._utilities.domain import InteractionMethod
 from artemis.interactions_methods.model_agnostic import SejongOhMethod
 from artemis.visualizer._configuration import VisualizationConfigurationProvider
 from .util import california_housing_random_forest, SAMPLE_SIZE, N_REPEAT, CALIFORNIA_SUBSET, has_decreasing_order, wine_random_forest, WINE_SUBSET
@@ -44,8 +44,8 @@ class SejongOhMethodTestCase(unittest.TestCase):
         # sample size taken into account
         self.assertEqual(len(sejong_oh_inter.X_sampled), SAMPLE_SIZE)
 
-        # variable importance calculated
-        self.assertIsNotNone(sejong_oh_inter.variable_importance)
+        # feature importance calculated
+        self.assertIsNotNone(sejong_oh_inter.feature_importance)
 
     def test_subset_of_features_sampled(self):
         # when
