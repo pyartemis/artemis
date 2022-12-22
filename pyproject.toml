@@ -1,8 +1,11 @@
 [tool.poetry]
-name = "artemis"
+name = "pyartemis"
+packages = [
+    { include = "artemis" }
+]
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Artur Żółkowski <artur.zolkowski@wp.pl>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
