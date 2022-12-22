@@ -4,7 +4,7 @@ packages = [
     { include = "artemis" }
 ]
 version = "0.1.0"
-description = ""
+description = "Library for providing easy-to-use XAI methods for deriving feature interactions in ML models."
 authors = ["Artur Żółkowski <artur.zolkowski@wp.pl>"]
 
 [tool.poetry.dependencies]
