@@ -217,4 +217,4 @@ def _calculate_hstat_value(pd_i: np.ndarray, pd_versus: np.ndarray, pd_i_versus:
     nominator = (center(pd_i_versus) - center(pd_i) - center(pd_versus)) ** 2
     if normalized: 
         denominator = center(pd_i_versus) ** 2
-    return np.sum(nominator) / np.sum(denominator) if normalized else np.sqrt(np.sum(nominator))
+    return np.sum(nominator) / np.sum(denominator) if normalized else np.sqrt(np.mean(nominator))
