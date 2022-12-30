@@ -4,6 +4,7 @@ from typing import Callable, List, Optional, Tuple
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from artemis.importance_methods.model_agnostic import PartialDependenceBasedImportance
 from artemis.interactions_methods._method import FeatureInteractionMethod
@@ -24,7 +25,7 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default",
              figsize: Tuple[float, float] = (8, 6), show: bool = True, **kwargs):
-        super().plot(vis_type, title, figsize, show)
+        super().plot(vis_type, title, figsize, show, **kwargs)
 
     def fit(self,
             model,
@@ -87,18 +88,21 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
     def plot_profile(self, feature1: str, feature2: Optional[str] = None):
         if feature2 is not None:
-            pair = self.pd_calculator.pd_pairs[self.pd_calculator._get_pair_key((feature1, feature2))]
+            pair_key = self.pd_calculator._get_pair_key((feature1, feature2))
+            pair = self.pd_calculator.pd_pairs[pair_key]
             cs = plt.contour(pair["f2_values"], pair["f1_values"], pair["pd_values"], colors="black", linewidths=0.5)
             cs2 = plt.contourf(pair["f2_values"], pair["f1_values"], pair["pd_values"])
             plt.clabel(cs, colors="black")
             plt.colorbar(cs2)
-            plt.xlabel(feature2)
-            plt.ylabel(feature1)
+            plt.xlabel(pair_key[1])
+            plt.ylabel(pair_key[0])
+            sns.rugplot(self.pd_calculator.X, y=pair_key[0], x=pair_key[1], color="black")
         else:
             single = self.pd_calculator.pd_single[feature1]
             plt.plot(single["f_values"], single["pd_values"])
             plt.xlabel(feature1)
             plt.ylabel("PD value")
+            sns.rugplot(self.pd_calculator.X, x=feature1, color="black")
     
     @abstractmethod
     def _calculate_ovo_interactions_from_pd(self, show_progress: bool):
