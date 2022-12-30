@@ -416,7 +416,7 @@ class Visualizer:
         ova.head(top_k).plot.barh(
             x="Feature",
             y=self.method,
-            ylabel=self.method,
+            xlabel=self.method,
             color=color,
             legend=False,
             title=title,
