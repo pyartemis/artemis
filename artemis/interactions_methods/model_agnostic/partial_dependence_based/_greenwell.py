@@ -68,7 +68,7 @@ class GreenwellMethod(PartialDependenceBasedMethod):
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default",
              figsize: Tuple[float, float] = (8, 6), show: bool = True, **kwargs):
-        super().plot(vis_type, title, figsize, show)
+        super().plot(vis_type, title, figsize, show, **kwargs)
 
     def _calculate_ovo_interactions_from_pd(self, show_progress: bool = False):
         self.pd_calculator.calculate_pd_pairs(self.pairs, show_progress=show_progress)
