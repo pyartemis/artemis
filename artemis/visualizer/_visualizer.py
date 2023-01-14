@@ -32,6 +32,7 @@ class Visualizer:
         title: Optional[str] = "default",
         figsize: tuple = (8, 6),
         show: bool = True,
+        path: Optional[str] = None,
         interactions_ascending_order: bool = False,
         importance_ascending_order: bool = False,
         _full_result: Optional[pd.DataFrame] = None,
@@ -110,6 +111,10 @@ class Visualizer:
                 show=show,
                 **kwargs,
             )
+        if show: 
+            plt.show()
+        else: 
+            plt.savefig(path, dpi=300, bbox_inches='tight')
 
     def plot_barchart_conditional(
             self,
@@ -153,10 +158,6 @@ class Visualizer:
         plt.colorbar(sm, label="Occurences", ax=ax)
         plt.xticks(rotation=90, size=7)
         plt.grid()
-        if show:
-            plt.show()
-        else:
-            return fig
 
     def plot_heatmap(
             self,
@@ -186,7 +187,6 @@ class Visualizer:
         linecolor = kwargs.pop("linecolor", config.LINECOLOR)
         cbar_shrink = kwargs.pop("cbar_shrink", config.CBAR_SHRINK)
         title = config.TITLE if title == "default" else title
-
         if not _directed:
             ovo_copy = ovo.copy()
             ovo_copy[_f1_name], ovo_copy[_f2_name] = (
@@ -242,10 +242,6 @@ class Visualizer:
             linecolor=linecolor,
             cbar_kws={"label": self.method, "shrink": cbar_shrink},
         )
-        if show:
-            plt.show()
-        else:
-            return fig
 
     def plot_interaction_graph(
             self,
@@ -336,10 +332,6 @@ class Visualizer:
                 font_color=font_color,
                 font_weight=font_weight,
             )
-        if show:
-            plt.show()
-        else:
-            return fig
 
     def _interactions_to_edge_widths(self, interactions_ascending_order: bool, ovo_copy: pd.DataFrame,
                                      max_width: float):
@@ -388,10 +380,6 @@ class Visualizer:
             ax=ax,
         )
         plt.gca().invert_yaxis()
-        if show:
-            plt.show()
-        else:
-            return fig
 
     def plot_barchart_ova(
             self,
@@ -424,10 +412,6 @@ class Visualizer:
             grid=True,
         )
         plt.gca().invert_yaxis()
-        if show:
-            plt.show()
-        else:
-            return fig
 
     def plot_summary(
             self,
@@ -504,11 +488,6 @@ class Visualizer:
             )
 
         fig.suptitle(title)
-        if show:
-            plt.show()
-        else:
-            plt.close()
-            return fig
 
     def plot_lollipop(
             self,
@@ -596,11 +575,6 @@ class Visualizer:
                 )
         plt.xlabel("Tree number")
         plt.ylabel("Gain")
-        if show:
-            plt.show()
-        else:
-            plt.close()
-            return fig
 
     def _edge_widths(self, G):
         return [
