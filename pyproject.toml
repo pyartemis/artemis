@@ -3,7 +3,7 @@ name = "pyartemis"
 packages = [
     { include = "artemis" }
 ]
-version = "0.1.2"
+version = "0.1.3"
 description = "A library for explanations of feature interactions in machine learning models."
 readme = "README.md"
 documentation = "https://pyartemis.github.io/"
