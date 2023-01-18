@@ -8,7 +8,7 @@ description = "A library for explanations of feature interactions in machine lea
 readme = "README.md"
 documentation = "https://pyartemis.github.io/"
 keywords = ["interactions", "xai", "Explainable Artificial Intelligence", "explanations", "machine learning", "iml", "Interpretable Machine Learning"]
-authors = ["Artur Żółkowski <artur.zolkowski@wp.pl>", "Mateusz Krzyziński <krzyzinskimateusz23@gmail.com>", "Paweł Fijałkowski <pablo2811@gmail.com>"]
+authors = ["Artur Żółkowski <artur.zolkowski@wp.pl>", "Mateusz Krzyziński <krzyzinskimateusz23@gmail.com>", "Paweł Fijałkowski <fijalkowskipablo@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
