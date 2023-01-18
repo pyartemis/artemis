@@ -111,9 +111,7 @@ class Visualizer:
                 show=show,
                 **kwargs,
             )
-        if show: 
-            plt.show()
-        else: 
+        if not show:
             plt.savefig(path, dpi=300, bbox_inches='tight')
 
     def plot_barchart_conditional(

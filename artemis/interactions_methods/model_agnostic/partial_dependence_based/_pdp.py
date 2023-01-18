@@ -158,10 +158,9 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
             plt.xlabel(feature1)
             plt.ylabel("PD value")
             sns.rugplot(self.pd_calculator.X, x=feature1, color="black")
-        if show:
-            plt.show()
-        else:
-            plt.savefig(path, dpi=300, bbox_inches="tight")
+        if not show:
+            plt.savefig(path, dpi=300, bbox_inches='tight')
+        
 
     def plot_zenplot(
         self,
@@ -184,7 +183,7 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         )
         continued = False
 
-        for i in range(len(to_vis)):
+        for i in range(zenpath_length):
             pair_values = get_pd_pairs_values(self, pair)
             ax = plt.subplot2grid((nrows, ncols), (id_row, id_col), rowspan=1)
 
@@ -252,6 +251,11 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
             idx, continued = find_next_pair_index(to_vis, pair[1])
             if continued:
                 pair = pair[1], get_second_feature(pair[1], to_vis.loc[idx])
+                if zenpath_length-1 == i:
+                    if id_col > id_row:
+                        ax.set_ylabel(pair[1])
+                    else:
+                        ax.set_title(pair[1], size=10)
             else:
                 if id_col > id_row:
                     ax.set_ylabel(pair[1])
@@ -264,10 +268,8 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
             plt.tight_layout()
         cbar_ax = fig.add_axes([1, 0.25, 0.05, 0.5])
         fig.colorbar(cs, cax=cbar_ax)
-        if show:
-            plt.show()
-        else:
-            plt.savefig(path, dpi=300, bbox_inches="tight")
+        if not show:
+            plt.savefig(path, dpi=300, bbox_inches='tight')
 
     @abstractmethod
     def _calculate_ovo_interactions_from_pd(self, show_progress: bool):
