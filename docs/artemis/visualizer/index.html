@@ -93,16 +93,12 @@ so only models implementing predict functions in scikit-learn API are supported.
         self.model = model
         self.X = X
 
-    def plot(
-        self,
-        features: List[Union[int, str, Tuple[int, int], Tuple[str, str]]],
-        grid_resolution: int = 100,
-        title: str = &#34;Partial Dependence&#34;,
-        figsize: tuple = (12, 6),
-        show: bool = True,
-        ax = None,
-        **kwargs
-    ):
+    def plot(self,
+             features: List[Union[int, str, Tuple[int, int], Tuple[str, str]]],
+             grid_resolution: int = 100,
+             title: str = &#34;Partial Dependence&#34;,
+             figsize: Tuple[float, float] = (12, 6),
+             **kwargs):
         &#34;&#34;&#34;Plot partial dependence plot.
 
         Parameters
@@ -116,30 +112,22 @@ so only models implementing predict functions in scikit-learn API are supported.
             Title of plot. Default is &#39;Partial Dependence&#39;.
         figsize : (float, float) 
             Size of plot. Default is (12, 6).
-        show : bool 
-            Whether to show plot. Default is True.
         **kwargs : Other Parameters
             Additional parameters for plot. Passed to PartialDependenceDisplay.from_estimator() method.
         &#34;&#34;&#34;
         fig, ax = plt.subplots(figsize=figsize)
-        PartialDependenceDisplay.from_estimator(
-            self.model,
-            self.X,
-            features,
-            grid_resolution=grid_resolution,
-            _ax=ax,
-            **kwargs
-        )
-        ax.set_title(title)
-        if show:
-            plt.show()
-        else:
-            return fig</code></pre>
+        PartialDependenceDisplay.from_estimator(self.model,
+                                                self.X,
+                                                features,
+                                                grid_resolution=grid_resolution,
+                                                _ax=ax,
+                                                **kwargs)
+        ax.set_title(title)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
 <dt id="artemis.visualizer.PartialDependenceVisualizer.plot"><code class="name flex">
-<span>def <span class="ident">plot</span></span>(<span>self, features: List[Union[int, str, Tuple[int, int], Tuple[str, str]]], grid_resolution: int = 100, title: str = 'Partial Dependence', figsize: tuple = (12, 6), show: bool = True, ax=None, **kwargs)</span>
+<span>def <span class="ident">plot</span></span>(<span>self, features: List[Union[int, str, Tuple[int, int], Tuple[str, str]]], grid_resolution: int = 100, title: str = 'Partial Dependence', figsize: Tuple[float, float] = (12, 6), **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot partial dependence plot.</p>
@@ -154,8 +142,6 @@ If one feature is provided, 1-dimensional PDP will be returned, two features &nd
 <dd>Title of plot. Default is 'Partial Dependence'.</dd>
 <dt><strong><code>figsize</code></strong> :&ensp;<code>(float, float) </code></dt>
 <dd>Size of plot. Default is (12, 6).</dd>
-<dt><strong><code>show</code></strong> :&ensp;<code>bool </code></dt>
-<dd>Whether to show plot. Default is True.</dd>
 <dt><strong><code>**kwargs</code></strong> :&ensp;<code>Other Parameters</code></dt>
 <dd>Additional parameters for plot. Passed to PartialDependenceDisplay.from_estimator() method.</dd>
 </dl></div>
@@ -163,16 +149,12 @@ If one feature is provided, 1-dimensional PDP will be returned, two features &nd
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plot(
-    self,
-    features: List[Union[int, str, Tuple[int, int], Tuple[str, str]]],
-    grid_resolution: int = 100,
-    title: str = &#34;Partial Dependence&#34;,
-    figsize: tuple = (12, 6),
-    show: bool = True,
-    ax = None,
-    **kwargs
-):
+<pre><code class="python">def plot(self,
+         features: List[Union[int, str, Tuple[int, int], Tuple[str, str]]],
+         grid_resolution: int = 100,
+         title: str = &#34;Partial Dependence&#34;,
+         figsize: Tuple[float, float] = (12, 6),
+         **kwargs):
     &#34;&#34;&#34;Plot partial dependence plot.
 
     Parameters
@@ -186,25 +168,17 @@ If one feature is provided, 1-dimensional PDP will be returned, two features &nd
         Title of plot. Default is &#39;Partial Dependence&#39;.
     figsize : (float, float) 
         Size of plot. Default is (12, 6).
-    show : bool 
-        Whether to show plot. Default is True.
     **kwargs : Other Parameters
         Additional parameters for plot. Passed to PartialDependenceDisplay.from_estimator() method.
     &#34;&#34;&#34;
     fig, ax = plt.subplots(figsize=figsize)
-    PartialDependenceDisplay.from_estimator(
-        self.model,
-        self.X,
-        features,
-        grid_resolution=grid_resolution,
-        _ax=ax,
-        **kwargs
-    )
-    ax.set_title(title)
-    if show:
-        plt.show()
-    else:
-        return fig</code></pre>
+    PartialDependenceDisplay.from_estimator(self.model,
+                                            self.X,
+                                            features,
+                                            grid_resolution=grid_resolution,
+                                            _ax=ax,
+                                            **kwargs)
+    ax.set_title(title)</code></pre>
 </details>
 </dd>
 </dl>

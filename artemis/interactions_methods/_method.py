@@ -71,7 +71,11 @@ class FeatureInteractionMethod(ABC):
         """
         ...
 
-    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: Tuple[float, float] = (8, 6), show: bool = True, **kwargs):
+    def plot(self,
+             vis_type: str = VisualizationType.HEATMAP,
+             title: str = "default",
+             figsize: Tuple[float, float] = (8, 6),
+             **kwargs):
         """
         Plot results of explanations.
 
@@ -89,8 +93,6 @@ class FeatureInteractionMethod(ABC):
             Title of plot, default is 'default' which means that title will be automatically generated for selected visualization type.
         figsize : (float, float) 
             Size of plot. Default is (8, 6).
-        show : bool 
-            Whether to show plot. Default is True.
         **kwargs : Other Parameters
             Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
             For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
@@ -144,18 +146,15 @@ class FeatureInteractionMethod(ABC):
                              feature_importance=self.feature_importance,
                              title=title,
                              figsize=figsize,
-                             show=show,
                              interactions_ascending_order=self._interactions_ascending_order,
                              importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
-
 
     def interaction_value(self, f1: str, f2: str):
 
         if self._compare_ovo is None:
             raise MethodNotFittedException(self.method)
 
-        return self._compare_ovo[
-            ((self._compare_ovo["Feature 1"] == f1) & (self._compare_ovo["Feature 2"] == f2)) |
-            ((self._compare_ovo["Feature 1"] == f2) & (self._compare_ovo["Feature 2"] == f1))
-            ][self.method].values[0]
+        return self._compare_ovo[((self._compare_ovo["Feature 1"] == f1) & (self._compare_ovo["Feature 2"] == f2)) |
+                                 ((self._compare_ovo["Feature 1"] == f2) &
+                                  (self._compare_ovo["Feature 2"] == f1))][self.method].values[0]

@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import pandas as pd
 from tqdm import tqdm
 
@@ -101,7 +103,7 @@ class SplitScoreMethod(FeatureInteractionMethod):
             trees_df=model.trees_df,
         )
 
-    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: Tuple[float, float] = (8, 6), **kwargs):
         """
         Plot results of explanations.
 
@@ -120,8 +122,6 @@ class SplitScoreMethod(FeatureInteractionMethod):
             Title of plot, default is 'default' which means that title will be automatically generated for selected visualization type.
         figsize : (float, float) 
             Size of plot. Default is (8, 6).
-        show : bool 
-            Whether to show plot. Default is True.
         **kwargs : Other Parameters
             Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
             For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
@@ -191,7 +191,6 @@ class SplitScoreMethod(FeatureInteractionMethod):
                              feature_importance=self.feature_importance,
                              title=title,
                              figsize=figsize,
-                             show=show,
                              interactions_ascending_order=self._interactions_ascending_order,
                              importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              _full_result=self.full_result,
