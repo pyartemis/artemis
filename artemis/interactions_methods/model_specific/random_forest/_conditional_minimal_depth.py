@@ -87,7 +87,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         self._feature_importance_obj = MinimalDepthImportance()
         self.feature_importance = self._feature_importance_obj.importance(model,trees)
 
-    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: tuple = (8, 6), show: bool = True, **kwargs):
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default", figsize: Tuple[float, float] = (8, 6), **kwargs):
         """
         Plot results of explanations.
 
@@ -106,8 +106,6 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
             Title of plot, default is 'default' which means that title will be automatically generated for selected visualization type.
         figsize : (float, float) 
             Size of plot. Default is (8, 6).
-        show : bool 
-            Whether to show plot. Default is True.
         **kwargs : Other Parameters
             Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
             For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
@@ -171,7 +169,6 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
                              feature_importance=self.feature_importance,
                              title = title,
                              figsize=figsize,
-                             show=show,
                              interactions_ascending_order=self._interactions_ascending_order,
                              importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)
@@ -194,7 +191,7 @@ def _calculate_conditional_minimal_depths(
         Conditional minimal depths, depths and split variables of all trees
 
     """
-    tree_result_list = list()
+    tree_result_list = []
     tree_id_to_depth_split = dict()
     for tree_id in tqdm(range(len(trees)), disable=not show_progress):
         tree_repr = _tree_representation(trees[tree_id].tree_)

@@ -1,12 +1,13 @@
 import dataclasses
+from typing import Tuple
 
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis._utilities.domain import CorrelationMethod
 from artemis._utilities.exceptions import MethodNotFittedException
 from artemis._utilities.ops import point_left_side_circle
+from artemis.interactions_methods._method import FeatureInteractionMethod
 from artemis.visualizer._configuration import InteractionGraphConfiguration
 
 
@@ -72,7 +73,7 @@ class FeatureInteractionMethodComparator:
         -------
         None
         """
-        correlations = list()
+        correlations = []
         for correlation_method in dataclasses.fields(CorrelationMethod):
             correlation_method_name = correlation_method.default
             correlations.append(
@@ -88,7 +89,7 @@ class FeatureInteractionMethodComparator:
                         method2: FeatureInteractionMethod,
                         n_labels: int = 3,
                         add_correlation_box: bool = False,
-                        fig_size: tuple = (8, 6)):
+                        figsize: Tuple[float, float] = (8, 6)):
         """
         Creates comparison plot for comparing results of two feature interaction methods. Depending on the parameters
         rank correlation might be included on the plot.
@@ -103,7 +104,7 @@ class FeatureInteractionMethodComparator:
             Number of pairs of features with the greatest interaction values to show labels of, default = 3
         add_correlation_box: bool
             Flag indicating whether to show rank correlation values on the plot, default = False
-        fig_size: tuple[int]
+        figsize: Tuple[float, float]
             Matplotlib size of the figure, default = (8, 6)
 
 
@@ -112,12 +113,12 @@ class FeatureInteractionMethodComparator:
         Figure
         """
         m1_name, m2_name = method1.method, method2.method
-        fig, ax = plt.subplots(figsize=fig_size)
+        fig, ax = plt.subplots(figsize=figsize)
         ax.set_axisbelow(True)
         plt.grid(True)
         circle_r = 0.2 * min(max(method1._compare_ovo[m1_name]), max(method2._compare_ovo[m2_name]))
 
-        x, y = list(), list()
+        x, y = [], []
         for index, row in method1._compare_ovo.iterrows():
 
             f1, f2 = row["Feature 1"], row["Feature 2"]

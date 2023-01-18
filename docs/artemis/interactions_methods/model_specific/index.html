@@ -160,7 +160,7 @@ ExtraTreesRegressor, ExtraTreesClassifier. </p>
         self._feature_importance_obj = MinimalDepthImportance()
         self.feature_importance = self._feature_importance_obj.importance(model,trees)
 
-    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = &#34;default&#34;, figsize: tuple = (8, 6), show: bool = True, **kwargs):
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = &#34;default&#34;, figsize: Tuple[float, float] = (8, 6), **kwargs):
         &#34;&#34;&#34;
         Plot results of explanations.
 
@@ -179,8 +179,6 @@ ExtraTreesRegressor, ExtraTreesClassifier. </p>
             Title of plot, default is &#39;default&#39; which means that title will be automatically generated for selected visualization type.
         figsize : (float, float) 
             Size of plot. Default is (8, 6).
-        show : bool 
-            Whether to show plot. Default is True.
         **kwargs : Other Parameters
             Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
             For &#39;summary&#39; visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
@@ -244,7 +242,6 @@ ExtraTreesRegressor, ExtraTreesClassifier. </p>
                              feature_importance=self.feature_importance,
                              title = title,
                              figsize=figsize,
-                             show=show,
                              interactions_ascending_order=self._interactions_ascending_order,
                              importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              **kwargs)</code></pre>
@@ -298,7 +295,7 @@ ExtraTreesRegressor, or ExtraTreesClassifier.</dd>
 </details>
 </dd>
 <dt id="artemis.interactions_methods.model_specific.ConditionalMinimalDepthMethod.plot"><code class="name flex">
-<span>def <span class="ident">plot</span></span>(<span>self, vis_type: str = 'heatmap', title: str = 'default', figsize: tuple = (8, 6), show: bool = True, **kwargs)</span>
+<span>def <span class="ident">plot</span></span>(<span>self, vis_type: str = 'heatmap', title: str = 'default', figsize: Tuple[float, float] = (8, 6), **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot results of explanations.</p>
@@ -316,8 +313,6 @@ ExtraTreesRegressor, or ExtraTreesClassifier.</dd>
 <dd>Title of plot, default is 'default' which means that title will be automatically generated for selected visualization type.</dd>
 <dt><strong><code>figsize</code></strong> :&ensp;<code>(float, float) </code></dt>
 <dd>Size of plot. Default is (8, 6).</dd>
-<dt><strong><code>show</code></strong> :&ensp;<code>bool </code></dt>
-<dd>Whether to show plot. Default is True.</dd>
 <dt><strong><code>**kwargs</code></strong> :&ensp;<code>Other Parameters</code></dt>
 <dd>Additional parameters for plot. Passed to suitable matplotlib or seaborn functions.
 For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name.
@@ -373,7 +368,7 @@ corresponding edge on visualization. Default depends on the interaction method.<
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = &#34;default&#34;, figsize: tuple = (8, 6), show: bool = True, **kwargs):
+<pre><code class="python">def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = &#34;default&#34;, figsize: Tuple[float, float] = (8, 6), **kwargs):
     &#34;&#34;&#34;
     Plot results of explanations.
 
@@ -392,8 +387,6 @@ corresponding edge on visualization. Default depends on the interaction method.<
         Title of plot, default is &#39;default&#39; which means that title will be automatically generated for selected visualization type.
     figsize : (float, float) 
         Size of plot. Default is (8, 6).
-    show : bool 
-        Whether to show plot. Default is True.
     **kwargs : Other Parameters
         Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
         For &#39;summary&#39; visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
@@ -457,7 +450,6 @@ corresponding edge on visualization. Default depends on the interaction method.<
                          feature_importance=self.feature_importance,
                          title = title,
                          figsize=figsize,
-                         show=show,
                          interactions_ascending_order=self._interactions_ascending_order,
                          importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                          **kwargs)</code></pre>
@@ -587,7 +579,7 @@ Currently model from LightGBM and XGBoost packages are supported. </p>
             trees_df=model.trees_df,
         )
 
-    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = &#34;default&#34;, figsize: tuple = (8, 6), show: bool = True, **kwargs):
+    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = &#34;default&#34;, figsize: Tuple[float, float] = (8, 6), **kwargs):
         &#34;&#34;&#34;
         Plot results of explanations.
 
@@ -606,8 +598,6 @@ Currently model from LightGBM and XGBoost packages are supported. </p>
             Title of plot, default is &#39;default&#39; which means that title will be automatically generated for selected visualization type.
         figsize : (float, float) 
             Size of plot. Default is (8, 6).
-        show : bool 
-            Whether to show plot. Default is True.
         **kwargs : Other Parameters
             Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
             For &#39;summary&#39; visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
@@ -677,7 +667,6 @@ Currently model from LightGBM and XGBoost packages are supported. </p>
                              feature_importance=self.feature_importance,
                              title=title,
                              figsize=figsize,
-                             show=show,
                              interactions_ascending_order=self._interactions_ascending_order,
                              importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                              _full_result=self.full_result,
@@ -765,7 +754,7 @@ Default is 'mean_gain'.</dd>
 </details>
 </dd>
 <dt id="artemis.interactions_methods.model_specific.SplitScoreMethod.plot"><code class="name flex">
-<span>def <span class="ident">plot</span></span>(<span>self, vis_type: str = 'heatmap', title: str = 'default', figsize: tuple = (8, 6), show: bool = True, **kwargs)</span>
+<span>def <span class="ident">plot</span></span>(<span>self, vis_type: str = 'heatmap', title: str = 'default', figsize: Tuple[float, float] = (8, 6), **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot results of explanations.</p>
@@ -783,8 +772,6 @@ Default is 'mean_gain'.</dd>
 <dd>Title of plot, default is 'default' which means that title will be automatically generated for selected visualization type.</dd>
 <dt><strong><code>figsize</code></strong> :&ensp;<code>(float, float) </code></dt>
 <dd>Size of plot. Default is (8, 6).</dd>
-<dt><strong><code>show</code></strong> :&ensp;<code>bool </code></dt>
-<dd>Whether to show plot. Default is True.</dd>
 <dt><strong><code>**kwargs</code></strong> :&ensp;<code>Other Parameters</code></dt>
 <dd>Additional parameters for plot. Passed to suitable matplotlib or seaborn functions.
 For 'summary' visualization parameters for respective plots should be in dict with keys corresponding to visualization name.
@@ -850,7 +837,7 @@ Default is ["o", ",", "v", "^", "&lt;", "&gt;"].</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = &#34;default&#34;, figsize: tuple = (8, 6), show: bool = True, **kwargs):
+<pre><code class="python">def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = &#34;default&#34;, figsize: Tuple[float, float] = (8, 6), **kwargs):
     &#34;&#34;&#34;
     Plot results of explanations.
 
@@ -869,8 +856,6 @@ Default is ["o", ",", "v", "^", "&lt;", "&gt;"].</dd>
         Title of plot, default is &#39;default&#39; which means that title will be automatically generated for selected visualization type.
     figsize : (float, float) 
         Size of plot. Default is (8, 6).
-    show : bool 
-        Whether to show plot. Default is True.
     **kwargs : Other Parameters
         Additional parameters for plot. Passed to suitable matplotlib or seaborn functions. 
         For &#39;summary&#39; visualization parameters for respective plots should be in dict with keys corresponding to visualization name. 
@@ -940,7 +925,6 @@ Default is ["o", ",", "v", "^", "&lt;", "&gt;"].</dd>
                          feature_importance=self.feature_importance,
                          title=title,
                          figsize=figsize,
-                         show=show,
                          interactions_ascending_order=self._interactions_ascending_order,
                          importance_ascending_order=self._feature_importance_obj.importance_ascending_order,
                          _full_result=self.full_result,

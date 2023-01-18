@@ -31,16 +31,12 @@ class PartialDependenceVisualizer:
         self.model = model
         self.X = X
 
-    def plot(
-        self,
-        features: List[Union[int, str, Tuple[int, int], Tuple[str, str]]],
-        grid_resolution: int = 100,
-        title: str = "Partial Dependence",
-        figsize: tuple = (12, 6),
-        show: bool = True,
-        ax = None,
-        **kwargs
-    ):
+    def plot(self,
+             features: List[Union[int, str, Tuple[int, int], Tuple[str, str]]],
+             grid_resolution: int = 100,
+             title: str = "Partial Dependence",
+             figsize: Tuple[float, float] = (12, 6),
+             **kwargs):
         """Plot partial dependence plot.
 
         Parameters
@@ -54,22 +50,14 @@ class PartialDependenceVisualizer:
             Title of plot. Default is 'Partial Dependence'.
         figsize : (float, float) 
             Size of plot. Default is (12, 6).
-        show : bool 
-            Whether to show plot. Default is True.
         **kwargs : Other Parameters
             Additional parameters for plot. Passed to PartialDependenceDisplay.from_estimator() method.
         """
         fig, ax = plt.subplots(figsize=figsize)
-        PartialDependenceDisplay.from_estimator(
-            self.model,
-            self.X,
-            features,
-            grid_resolution=grid_resolution,
-            _ax=ax,
-            **kwargs
-        )
+        PartialDependenceDisplay.from_estimator(self.model,
+                                                self.X,
+                                                features,
+                                                grid_resolution=grid_resolution,
+                                                _ax=ax,
+                                                **kwargs)
         ax.set_title(title)
-        if show:
-            plt.show()
-        else:
-            return fig

@@ -44,7 +44,6 @@ class GreenwellMethod(PartialDependenceBasedMethod):
     ----------
     - https://arxiv.org/pdf/1805.04755.pdf
     """
-
     def __init__(self, random_state: Optional[int] = None):
         """Constructor for GreenwellMethod
         
@@ -66,9 +65,13 @@ class GreenwellMethod(PartialDependenceBasedMethod):
             pd_calculator: Optional[PartialDependenceCalculator] = None):
         super().fit(model, X, n, predict_function, features, show_progress, batchsize, pd_calculator)
 
-    def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default",
-             figsize: Tuple[float, float] = (8, 6), show: bool = True, **kwargs):
-        super().plot(vis_type, title, figsize, show, **kwargs)
+    def plot(self,
+             vis_type: str = VisualizationType.HEATMAP,
+             title: str = "default",
+             figsize: Tuple[float, float] = (8, 6),
+             **kwargs):
+        super().plot(vis_type, title, figsize, **kwargs)
+
 
     def _calculate_ovo_interactions_from_pd(self, show_progress: bool = False):
         self.pd_calculator.calculate_pd_pairs(self.pairs, show_progress=show_progress)

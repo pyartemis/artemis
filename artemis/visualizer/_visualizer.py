@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import networkx as nx
 import numpy as np
@@ -30,9 +30,7 @@ class Visualizer:
         ova: Optional[pd.DataFrame] = None,
         feature_importance: Optional[pd.DataFrame] = None,
         title: Optional[str] = "default",
-        figsize: tuple = (8, 6),
-        show: bool = True,
-        path: Optional[str] = None,
+        figsize: Tuple[float, float] = (8, 6),
         interactions_ascending_order: bool = False,
         importance_ascending_order: bool = False,
         _full_result: Optional[pd.DataFrame] = None,
@@ -52,7 +50,6 @@ class Visualizer:
                 ova,
                 title=title,
                 figsize=figsize,
-                show=show,
                 interactions_ascending_order=interactions_ascending_order,
                 _f1_name=_feature_column_name_1,
                 _f2_name=_feature_column_name_2,
@@ -65,7 +62,6 @@ class Visualizer:
                 feature_importance,
                 title=title,
                 figsize=figsize,
-                show=show,
                 _f1_name=_feature_column_name_1,
                 _f2_name=_feature_column_name_2,
                 interactions_ascending_order=interactions_ascending_order,
@@ -73,14 +69,13 @@ class Visualizer:
                 **kwargs,
             )
         elif vis_type == VisualizationType.BAR_CHART_OVA:
-            self.plot_barchart_ova(ova, figsize=figsize, show=show, **kwargs)
+            self.plot_barchart_ova(ova, figsize=figsize, **kwargs)
         elif vis_type == VisualizationType.HEATMAP:
             self.plot_heatmap(
                 ovo,
                 feature_importance,
                 title=title,
                 figsize=figsize,
-                show=show,
                 interactions_ascending_order=interactions_ascending_order,
                 importance_ascending_order=importance_ascending_order,
                 _f1_name=_feature_column_name_1,
@@ -93,14 +88,13 @@ class Visualizer:
                 ovo,
                 title=title,
                 figsize=figsize,
-                show=show,
                 _f1_name=_feature_column_name_1,
                 _f2_name=_feature_column_name_2,
                 **kwargs,
             )
         elif vis_type == VisualizationType.LOLLIPOP:
             self.plot_lollipop(
-                _full_result, title=title, figsize=figsize, show=show, **kwargs
+                _full_result, title=title, figsize=figsize, **kwargs
             )
         elif vis_type == VisualizationType.BAR_CHART_CONDITIONAL:
             self.plot_barchart_conditional(
@@ -108,19 +102,15 @@ class Visualizer:
                 feature_importance,
                 title=title,
                 figsize=figsize,
-                show=show,
                 **kwargs,
             )
-        if not show:
-            plt.savefig(path, dpi=300, bbox_inches='tight')
 
     def plot_barchart_conditional(
             self,
             ovo: pd.DataFrame,
             feature_importance: pd.DataFrame,
             title: str = "default",
-            figsize: tuple = (8, 6),
-            show: bool = True,
+            figsize: Tuple[float, float] = (8, 6),
             ax=None,
             **kwargs,
     ):
@@ -162,8 +152,7 @@ class Visualizer:
             ovo: pd.DataFrame,
             feature_importance: pd.DataFrame,
             title: str = "default",
-            figsize: tuple = (8, 6),
-            show: bool = True,
+            figsize: Tuple[float, float] = (8, 6),
             interactions_ascending_order: bool = False,
             importance_ascending_order: bool = False,
             ax=None,
@@ -246,8 +235,7 @@ class Visualizer:
             ovo: pd.DataFrame,
             feature_importance: pd.DataFrame,
             title: str = "default",
-            figsize: tuple = (8, 6),
-            show: bool = True,
+            figsize: Tuple[float, float] = (8, 6),
             ax=None,
             interactions_ascending_order: bool = False,
             _f1_name: str = "Feature 1",
@@ -347,8 +335,7 @@ class Visualizer:
             self,
             ovo: pd.DataFrame,
             title: str = "default",
-            figsize: tuple = (8, 6),
-            show: bool = True,
+            figsize: Tuple[float, float] = (8, 6),
             ax=None,
             _f1_name: str = "Feature 1",
             _f2_name: str = "Feature 2",
@@ -383,8 +370,7 @@ class Visualizer:
             self,
             ova: pd.DataFrame,
             title: str = "default",
-            figsize: tuple = (8, 6),
-            show: bool = True,
+            figsize: Tuple[float, float] = (8, 6),
             ax=None,
             **kwargs,
     ):
@@ -417,8 +403,7 @@ class Visualizer:
             feature_importance: pd.DataFrame,
             ova: Optional[pd.DataFrame] = None,
             title: str = "default",
-            figsize: tuple = (8, 6),
-            show: bool = True,
+            figsize: Tuple[float, float] = (8, 6),
             interactions_ascending_order: bool = False,
             _f1_name: str = "Feature 1",
             _f2_name: str = "Feature 2",
@@ -444,7 +429,6 @@ class Visualizer:
             _f1_name=_f1_name,
             _f2_name=_f2_name,
             _directed=_directed,
-            show=False,
             **heatmap_kwargs if heatmap_kwargs is not None else {},
         )
         self.plot_interaction_graph(
@@ -454,7 +438,6 @@ class Visualizer:
             _f1_name=_f1_name,
             _f2_name=_f2_name,
             _directed=_directed,
-            show=False,
             **graph_kwargs if graph_kwargs is not None else {},
         )
         if ova is not None:
@@ -463,7 +446,6 @@ class Visualizer:
             self.plot_barchart_ovo(
                 ovo,
                 ax=ax3,
-                show=False,
                 _f1_name=_f1_name,
                 _f2_name=_f2_name,
                 **bar_char_ovo_kwargs if bar_char_ovo_kwargs is not None else {},
@@ -471,7 +453,6 @@ class Visualizer:
             self.plot_barchart_ova(
                 ova,
                 ax=ax4,
-                show=False,
                 **bar_char_ova_kwargs if bar_char_ova_kwargs is not None else {},
             )
         else:
@@ -479,7 +460,6 @@ class Visualizer:
             self.plot_barchart_ovo(
                 ovo,
                 ax=ax3,
-                show=False,
                 _f1_name=_f1_name,
                 _f2_name=_f2_name,
                 **bar_char_ovo_kwargs if bar_char_ovo_kwargs is not None else {},
@@ -491,8 +471,7 @@ class Visualizer:
             self,
             full_result: pd.DataFrame,
             title: str = "default",
-            figsize: tuple = (8, 6),
-            show: bool = True,
+            figsize: Tuple[float, float] = (8, 6),
             ax=None,
             **kwargs,
     ):

@@ -126,7 +126,7 @@ each other. Monotonicity of the plot suggest cohesion in results. Both provided 
         -------
         None
         &#34;&#34;&#34;
-        correlations = list()
+        correlations = []
         for correlation_method in dataclasses.fields(CorrelationMethod):
             correlation_method_name = correlation_method.default
             correlations.append(
@@ -142,7 +142,7 @@ each other. Monotonicity of the plot suggest cohesion in results. Both provided 
                         method2: FeatureInteractionMethod,
                         n_labels: int = 3,
                         add_correlation_box: bool = False,
-                        fig_size: tuple = (8, 6)):
+                        figsize: Tuple[float, float] = (8, 6)):
         &#34;&#34;&#34;
         Creates comparison plot for comparing results of two feature interaction methods. Depending on the parameters
         rank correlation might be included on the plot.
@@ -157,7 +157,7 @@ each other. Monotonicity of the plot suggest cohesion in results. Both provided 
             Number of pairs of features with the greatest interaction values to show labels of, default = 3
         add_correlation_box: bool
             Flag indicating whether to show rank correlation values on the plot, default = False
-        fig_size: tuple[int]
+        figsize: Tuple[float, float]
             Matplotlib size of the figure, default = (8, 6)
 
 
@@ -166,12 +166,12 @@ each other. Monotonicity of the plot suggest cohesion in results. Both provided 
         Figure
         &#34;&#34;&#34;
         m1_name, m2_name = method1.method, method2.method
-        fig, ax = plt.subplots(figsize=fig_size)
+        fig, ax = plt.subplots(figsize=figsize)
         ax.set_axisbelow(True)
         plt.grid(True)
         circle_r = 0.2 * min(max(method1._compare_ovo[m1_name]), max(method2._compare_ovo[m2_name]))
 
-        x, y = list(), list()
+        x, y = [], []
         for index, row in method1._compare_ovo.iterrows():
 
             f1, f2 = row[&#34;Feature 1&#34;], row[&#34;Feature 2&#34;]
@@ -283,7 +283,7 @@ def correlation(
 <h3>Methods</h3>
 <dl>
 <dt id="artemis.comparison.FeatureInteractionMethodComparator.comparison_plot"><code class="name flex">
-<span>def <span class="ident">comparison_plot</span></span>(<span>self, method1: artemis.interactions_methods._method.FeatureInteractionMethod, method2: artemis.interactions_methods._method.FeatureInteractionMethod, n_labels: int = 3, add_correlation_box: bool = False, fig_size: tuple = (8, 6))</span>
+<span>def <span class="ident">comparison_plot</span></span>(<span>self, method1: artemis.interactions_methods._method.FeatureInteractionMethod, method2: artemis.interactions_methods._method.FeatureInteractionMethod, n_labels: int = 3, add_correlation_box: bool = False, figsize: Tuple[float, float] = (8, 6))</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Creates comparison plot for comparing results of two feature interaction methods. Depending on the parameters
@@ -298,7 +298,7 @@ rank correlation might be included on the plot.</p>
 <dd>Number of pairs of features with the greatest interaction values to show labels of, default = 3</dd>
 <dt><strong><code>add_correlation_box</code></strong> :&ensp;<code>bool</code></dt>
 <dd>Flag indicating whether to show rank correlation values on the plot, default = False</dd>
-<dt><strong><code>fig_size</code></strong> :&ensp;<code>tuple[int]</code></dt>
+<dt><strong><code>figsize</code></strong> :&ensp;<code>Tuple[float, float]</code></dt>
 <dd>Matplotlib size of the figure, default = (8, 6)</dd>
 </dl>
 <h2 id="returns">Returns</h2>
@@ -315,7 +315,7 @@ rank correlation might be included on the plot.</p>
                     method2: FeatureInteractionMethod,
                     n_labels: int = 3,
                     add_correlation_box: bool = False,
-                    fig_size: tuple = (8, 6)):
+                    figsize: Tuple[float, float] = (8, 6)):
     &#34;&#34;&#34;
     Creates comparison plot for comparing results of two feature interaction methods. Depending on the parameters
     rank correlation might be included on the plot.
@@ -330,7 +330,7 @@ rank correlation might be included on the plot.</p>
         Number of pairs of features with the greatest interaction values to show labels of, default = 3
     add_correlation_box: bool
         Flag indicating whether to show rank correlation values on the plot, default = False
-    fig_size: tuple[int]
+    figsize: Tuple[float, float]
         Matplotlib size of the figure, default = (8, 6)
 
 
@@ -339,12 +339,12 @@ rank correlation might be included on the plot.</p>
     Figure
     &#34;&#34;&#34;
     m1_name, m2_name = method1.method, method2.method
-    fig, ax = plt.subplots(figsize=fig_size)
+    fig, ax = plt.subplots(figsize=figsize)
     ax.set_axisbelow(True)
     plt.grid(True)
     circle_r = 0.2 * min(max(method1._compare_ovo[m1_name]), max(method2._compare_ovo[m2_name]))
 
-    x, y = list(), list()
+    x, y = [], []
     for index, row in method1._compare_ovo.iterrows():
 
         f1, f2 = row[&#34;Feature 1&#34;], row[&#34;Feature 2&#34;]
@@ -411,7 +411,7 @@ rank correlation might be included on the plot.</p>
     -------
     None
     &#34;&#34;&#34;
-    correlations = list()
+    correlations = []
     for correlation_method in dataclasses.fields(CorrelationMethod):
         correlation_method_name = correlation_method.default
         correlations.append(

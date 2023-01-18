@@ -34,10 +34,9 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         vis_type: str = VisualizationType.HEATMAP,
         title: str = "default",
         figsize: Tuple[float, float] = (8, 6),
-        show: bool = True,
         **kwargs
     ):
-        super().plot(vis_type, title, figsize, show, **kwargs)
+        super().plot(vis_type, title, figsize, **kwargs)
 
     def fit(
         self,
@@ -110,15 +109,29 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         )
 
     def plot_profile(
-        self,
-        feature1: str,
-        feature2: Optional[str] = None,
-        kind: str = "colormesh",
-        cmap: str = "RdYlBu_r",
-        figsize: tuple = (6, 4),
-        show: bool = True,
-        path: Optional[str] = None,
+            self,
+            feature1: str,
+            feature2: Optional[str] = None,
+            kind: str = "colormesh",
+            cmap: str = "RdYlBu_r",
+            figsize: Tuple[float, float] = (6, 4),
     ):
+        """
+        Plots partial dependence profile for a given feature/pair of features.
+        
+        Parameters
+        ----------
+        feature1 : str 
+            First feature.
+        feature2 : str, optional
+            Second feature. If None, profile for a single feature will be plotted. Default is None.
+        kind : str 
+            Kind of plot, used only for pair of features. Can be 'colormesh' or 'contour'. Default is 'colormesh'.
+        cmap: str 
+            Colormap. Default is 'RdYlBu_r'.
+        figsize : (float, float) 
+            Size of plot. Default is (8, 6).
+        """
         plt.figure(figsize=figsize)
         if feature2 is not None:
             pair_key = self.pd_calculator._get_pair_key((feature1, feature2))
@@ -158,21 +171,34 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
             plt.xlabel(feature1)
             plt.ylabel("PD value")
             sns.rugplot(self.pd_calculator.X, x=feature1, color="black")
-        if not show:
-            plt.savefig(path, dpi=300, bbox_inches='tight')
-        
 
     def plot_zenplot(
-        self,
-        zenpath_length: int = 7,
-        kind: str = "colormesh",
-        cmap: str = "RdYlBu_r",
-        figsize: tuple = (14, 12),
-        show: bool = True,
-        path: Optional[str] = None,
+            self,
+            zenpath_length: int = 7,
+            kind: str = "colormesh",
+            cmap: str = "RdYlBu_r",
+            figsize: Tuple[float, float] = (14, 12),
     ):
+        """
+        Plots zenplot, a grid of charts where each panel contains a PD function visualization for a different pair of features
+        
+        Parameters
+        ----------
+        zenpath_length : int
+            Length of zenpath. Default is 7.
+        kind : str 
+            Kind of plot. Can be 'colormesh' or 'contour'. Default is 'colormesh'.
+        cmap: str 
+            Colormap. Default is 'RdYlBu_r'.
+        figsize : (float, float) 
+            Size of plot. Default is (8, 6).
+
+        References
+        ----------
+        - https://www.jstatsoft.org/article/view/v095i04
+        """
         fig = plt.figure(figsize=figsize)
-        to_vis = self.ovo.copy().iloc[: (zenpath_length + 1)]
+        to_vis = self.ovo.copy().iloc[:(zenpath_length + 1)]
         min_pd, max_pd = get_pd_dict(self.pd_calculator, to_vis)
         pair = to_vis.iloc[0]["Feature 1"], to_vis.iloc[0]["Feature 2"]
         to_vis = to_vis.drop(0)
@@ -251,7 +277,7 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
             idx, continued = find_next_pair_index(to_vis, pair[1])
             if continued:
                 pair = pair[1], get_second_feature(pair[1], to_vis.loc[idx])
-                if zenpath_length-1 == i:
+                if zenpath_length - 1 == i:
                     if id_col > id_row:
                         ax.set_ylabel(pair[1])
                     else:
@@ -269,8 +295,6 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
         cbar_ax = fig.add_axes([1, 0.25, 0.05, 0.5])
         clb = plt.colorbar(cs, cax=cbar_ax)
         clb.ax.set_title("PD value")
-        if not show:
-            plt.savefig(path, dpi=300, bbox_inches='tight')
 
     @abstractmethod
     def _calculate_ovo_interactions_from_pd(self, show_progress: bool):
