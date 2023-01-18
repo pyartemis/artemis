@@ -267,7 +267,8 @@ class PartialDependenceBasedMethod(FeatureInteractionMethod):
 
             plt.tight_layout()
         cbar_ax = fig.add_axes([1, 0.25, 0.05, 0.5])
-        fig.colorbar(cs, cax=cbar_ax)
+        clb = plt.colorbar(cs, cax=cbar_ax)
+        clb.ax.set_title("PD value")
         if not show:
             plt.savefig(path, dpi=300, bbox_inches='tight')
 
