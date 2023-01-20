@@ -16,7 +16,7 @@ from artemis._utilities.exceptions import MethodNotFittedException
 
 class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
     """
-    Conditional Smallest Depth Method for Feature Interaction Extraction.
+    Conditional Minimal Depth Method for Feature Interaction Extraction.
     It applies to tree-based models like Random Forests.
     Currently scikit-learn forest models are supported, i.e., RandomForestClassifier, RandomForestRegressor, 
     ExtraTreesRegressor, ExtraTreesClassifier. 
@@ -59,7 +59,7 @@ class ConditionalMinimalDepthMethod(FeatureInteractionMethod):
         compare_ovo['id'] = compare_ovo[["Feature 1", "Feature 2"]].apply(lambda x: "".join(sorted(x)), axis=1)
         return (compare_ovo.groupby("id")
                            .agg({"Feature 1": "first", "Feature 2": "first", self.method: "mean"})
-                           .sort_values("Conditional Smallest Depth Measure",
+                           .sort_values(InteractionMethod.CONDITIONAL_MINIMAL_DEPTH,
                                         ascending=self._interactions_ascending_order,
                                         ignore_index=True))
 
