@@ -1,4 +1,4 @@
-name: Test feature interactions
+name: build
 
 on:
   push:
