@@ -1,4 +1,6 @@
-# ARTEMIS: A Python Library for Feature Interactions in Machine Learning Models
+# ARTEMIS: A Robust Toolkit of Explanation Methods for Interaction Spotting
+A Python package with explanation methods for extraction of feature interactions from predictive models
+
 [![build](https://github.com/pyartemis/artemis/actions/workflows/python-app.yml/badge.svg)](https://github.com/pyartemis/artemis/actions/workflows/python-app.yml)
 [![PyPI version](https://badge.fury.io/py/pyartemis.svg)](https://pypi.org/project/pyartemis/)
 [![Downloads](https://static.pepy.tech/badge/pyartemis)](https://pepy.tech/project/pyartemis)
