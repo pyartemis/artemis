@@ -33,5 +33,5 @@ The authors of the `artemis` package are:
 - [Mateusz Krzyziński](https://github.com/krzyzinskim)
 - [Artur Żółkowski](https://github.com/arturzolkowski)
 
-BSc thesis and work on the `artemis` package was supervised by [Przemyslaw Biecek, PhD, DSc](https://github.com/pbiecek). 
+BSc thesis and work on the `artemis` package was supervised by [Przemysław Biecek, PhD, DSc](https://github.com/pbiecek). 
 
