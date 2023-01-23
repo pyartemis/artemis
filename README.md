@@ -28,7 +28,7 @@ The source code and development version is currently hosted on [GitHub](https://
 
 ## Authors
 
-The package was created as a software project associated with the BSc thesis ***Methods for extraction of interactions from predictive models*** in the field of Data Science (pl. *Inżynieria i analiza danych*) at Faculty of Mathematics and Information Science (MiNI), Warsaw University of Technology. 
+The package was created as a software project associated with the BSc thesis ***Methods for extraction of interactions from predictive models*** in the field of Data Science (pl. *Inżynieria i analiza danych*) at Faculty of Mathematics and Information Science (MiNI), Warsaw University of Technology in cooperation with NASK National Research Institute.  
 
 The authors of the `artemis` package are: 
 - [Paweł Fijałkowski](https://github.com/pablo2811)
