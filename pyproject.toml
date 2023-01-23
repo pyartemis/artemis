@@ -4,7 +4,7 @@ packages = [
     { include = "artemis" }
 ]
 version = "0.1.4"
-description = "A library for explanations of feature interactions in machine learning models."
+description = "A Python package with explanation methods for extraction of feature interactions from predictive models"
 readme = "README.md"
 documentation = "https://pyartemis.github.io/"
 keywords = ["interactions", "xai", "Explainable Artificial Intelligence", "explanations", "machine learning", "iml", "Interpretable Machine Learning"]
