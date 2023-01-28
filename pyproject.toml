@@ -3,9 +3,12 @@ name = "pyartemis"
 packages = [
     { include = "artemis" }
 ]
-version = "0.1.0"
-description = "Library for providing easy-to-use XAI methods for deriving feature interactions in ML models."
-authors = ["Artur Żółkowski <artur.zolkowski@wp.pl>"]
+version = "0.1.4"
+description = "A Python package with explanation methods for extraction of feature interactions from predictive models"
+readme = "README.md"
+documentation = "https://pyartemis.github.io/"
+keywords = ["interactions", "xai", "Explainable Artificial Intelligence", "explanations", "machine learning", "iml", "Interpretable Machine Learning"]
+authors = ["Artur Żółkowski <artur.zolkowski@wp.pl>", "Mateusz Krzyziński <krzyzinskimateusz23@gmail.com>", "Paweł Fijałkowski <fijalkowskipablo@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"

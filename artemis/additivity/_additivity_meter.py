@@ -36,7 +36,6 @@ class AdditivityMeter:
         self.X_smapled = None
         self.pd_calculator = None
         self
-       
 
     def fit(
         self,
@@ -110,11 +109,9 @@ class AdditivityMeter:
         self.preds = self.predict_function(self.model, self.X_sampled)
         for var in self.X_sampled.columns:
             self.full_result[var] = self.pd_calculator.get_pd_single(var, self.X_sampled[var].values) - np.mean(self.preds)
-        
-        self.full_result = self.full_result 
+
+        self.full_result = self.full_result
         self.full_result["centered_prediction"] = self.preds - np.mean(self.preds)
 
         sum_first_order_effects = self.full_result.values[:, :-1].sum(axis=1) + np.mean(self.preds)
         return 1-np.sum((self.preds - sum_first_order_effects)**2) / np.sum((self.full_result["centered_prediction"])**2)
-
-        

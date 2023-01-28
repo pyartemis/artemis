@@ -65,8 +65,8 @@ class SejongOhMethod(FeatureInteractionMethod):
         return False
 
     def plot(self, vis_type: str = VisualizationType.HEATMAP, title: str = "default",
-             figsize: Tuple[float, float] = (8, 6), show: bool = True, **kwargs):
-        super().plot(vis_type, title, figsize, show)
+             figsize: Tuple[float, float] = (8, 6), **kwargs):
+        super().plot(vis_type, title, figsize, **kwargs)
 
     def fit(
             self,
@@ -116,7 +116,7 @@ def _perf_based_ovo(
 ):
     """For each pair of `features_included`, calculate Sejong Oh performance based interaction value."""
     original_performance = method_class.metric.calculate(y_true, model.predict(X))
-    interactions = list()
+    interactions = []
 
     for f1, f2 in tqdm(method_class.pairs, disable=not show_progress, desc=ProgressInfoLog.CALC_OVO):
         inter = [
