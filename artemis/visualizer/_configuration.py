@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 from artemis._utilities.domain import InteractionMethod, VisualizationType
@@ -160,7 +160,6 @@ class VisualizationConfigurationProvider:
 
     @classmethod
     def _cond_depth_config(cls):
-
         graph_config = InteractionGraphConfiguration()
         graph_config.THRESHOLD_RELEVANT_INTERACTION = 0.6
         graph_config.MAX_EDGE_WIDTH = 3
@@ -176,15 +175,15 @@ class VisualizationConfigurationProvider:
 @dataclass
 class VisualizationConfiguration:
     accepted_visualizations: List[str]
-    interaction_graph: InteractionGraphConfiguration = InteractionGraphConfiguration()
-    interaction_matrix: InteractionMatrixConfiguration = (
-        InteractionMatrixConfiguration()
+    interaction_graph: InteractionGraphConfiguration = field(default_factory=InteractionGraphConfiguration)
+    interaction_matrix: InteractionMatrixConfiguration = field(default_factory=InteractionMatrixConfiguration)
+    interaction_bar_chart_ova: InteractionVersusAllConfiguration = field(
+        default_factory=InteractionVersusAllConfiguration
     )
-    interaction_bar_chart_ova: InteractionVersusAllConfiguration = (
-        InteractionVersusAllConfiguration()
+    interaction_bar_chart_ovo: InteractionVersusOneConfiguration = field(
+        default_factory=InteractionVersusOneConfiguration
     )
-    interaction_bar_chart_ovo: InteractionVersusOneConfiguration = (
-        InteractionVersusOneConfiguration()
+    lollipop: LollipopSplitScoreConfiguration = field(default_factory=LollipopSplitScoreConfiguration)
+    interaction_bar_chart_conditional: BarChartConditionalDepthConfiguration = field(
+        default_factory=BarChartConditionalDepthConfiguration
     )
-    lollipop: LollipopSplitScoreConfiguration = LollipopSplitScoreConfiguration()
-    interaction_bar_chart_conditional: BarChartConditionalDepthConfiguration = BarChartConditionalDepthConfiguration()
